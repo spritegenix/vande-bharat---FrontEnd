@@ -1,0 +1,45 @@
+.rbt-menu {
+  background-color: transparent !important;
+  z-index: 90 !important;
+  inset: 16px auto auto 0px !important;
+  border-radius: 0.25rem;
+  border: none !important;
+}
+
+.rbt-input-wrapper {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  .rbt-token {
+    display: flex;
+    gap: 0.2rem;
+    align-items: center;
+    border-radius: 0.25rem;
+    background-color: #dbeafe;
+    color: #1d4ed8;
+    padding: 0.125rem 0.5rem;
+  }
+}
+
+.rbt-aux {
+  position: absolute;
+  bottom: -3.6rem;
+  width: 100%;
+  background: #ffffff;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  border: 1px solid var(--bg1);
+}
+
+.rbt {
+  width: 100%;
+}
+div:has(.rbt) {
+  width: 100%;
+}
+
+.rbt-input-main {
+  border: none !important;
+  outline: none !important;
+  background-color: transparent !important;
+}
