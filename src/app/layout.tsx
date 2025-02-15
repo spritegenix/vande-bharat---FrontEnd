@@ -70,17 +70,15 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${inter.variable} ${merriWeather.variable} relative h-[200vh] scroll-smooth antialiased transition-all duration-300 ease-in-out`}
+        className={`${inter.variable} ${merriWeather.variable} relative scroll-smooth antialiased transition-all duration-300 ease-in-out`}
       >
         <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="lazyOnload" />
         <Providers>
-          <Layout>
-            {/*  modal portal */}
-            <div id="modal-portal" className="relative z-[999999] h-0" />
-            {/*  auth modal */}
-            {authModal ? authModal : "null"}
-            {children}
-          </Layout>
+          {/*  modal portal */}
+          <div id="modal-portal" className="relative z-[999999] h-0" />
+          {/*  auth modal */}
+          {authModal ? authModal : "null"}
+          {children}
         </Providers>
       </body>
     </html>

@@ -6,37 +6,69 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import Link from "next/link";
 import AuthButton from "./AuthButton";
 import Notification from "./Notification";
+import { AlignJustify, Search } from "lucide-react";
 
-export default function Header() {
+export default function Header({ setIsLeftMenuOpen, isSearchOpen = false, setSearchOpen }: any) {
   return (
-    <Wrapper as="header" className="sticky top-0 z-10 p-1" containerClassName="border-b">
-      {/* Desktop Mode  */}
-      <nav className="flex w-full justify-between gap-2">
-        <Logo />
-        <GlobalSearch />
-        <TooltipProvider delayDuration={0}>
-          <div className="flex items-center gap-2 sm:gap-5">
-            {/* Donation  */}
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Link href="/donation" className="cursor-pointer">
-                  <SvgIcon svgPath={donationIcon} />
-                </Link>
-              </TooltipTrigger>
-              <TooltipContent side="bottom" className="px-2 py-1 text-xs" showArrow={true}>
-                Donation
-              </TooltipContent>
-            </Tooltip>
-            {/* Notification  */}
-            <Notification />
-            {/* Auth Button  */}
-            <AuthButton />
+    <header className="fixed top-0 z-50 w-full border-b bg-background dark:bg-background sm:h-14">
+      <Wrapper className="my-auto p-1">
+        {/* Desktop Mode  */}
+        <nav className="hidden w-full justify-between gap-2 sm:flex">
+          <Logo className="my-auto" />
+          <GlobalSearch />
+          <TooltipProvider delayDuration={0}>
+            <div className="flex items-center gap-2 sm:gap-5">
+              {/* Donation  */}
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Link href="/donation" className="cursor-pointer">
+                    <SvgIcon svgPath={donationIcon} />
+                  </Link>
+                </TooltipTrigger>
+                <TooltipContent side="bottom" className="px-2 py-1 text-xs" showArrow={true}>
+                  Donation
+                </TooltipContent>
+              </Tooltip>
+              {/* Notification  */}
+              <Notification />
+              {/* Auth Button  */}
+              <AuthButton />
+            </div>
+          </TooltipProvider>
+        </nav>
+        {/* Mobile Mode  */}
+        <nav className="w-full sm:hidden">
+          <div className="flex w-full justify-between">
+            <div className="flex gap-2">
+              <button onClick={() => setIsLeftMenuOpen((pre: any) => !pre)}>
+                <AlignJustify />
+              </button>
+              <Logo className="my-auto" />
+            </div>
+            <div className="flex items-center gap-2 sm:gap-5">
+              {/* Search Button  */}
+              <button onClick={() => setSearchOpen((pre: any) => !pre)}>
+                <Search />
+              </button>
+              {/* Donation  */}
+              <Link href="/donation" className="cursor-pointer">
+                <SvgIcon svgPath={donationIcon} />
+              </Link>
+              {/* Notification  */}
+              <Notification />
+              {/* Auth Button  */}
+              <AuthButton />
+            </div>
           </div>
-        </TooltipProvider>
-      </nav>
-      {/* Mobile Mode  */}
-      {/* <nav>Header</nav> */}
-    </Wrapper>
+
+          {isSearchOpen && (
+            <div className="mx-auto">
+              <GlobalSearch />
+            </div>
+          )}
+        </nav>
+      </Wrapper>
+    </header>
   );
 }
 

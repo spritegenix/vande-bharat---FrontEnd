@@ -5,13 +5,13 @@ import React from "react";
 
 export default function Logo({
   mode = "dark",
-  className,
+  className = "",
 }: {
   mode?: "light" | "dark";
   className?: string;
 }) {
   return (
-    <Link href="/" className="cursor-pointer">
+    <Link href="/" className={`cursor-pointer ${className}`}>
       {/* <Image
         src={mode === "light" ? logoWhite : logoDark}
         alt="logo"
@@ -19,9 +19,7 @@ export default function Logo({
         width={500}
         className="max-h-14 w-min object-contain"
       /> */}
-      <h1 className="cursor-pointer text-lg font-medium md:text-3xl">
-        Vande Bharat
-      </h1>
+      <h1 className="cursor-pointer text-lg font-medium md:text-3xl">Vande Bharat</h1>
     </Link>
   );
 }

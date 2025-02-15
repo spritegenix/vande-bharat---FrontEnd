@@ -2,13 +2,14 @@ import React from "react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import Button from "@/components/elements/Button";
 import UserButton from "./UserButton";
+import Link from "next/link";
 
 export default function AuthButton() {
   const isLogin = true;
   return (
     <>
       {!isLogin ? (
-        <Button href="/login" prefetch={true}>
+        <Button as={Link} href="/login" prefetch={true}>
           Log In
         </Button>
       ) : (

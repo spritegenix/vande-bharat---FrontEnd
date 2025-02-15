@@ -5,6 +5,7 @@ import Modal from "@/components/elements/Modal";
 import AuthButton from "./AuthButton";
 import { FcGoogle } from "react-icons/fc";
 import { TiSocialFacebook } from "react-icons/ti";
+import Logo from "@/components/elements/Logo";
 
 export default function AuthModal() {
   const router = useRouter();
@@ -20,7 +21,10 @@ export default function AuthModal() {
 }
 export function AuthModalCard() {
   return (
-    <div className="relative max-w-full space-y-4 overflow-hidden rounded-lg bg-white shadow-lg md:w-[678px]">
+    <div className="relative max-w-full space-y-4 overflow-hidden rounded-lg bg-white p-3 shadow-lg md:max-w-sm">
+      <div className="flex w-full justify-center">
+        <Logo />
+      </div>
       <AuthButton text="Sign in with Google" href="/api/google" icon={<FcGoogle />} />
       <AuthButton text="Sign in with Facebook" href="/api/facebook" icon={<TiSocialFacebook />} />
       <AuthButton text="Sign in with Apple" href="/api/apple" icon={<TiSocialFacebook />} />

@@ -25,7 +25,7 @@ export default function Wrapper({
 }: WrapperProps) {
   return (
     <Component
-      className={`w-full px-3 xl:px-20 ${bgColor} ${containerClassName} ${isTop && "pt-[4.5rem] md:pt-36"} ${isTop2 && "pt-20"} `}
+      className={`w-full px-3 xl:px-10 ${bgColor} ${containerClassName} ${isTop && "pt-14"}`}
       {...props}
     >
       <div className={`mx-auto w-full ${isMaxWidthChangeRequired} ${className}`}>{children}</div>

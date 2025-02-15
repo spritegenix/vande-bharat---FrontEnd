@@ -15,7 +15,7 @@ export default function AuthButton({ icon, text, href }: ButtonProps) {
       asChild
     >
       <a href={href} className="flex w-full items-center gap-2">
-        {icon}
+        <span className="text-2xl">{icon}</span>
         {text}
       </a>
     </Button>

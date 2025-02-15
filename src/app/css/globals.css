@@ -14,15 +14,15 @@
   :root {
     --font-merriweather: "Merriweather", serif;
     --font-inter: "Inter", sans-serif;
-    --background: 0 0% 100%;
-    --foreground: 0 0% 3.9%;
+    --background: #ffffff;
+    --foreground: #000000;
     --card: 0 0% 100%;
     --card-foreground: 0 0% 3.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 3.9%;
-    --primary: #046A38;
+    --primary: #046a38;
     --primary-foreground: 0 0% 98%;
-    --secondary: #FF671F;
+    --secondary: #ff671f;
     --secondary-foreground: 0 0% 9%;
     --muted: 0 0% 96.1%;
     --muted-foreground: 0 0% 45.1%;
@@ -41,13 +41,13 @@
     --radius: 0.5rem;
   }
   .dark {
-    --background: 0 0% 3.9%;
-    --foreground: 0 0% 98%;
+    --background: #000000;
+    --foreground: #e4e4e7;
     --card: 0 0% 3.9%;
     --card-foreground: 0 0% 98%;
     --popover: 0 0% 3.9%;
     --popover-foreground: 0 0% 98%;
-    --primary:#FF671F;
+    --primary: #ff671f;
     --primary-foreground: 0 0% 9%;
     --secondary: 0 0% 14.9%;
     --secondary-foreground: 0 0% 98%;
@@ -84,7 +84,7 @@
     font-family: var(--font-merriweather);
   }
   .svgFill {
-    @apply fill-primary hover:fill-secondary dark:fill-zinc-400 dark:hover:fill-zinc-50 duration-300 ease-in-out transition-all;
+    @apply fill-primary transition-all duration-300 ease-in-out hover:fill-secondary dark:fill-zinc-400 dark:hover:fill-zinc-50;
   }
 }
 

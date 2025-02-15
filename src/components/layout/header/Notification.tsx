@@ -23,7 +23,96 @@ function NotificationTooltipWrapper({ children }: { children: React.ReactNode })
   );
 }
 
-// -----------------------------------
+export default function Notification() {
+  const [notifications, setNotifications] = useState(initialNotifications);
+  const unreadCount = notifications.filter((n) => n.unread).length;
+
+  const handleMarkAllAsRead = () => {
+    setNotifications(
+      notifications.map((notification) => ({
+        ...notification,
+        unread: false,
+      })),
+    );
+  };
+
+  const handleNotificationClick = (id: number) => {
+    setNotifications(
+      notifications.map((notification) =>
+        notification.id === id ? { ...notification, unread: false } : notification,
+      ),
+    );
+  };
+
+  return (
+    <NotificationTooltipWrapper>
+      <div>
+        <Popover>
+          <PopoverTrigger asChild>
+            <div className="relative">
+              <Badge className="absolute -top-1 left-full size-4 -translate-x-4 rounded-full border-background p-1 text-white">
+                6
+              </Badge>
+              <IoMdNotificationsOutline className="text-3xl" />
+            </div>
+          </PopoverTrigger>
+          <PopoverContent align="end" className="w-80 p-1">
+            <div className="flex items-baseline justify-between gap-4 px-3 py-2">
+              <div className="text-sm font-semibold">Notifications</div>
+              {unreadCount > 0 && (
+                <p className="text-xs font-medium hover:underline" onClick={handleMarkAllAsRead}>
+                  Mark all as read
+                </p>
+              )}
+            </div>
+            <div
+              role="separator"
+              aria-orientation="horizontal"
+              className="-mx-1 my-1 h-px bg-border"
+            ></div>
+            {notifications.map((notification) => (
+              <div
+                key={notification.id}
+                className="rounded-md px-3 py-2 text-sm transition-colors hover:bg-accent"
+              >
+                <div className="relative flex items-start gap-3 pe-3">
+                  <Image
+                    src={notification.image.userAvatar}
+                    className="size-9 rounded-md"
+                    width={32}
+                    height={32}
+                    alt={notification.user}
+                  />
+                  <div className="flex-1 space-y-1">
+                    <p
+                      className="text-left text-foreground/80 after:absolute after:inset-0"
+                      onClick={() => handleNotificationClick(notification.id)}
+                    >
+                      <span className="font-medium text-foreground hover:underline">
+                        {notification.user}
+                      </span>{" "}
+                      {notification.action}{" "}
+                      <span className="font-medium text-foreground hover:underline">
+                        {notification.target}
+                      </span>
+                      .
+                    </p>
+                    <div className="text-xs text-muted-foreground">{notification.timestamp}</div>
+                  </div>
+                  {notification.unread && (
+                    <div className="absolute end-0 self-center">
+                      <Dot />
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </PopoverContent>
+        </Popover>
+      </div>
+    </NotificationTooltipWrapper>
+  );
+}
 
 const initialNotifications = [
   {
@@ -81,92 +170,3 @@ const initialNotifications = [
     unread: false,
   },
 ];
-
-export default function Notification() {
-  const [notifications, setNotifications] = useState(initialNotifications);
-  const unreadCount = notifications.filter((n) => n.unread).length;
-
-  const handleMarkAllAsRead = () => {
-    setNotifications(
-      notifications.map((notification) => ({
-        ...notification,
-        unread: false,
-      })),
-    );
-  };
-
-  const handleNotificationClick = (id: number) => {
-    setNotifications(
-      notifications.map((notification) =>
-        notification.id === id ? { ...notification, unread: false } : notification,
-      ),
-    );
-  };
-
-  return (
-    <NotificationTooltipWrapper>
-      <Popover>
-        <PopoverTrigger asChild>
-          <div className="relative">
-            <Badge className="absolute -top-1 left-full size-4 -translate-x-4 rounded-full border-background p-1 text-white">
-              6
-            </Badge>
-            <IoMdNotificationsOutline className="text-3xl" />
-          </div>
-        </PopoverTrigger>
-        <PopoverContent align="end" className="w-80 p-1">
-          <div className="flex items-baseline justify-between gap-4 px-3 py-2">
-            <div className="text-sm font-semibold">Notifications</div>
-            {unreadCount > 0 && (
-              <p className="text-xs font-medium hover:underline" onClick={handleMarkAllAsRead}>
-                Mark all as read
-              </p>
-            )}
-          </div>
-          <div
-            role="separator"
-            aria-orientation="horizontal"
-            className="-mx-1 my-1 h-px bg-border"
-          ></div>
-          {notifications.map((notification) => (
-            <div
-              key={notification.id}
-              className="rounded-md px-3 py-2 text-sm transition-colors hover:bg-accent"
-            >
-              <div className="relative flex items-start gap-3 pe-3">
-                <Image
-                  src={notification.image.userAvatar}
-                  className="size-9 rounded-md"
-                  width={32}
-                  height={32}
-                  alt={notification.user}
-                />
-                <div className="flex-1 space-y-1">
-                  <p
-                    className="text-left text-foreground/80 after:absolute after:inset-0"
-                    onClick={() => handleNotificationClick(notification.id)}
-                  >
-                    <span className="font-medium text-foreground hover:underline">
-                      {notification.user}
-                    </span>{" "}
-                    {notification.action}{" "}
-                    <span className="font-medium text-foreground hover:underline">
-                      {notification.target}
-                    </span>
-                    .
-                  </p>
-                  <div className="text-xs text-muted-foreground">{notification.timestamp}</div>
-                </div>
-                {notification.unread && (
-                  <div className="absolute end-0 self-center">
-                    <Dot />
-                  </div>
-                )}
-              </div>
-            </div>
-          ))}
-        </PopoverContent>
-      </Popover>
-    </NotificationTooltipWrapper>
-  );
-}
