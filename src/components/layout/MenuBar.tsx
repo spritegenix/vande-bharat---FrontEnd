@@ -94,8 +94,8 @@ export default function MenuBar({ className }: MenuBarProps) {
 
 function MenuTab({ icon, label, activeTab, setActiveTab, className, href }: any) {
   const [isHovered, setIsHovered] = useState(false);
-  const truncatedLabel = label.length > 12 ? `${label.slice(0, 12)}...` : label;
-  const isTruncatedLabel = label.length > 12 ? true : false;
+  const truncatedLabel = label.length > 13 ? `${label.slice(0, 12)}...` : label;
+  const isTruncatedLabel = label.length > 13 ? true : false;
   return (
     <div
       className="relative"
