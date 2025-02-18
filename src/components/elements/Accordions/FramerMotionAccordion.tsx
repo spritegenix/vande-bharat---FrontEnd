@@ -33,7 +33,7 @@ export const FramerMotionAccordion: React.FC<AccordionProps> = ({
       <AccordionTitle
         isExpanded={isExpanded}
         setIsExpanded={setIsExpanded}
-        className="border border-bg1 bg-white p-2"
+        className="border-bg1 border bg-white p-2"
       >
         {titleChildren}
       </AccordionTitle>
@@ -56,7 +56,18 @@ const AccordionTitle: React.FC<AccordionTitleProps> = ({
       className={`flex w-full cursor-pointer items-center justify-between gap-2 ${className}`}
     >
       {children}
-      <span>{isExpanded ? <FaMinus /> : <FaPlus />}</span>
+      <motion.span
+        animate={{
+          rotate: isOpen ? [0, -10, 180] : [180, 10, 0],
+        }}
+        transition={{
+          duration: 0.5,
+          ease: "easeInOut",
+        }}
+        className="flex items-center"
+      >
+        {isOpen ? (closeIcon ?? <FaMinus />) : (openIcon ?? <FaPlus />)}
+      </motion.span>
     </motion.div>
   );
 };

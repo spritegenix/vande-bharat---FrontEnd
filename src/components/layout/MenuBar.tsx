@@ -7,15 +7,15 @@ import {
   MessageSquareShare,
   BellRing,
   UserRound,
-  UserRoundCheck,
   Bookmark,
-  StickyNote,
   Squircle,
   BadgePlus,
+  Folder,
 } from "lucide-react";
 import Modal from "../elements/Modal";
 import CreatePageForm from "./CreatePageForm";
 import CreateCommunityForm from "./CreateCommunityForm";
+import MotionAccordion from "../elements/Accordions/MotionAccordion";
 
 interface MenuBarProps {
   className?: string;
@@ -30,7 +30,6 @@ interface MenuTabProps {
 }
 
 export default function MenuBar({ className }: MenuBarProps) {
-  const [showAllPages, setShowAllPages] = useState(false);
   const [showAllCommunities, setShowAllCommunities] = useState(false);
   const userProfileSlug = "user-1";
 
@@ -50,41 +49,64 @@ export default function MenuBar({ className }: MenuBarProps) {
             label="Profile"
             href={userProfileSlug && `/profile/${userProfileSlug}`}
           />
-          <MenuTab icon={<UserRoundCheck />} label="Follows" href="/follows" />
           <MenuTab icon={<Bookmark />} label="Bookmarks" href="/bookmarks" />
         </div>
         <hr className="my-4 w-full max-w-52 border-t" />
-        {/* ---------------------------Pages---------------------------  */}
-        <p className="mb-2 pl-5 text-sm font-semibold text-zinc-500">Pages</p>
-        <MenuTab icon={<StickyNote />} label="Followed Pages" href="/followed-pages" />
-        <div className="pl-2">
-          {Array.from({ length: showAllPages ? 10 : 5 }).map((_, index) => (
+        {/* ---------------------------Following---------------------------  */}
+        <p className="mb-2 pl-3 text-sm font-semibold text-zinc-500">Following</p>
+        <div>
+          {Array.from({ length: 8 }).map((_, index) => (
             <MenuTab
               key={index}
               icon={<Squircle />}
-              label={`Pages ${index}`}
-              href={`/page/page-${index + 1}`}
+              label={`Profile ${index}`}
+              href={`/profile/page-${index + 1}`}
             />
           ))}
-          <button
-            onClick={() => setShowAllPages(!showAllPages)}
-            className="ml-5 cursor-pointer text-sm font-semibold text-zinc-500"
+          <Link
+            href={"/profile"}
+            className="ml-4 cursor-pointer text-sm font-semibold text-zinc-500"
           >
-            {showAllPages ? "See Less" : "See All"}
-          </button>
+            See All
+          </Link>
         </div>
-        <MenuTab
-          as={"button"}
-          icon={<BadgePlus />}
-          label="Create Page"
-          onClick={() => setIsCreatePageOpen(true)}
-        />
         <hr className="my-4 w-full max-w-52 border-t" />
         {/* --------------------------Communities----------------------------  */}
         <p className="mb-2 pl-5 text-sm font-semibold text-zinc-500">Communities</p>
-        <MenuTab icon={<StickyNote />} label="Followed Communities" href="/followed-communities" />
-        <div className="pl-2">
-          {Array.from({ length: showAllCommunities ? 10 : 5 }).map((_, index) => (
+        <MotionAccordion
+          className="space-y-1"
+          title="Your Communities"
+          titleClassName="text-left px-4"
+          titleIcon={<Folder />}
+          defaultOpen
+          openIcon={<span>➕</span>}
+          closeIcon={<span>➖</span>}
+        >
+          <div className="ml-3">
+            {Array.from({ length: showAllCommunities ? 10 : 5 }).map((_, index) => (
+              <MenuTab
+                key={index}
+                icon={<Squircle />}
+                label={`Owned Community ${index}`}
+                href={`/community/owned-community-${index + 1}`}
+              />
+            ))}
+            <button
+              onClick={() => setShowAllCommunities(!showAllCommunities)}
+              className="ml-5 cursor-pointer text-sm font-semibold text-zinc-500"
+            >
+              {showAllCommunities ? "See Less" : "See All"}
+            </button>
+          </div>
+          <MenuTab
+            as={"button"}
+            icon={<BadgePlus />}
+            label="Create Community"
+            onClick={() => setIsCreateCommunityOpen(true)}
+          />
+        </MotionAccordion>
+        <div>
+          {Array.from({ length: 8 }).map((_, index) => (
             <MenuTab
               key={index}
               icon={<Squircle />}
@@ -92,19 +114,13 @@ export default function MenuBar({ className }: MenuBarProps) {
               href={`/community/community-${index + 1}`}
             />
           ))}
-          <button
-            onClick={() => setShowAllCommunities(!showAllCommunities)}
+          <Link
+            href={"/community"}
             className="ml-5 cursor-pointer text-sm font-semibold text-zinc-500"
           >
-            {showAllCommunities ? "See Less" : "See All"}
-          </button>
+            See All
+          </Link>
         </div>
-        <MenuTab
-          as={"button"}
-          icon={<BadgePlus />}
-          label="Create Community"
-          onClick={() => setIsCreateCommunityOpen(true)}
-        />
       </div>
       {/* Create Page Modal  */}
       {isCreatePageOpen && (
@@ -125,7 +141,6 @@ export default function MenuBar({ className }: MenuBarProps) {
 
 function MenuTab({ as: Component = Link, icon, label, className, ...props }: MenuTabProps) {
   const pathname = usePathname();
-
   // Determine if the tab is active based on the current pathname
   const isActive = (): boolean => {
     return pathname === props.href;
@@ -136,7 +151,7 @@ function MenuTab({ as: Component = Link, icon, label, className, ...props }: Men
       <Component
         className={`${
           isActive() ? "dark:text-background" : ""
-        } relative flex w-full cursor-pointer flex-nowrap items-center gap-2 py-1.5 pl-5 font-medium transition-all focus-visible:outline-2 ${className}`}
+        } relative flex w-full cursor-pointer flex-nowrap items-center gap-2 py-1.5 pl-4 transition-all focus-visible:outline-2 ${className}`}
         {...props}
       >
         {isActive() && (
