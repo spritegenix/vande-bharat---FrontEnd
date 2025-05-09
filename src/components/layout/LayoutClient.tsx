@@ -24,8 +24,10 @@ export default function LayoutClient({ children }: any) {
       />
       <Wrapper as="main" isTop className="mx-auto grid grid-cols-12">
         {/* Desktop View */}
-        <nav className="col-span-2 hidden h-[calc(100vh-3.5rem)] overflow-y-hidden border-r hover:overflow-y-auto lg:block">
-          <MenuBar className="pt-4" />
+        <nav className="col-span-2 hidden h-full border-r lg:block">
+          <div className="sticky top-10">
+            <MenuBar className="pt-4" />
+          </div>
         </nav>
 
         {/* Mobile View */}
@@ -36,7 +38,7 @@ export default function LayoutClient({ children }: any) {
               animate={{ x: 0 }}
               exit={{ x: "-100%" }}
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className={`fixed left-0 flex ${isSearchOpen ? "top-[5.5rem]" : "top-14"} z-50 w-full border-r bg-background shadow-lg dark:bg-background lg:hidden`}
+              className={`fixed left-0 flex ${isSearchOpen ? "sm:top-[5.5rem] md:top-[53px]" : "top-14"} z-50 w-full border-r bg-background shadow-lg dark:bg-background lg:hidden`}
             >
               <MenuBar className="h-[calc(100vh-3.5rem)] w-3/5 overflow-y-auto p-4" />
               <div
@@ -46,7 +48,7 @@ export default function LayoutClient({ children }: any) {
             </motion.nav>
           )}
         </AnimatePresence>
-        <section className="col-span-8">{children}</section>
+        <section className="col-span-12 lg:col-span-8">{children}</section>
         <aside className="col-span-2 hidden border-l sm:block"></aside>
       </Wrapper>
       <ScrollToTopButton />

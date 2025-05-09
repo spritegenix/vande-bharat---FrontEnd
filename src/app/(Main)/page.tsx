@@ -1,6 +1,13 @@
+import Feed from "@/components/Feed";
+import FeedsSection from "@/components/FeedsSection";
 import Layout from "@/components/layout/Layout";
 import React from "react";
 
 export default function HomePage() {
-  return <h1>Home Page</h1>;
+  return (
+    <>
+      <Feed />
+      <FeedsSection />
+    </>
+  );
 }

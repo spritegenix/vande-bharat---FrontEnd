@@ -13,7 +13,7 @@ export default function Header({ setIsLeftMenuOpen, isSearchOpen = false, setSea
     <header className="fixed top-0 z-50 w-full border-b bg-background dark:bg-background sm:h-14">
       <Wrapper className="my-auto p-1">
         {/* Desktop Mode  */}
-        <nav className="hidden w-full justify-between gap-2 sm:flex">
+        <nav className="hidden w-full justify-between gap-2 lg:flex">
           <Logo className="my-auto" />
           <GlobalSearch />
           <TooltipProvider delayDuration={0}>
@@ -37,7 +37,7 @@ export default function Header({ setIsLeftMenuOpen, isSearchOpen = false, setSea
           </TooltipProvider>
         </nav>
         {/* Mobile Mode  */}
-        <nav className="w-full sm:hidden">
+        <nav className="w-full lg:hidden">
           <div className="flex w-full justify-between">
             <div className="flex gap-2">
               <button onClick={() => setIsLeftMenuOpen((pre: any) => !pre)}>
@@ -62,7 +62,7 @@ export default function Header({ setIsLeftMenuOpen, isSearchOpen = false, setSea
           </div>
 
           {isSearchOpen && (
-            <div className="mx-auto">
+            <div className="left-[160px] top-[10px] mx-auto md:absolute">
               <GlobalSearch />
             </div>
           )}

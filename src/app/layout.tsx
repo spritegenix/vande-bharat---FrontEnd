@@ -8,6 +8,7 @@ import Env from "@/lib/env";
 import Script from "next/script";
 import Layout from "@/components/layout/Layout";
 import Providers from "@/providers/Providers";
+import { Toaster } from "@/components/ui/toaster";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -70,7 +71,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${inter.variable} ${merriWeather.variable} relative scroll-smooth antialiased transition-all duration-300 ease-in-out`}
+        className={`${inter.variable} ${merriWeather.variable} relative scroll-smooth bg-offwhite antialiased transition-all duration-300 ease-in-out dark:bg-gray-900`}
       >
         <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="lazyOnload" />
         <Providers>
@@ -80,6 +81,7 @@ export default function RootLayout({
           {authModal ? authModal : "null"}
           {children}
         </Providers>
+        <Toaster />
       </body>
     </html>
   );

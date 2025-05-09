@@ -109,8 +109,8 @@ export default function UserButton({ className }: UserButtonProps) {
               exit={{ x: "-100%" }}
               transition={{ type: "tween", duration: 0.2 }}
             >
-              <DropdownMenuLabel>Logged in as @{"Pankaj"}</DropdownMenuLabel>
-              <DropdownMenuLabel>
+              <DropdownMenuLabel className="m-3">Logged in as @{"Pankaj"}</DropdownMenuLabel>
+              <DropdownMenuLabel className="flex justify-center">
                 <Button
                   leftIcon={<PiUserSwitch className="text-xl" />}
                   onClick={() => setIsProfileSwitchTab(true)}
