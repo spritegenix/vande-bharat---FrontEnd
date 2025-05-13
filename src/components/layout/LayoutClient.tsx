@@ -11,10 +11,6 @@ export default function LayoutClient({ children }: any) {
   const [isLeftMenuOpen, setIsLeftMenuOpen] = useState(false);
   const [isSearchOpen, setSearchOpen] = useState(false);
 
-  useEffect(() => {
-    import("@/app/(UserAuth)/_sections/AuthModal");
-  }, []);
-
   return (
     <>
       <Header

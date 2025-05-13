@@ -9,7 +9,7 @@ import Script from "next/script";
 import Layout from "@/components/layout/Layout";
 import Providers from "@/providers/Providers";
 import { Toaster } from "@/components/ui/toaster";
-
+import { ClerkProvider } from "@clerk/nextjs";
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
@@ -69,20 +69,21 @@ export default function RootLayout({
   authModal: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${inter.variable} ${merriWeather.variable} relative scroll-smooth bg-offwhite antialiased transition-all duration-300 ease-in-out dark:bg-gray-900`}
-      >
-        <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="lazyOnload" />
-        <Providers>
-          {/*  modal portal */}
-          <div id="modal-portal" className="relative z-[999999] h-0" />
-          {/*  auth modal */}
-          {authModal ? authModal : "null"}
-          {children}
-        </Providers>
-        <Toaster />
-      </body>
-    </html>
+    <ClerkProvider>
+      <html lang="en">
+        <body
+          className={`${inter.variable} ${merriWeather.variable} relative scroll-smooth bg-offwhite antialiased transition-all duration-300 ease-in-out dark:bg-gray-900`}
+        >
+          <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="lazyOnload" />
+          <Providers>
+            {/*  modal portal */}
+            <div id="modal-portal" className="relative z-[999999] h-0" />
+
+            {children}
+          </Providers>
+          <Toaster />
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }

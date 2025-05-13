@@ -36,13 +36,13 @@ import Button from "@/components/elements/Button";
 import { PiUserSwitch } from "react-icons/pi";
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-
+import { SignOutButton, UserButton, useUser } from "@clerk/nextjs";
 interface UserButtonProps {
   className?: string;
 }
 
-export default function UserButton({ className }: UserButtonProps) {
-  //   const { user } = useSession();
+export default function UserProfile({ className }: UserButtonProps) {
+  const { user } = useUser();
 
   const { theme, setTheme } = useTheme();
   const [isProfileSwitchTab, setIsProfileSwitchTab] = useState(false);
@@ -109,15 +109,17 @@ export default function UserButton({ className }: UserButtonProps) {
               exit={{ x: "-100%" }}
               transition={{ type: "tween", duration: 0.2 }}
             >
-              <DropdownMenuLabel className="m-3">Logged in as @{"Pankaj"}</DropdownMenuLabel>
-              <DropdownMenuLabel className="flex justify-center">
+              <DropdownMenuLabel className="m-3">
+                Logged in as @{user?.username || user?.firstName}
+              </DropdownMenuLabel>
+              {/* <DropdownMenuLabel className="flex justify-center">
                 <Button
                   leftIcon={<PiUserSwitch className="text-xl" />}
                   onClick={() => setIsProfileSwitchTab(true)}
                 >
                   See all profiles
                 </Button>
-              </DropdownMenuLabel>
+              </DropdownMenuLabel> */}
               <DropdownMenuSeparator />
               <Link href={"/settings"}>
                 <DropdownMenuItem>
@@ -163,14 +165,10 @@ export default function UserButton({ className }: UserButtonProps) {
                 </DropdownMenuPortal>
               </DropdownMenuSub>
               <DropdownMenuSeparator />
-              <DropdownMenuItem
-                onClick={() => {
-                  // queryClient.clear();
-                  // logout();
-                }}
-              >
-                <LogOutIcon className="mr-2 size-4" />
-                Logout
+              <DropdownMenuItem>
+                <SignOutButton />
+                {/* <LogOutIcon className="mr-2 size-4" />
+                Logout */}
               </DropdownMenuItem>
             </motion.div>
           )}

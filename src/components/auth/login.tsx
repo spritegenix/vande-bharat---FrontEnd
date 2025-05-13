@@ -1,32 +1,14 @@
 "use client";
 import React from "react";
-import { useRouter } from "next/navigation";
-import Modal from "@/components/elements/Modal";
-import AuthButton from "./AuthButton";
 import { FcGoogle } from "react-icons/fc";
 import { TiSocialFacebook } from "react-icons/ti";
 import Logo from "@/components/elements/Logo";
-import { Input } from "@/components/ui/input";
 import LoginForm from "@/components/forms/LoginForm";
 import Link from "next/link";
-import { FaFacebook } from "react-icons/fa6";
 import { BsTwitterX } from "react-icons/bs";
-import { Button } from "@/components/ui/button";
 import Image from "next/image";
-
-export default function AuthModal() {
-  const router = useRouter();
-
-  const handleClose = () => {
-    router.back();
-  };
-  return (
-    <Modal onClose={handleClose}>
-      <AuthModalCard />
-    </Modal>
-  );
-}
-export function AuthModalCard() {
+import AuthButton from "@/app/(UserAuth)/_sections/AuthButton";
+export default function login() {
   return (
     <div className="relative m-2 flex w-full max-w-4xl overflow-hidden rounded-lg bg-white shadow-lg md:mx-auto">
       {/* Left side: Login form */}
