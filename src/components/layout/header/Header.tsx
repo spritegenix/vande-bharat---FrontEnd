@@ -25,7 +25,7 @@ export default function Header({ setIsLeftMenuOpen, isSearchOpen = false, setSea
                     <SvgIcon svgPath={donationIcon} />
                   </Link>
                 </TooltipTrigger>
-                <TooltipContent side="bottom" className="px-2 py-1 text-xs" showArrow={true}>
+                <TooltipContent side="bottom" className="px-2 py-1 text-xs">
                   Donation
                 </TooltipContent>
               </Tooltip>

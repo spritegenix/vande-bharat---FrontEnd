@@ -28,7 +28,7 @@ export default function AuthButton() {
                 /> */}
               </div>
             </TooltipTrigger>
-            <TooltipContent side="bottom" className="px-2 py-1 text-xs" showArrow={true}>
+            <TooltipContent side="bottom" className="px-2 py-1 text-xs">
               Account
             </TooltipContent>
           </Tooltip>
