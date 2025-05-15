@@ -16,6 +16,8 @@ import Modal from "../elements/Modal";
 import CreatePageForm from "./CreatePageForm";
 import CreateCommunityForm from "./CreateCommunityForm";
 import MotionAccordion from "../elements/Accordions/MotionAccordion";
+import { mockProfiles } from "../profile/FollowingProfile";
+import UserAvatar from "./header/UserAvatar";
 
 interface MenuBarProps {
   className?: string;
@@ -54,14 +56,12 @@ export default function MenuBar({ className }: MenuBarProps) {
         <hr className="my-4 w-full max-w-52 border-t" />
         {/* ---------------------------Following---------------------------  */}
         <p className="mb-2 pl-3 text-sm font-semibold text-zinc-500">Following</p>
-        <div>
-          {Array.from({ length: 8 }).map((_, index) => (
-            <MenuTab
-              key={index}
-              icon={<Squircle />}
-              label={`Profile ${index}`}
-              href={`/profile/page-${index + 1}`}
-            />
+        <div className="flex flex-col gap-y-3">
+          {mockProfiles.slice(0, 6).map((item) => (
+            <div key={item.id} className="flex items-center gap-x-5 pl-3">
+              <UserAvatar avatarUrl={item.avatar} size={30} />
+              <p>{item.name}</p>
+            </div>
           ))}
           <Link
             href={"/profile"}

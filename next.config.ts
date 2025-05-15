@@ -5,7 +5,10 @@ const nextConfig: NextConfig = {
     staleTimes: {
       dynamic: 30,
     }
-  }
+  },
+   images: {
+    domains: ["i.pravatar.cc"], 
+  },
 };
 
 export default nextConfig;

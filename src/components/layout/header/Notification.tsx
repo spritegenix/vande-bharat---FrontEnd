@@ -15,7 +15,7 @@ function NotificationTooltipWrapper({ children }: { children: React.ReactNode })
     <TooltipProvider delayDuration={0}>
       <Tooltip>
         <TooltipTrigger asChild>{children}</TooltipTrigger>
-        <TooltipContent side="bottom" className="px-2 py-1 text-xs" showArrow={true}>
+        <TooltipContent side="bottom" className="px-2 py-1 text-xs">
           Inbox
         </TooltipContent>
       </Tooltip>
@@ -85,7 +85,7 @@ export default function Notification() {
                   />
                   <div className="flex-1 space-y-1">
                     <p
-                      className="text-left text-foreground/80 after:absolute after:inset-0"
+                      className="text-foreground/80 text-left after:absolute after:inset-0"
                       onClick={() => handleNotificationClick(notification.id)}
                     >
                       <span className="font-medium text-foreground hover:underline">

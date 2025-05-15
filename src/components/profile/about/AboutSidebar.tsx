@@ -7,7 +7,6 @@ import { cn } from "@/lib/utils";
 const tabs = [
   { key: "about_overview", label: "Overview" },
   { key: "about_work", label: "Work & Education" },
-  { key: "about_places", label: "Places Lived" },
 ];
 
 export function AboutSidebar() {

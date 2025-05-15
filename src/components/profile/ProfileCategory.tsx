@@ -3,13 +3,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import Feed from "../Feed";
 import FeedsSection from "../FeedsSection";
 import About from "./about/About";
+import FollowingProfileList from "./FollowingProfile";
 
 export default function ProfileCategory() {
   return (
     <>
       <Tabs defaultValue="posts" className="mt-5 border-t-2">
         <TabsList className="flex justify-start bg-transparent md:gap-6">
-          {["posts", "about", "friends", "photos", "videos"].map((tab) => (
+          {["posts", "about", "Following Profiles", "Communities"].map((tab) => (
             <TabsTrigger
               key={tab}
               value={tab}
@@ -26,13 +27,10 @@ export default function ProfileCategory() {
         <TabsContent value="about">
           <About />
         </TabsContent>
-        <TabsContent value="friends">
-          <About />
+        <TabsContent value="Following Profiles">
+          <FollowingProfileList />
         </TabsContent>
-        <TabsContent value="photos">
-          <About />
-        </TabsContent>
-        <TabsContent value="videos">
+        <TabsContent value="Communities">
           <About />
         </TabsContent>
       </Tabs>
