@@ -2,14 +2,31 @@
 import CoverImage from "@/components/profile/CoverImage";
 import ProfileCategory from "@/components/profile/ProfileCategory";
 import { useCurrentUser } from "@/queries/user/user.queries";
+import { useAuth } from "@clerk/nextjs";
 import axios from "axios";
-import React from "react";
+import React, { useEffect } from "react";
 
 export default function IndividualProfilePage() {
+  const { getToken } = useAuth();
   const { data: user, isLoading, isError } = useCurrentUser();
+  useEffect(() => {
+    const fetchToken = async () => {
+      try {
+        const token = await getToken({ template: "default" });
+        console.log("JWT Token:", token);
+      } catch (err) {
+        console.error("Failed to get Clerk token:", err);
+      }
+    };
+
+    fetchToken();
+  }, [getToken]);
+
+  
   if (isLoading) return <p>Loading...</p>;
   if (isError) return <p>Failed to load user.</p>;
   console.log(user);
+
 
   return (
     <div>
@@ -34,7 +51,7 @@ export default function IndividualProfilePage() {
 //   const [error, setError] = useState(false);
 
 //   useEffect(() => {
-//     axios("https://2vm9cng1-3000.inc1.devtunnels.ms/api/v1/users/me")
+//     axios("http://localhost:4000/api/v1/users/me")
 //       .then((res) => {
 //         setData(res.data);
 //         console.log(res.data);

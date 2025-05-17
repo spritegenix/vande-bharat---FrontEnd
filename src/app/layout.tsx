@@ -69,20 +69,23 @@ export default function RootLayout({
   authModal: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider>
-      <html lang="en">
-        <body
-          className={`${inter.variable} ${merriWeather.variable} relative scroll-smooth bg-offwhite antialiased transition-all duration-300 ease-in-out dark:bg-gray-900`}
+    <html lang="en">
+      <body
+        className={`${inter.variable} ${merriWeather.variable} relative scroll-smooth bg-offwhite antialiased transition-all duration-300 ease-in-out dark:bg-gray-900`}
+      >
+        <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="lazyOnload" />
+        <ClerkProvider
+        // publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
+        // proxyUrl={process.env.NEXT_PUBLIC_API_BASE_URL}
         >
-          <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="lazyOnload" />
           <Providers>
             {/*  modal portal */}
             <div id="modal-portal" className="relative z-[999999] h-0" />
             {children}
           </Providers>
           <Toaster richColors closeButton position="top-right" />
-        </body>
-      </html>
-    </ClerkProvider>
+        </ClerkProvider>
+      </body>
+    </html>
   );
 }

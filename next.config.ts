@@ -7,7 +7,7 @@ const nextConfig: NextConfig = {
     }
   },
    images: {
-    domains: ["i.pravatar.cc"], 
+    domains: ["i.pravatar.cc", "https://img.clerk.com", ], 
   },
   
 };
