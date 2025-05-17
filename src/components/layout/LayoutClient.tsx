@@ -6,6 +6,8 @@ import Header from "./header/Header";
 import MenuBar from "./MenuBar";
 import Wrapper from "../elements/Wrappers";
 import { AnimatePresence, motion } from "framer-motion";
+import { Button } from "../ui/button";
+import { toast } from "sonner";
 
 export default function LayoutClient({ children }: any) {
   const [isLeftMenuOpen, setIsLeftMenuOpen] = useState(false);
@@ -18,6 +20,7 @@ export default function LayoutClient({ children }: any) {
         isSearchOpen={isSearchOpen}
         setSearchOpen={setSearchOpen}
       />
+
       <Wrapper as="main" isTop className="mx-auto grid grid-cols-12">
         {/* Desktop View */}
         <nav className="col-span-2 hidden h-full border-r lg:block">

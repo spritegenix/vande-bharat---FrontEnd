@@ -1,39 +1,63 @@
-import React from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
-import Feed from "../Feed";
-import FeedsSection from "../FeedsSection";
-import About from "./about/About";
-import FollowingProfileList from "./FollowingProfile";
+"use client";
 
-export default function ProfileCategory() {
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { useEffect, useState } from "react";
+import FeedsSection from "../FeedsSection";
+import Feed from "../Feed";
+import FollowingProfileList from "./FollowingProfile";
+import About from "./about/About";
+
+const tabOptions = ["posts", "about", "Following Profiles", "Communities"];
+
+export default function ProfileTabs() {
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const router = useRouter();
+
+  const queryTab = searchParams.get("tab")?.toLowerCase() || "posts";
+  const [selectedTab, setSelectedTab] = useState(queryTab);
+
+  useEffect(() => {
+    setSelectedTab(queryTab);
+  }, [queryTab]);
+
+  const handleTabChange = (value: string) => {
+    const params = new URLSearchParams(searchParams);
+    params.set("tab", value.toLowerCase());
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+  };
+
   return (
-    <>
-      <Tabs defaultValue="posts" className="mt-5 border-t-2">
-        <TabsList className="flex justify-start bg-transparent md:gap-6">
-          {["posts", "about", "Following Profiles", "Communities"].map((tab) => (
-            <TabsTrigger
-              key={tab}
-              value={tab}
-              className="px-2 py-1 transition data-[state=active]:rounded-none data-[state=active]:border-b-2 data-[state=active]:border-blue-500 data-[state=active]:text-blue-600 data-[state=active]:shadow-none"
-            >
-              {tab.charAt(0).toUpperCase() + tab.slice(1)}
-            </TabsTrigger>
-          ))}
-        </TabsList>
-        <TabsContent value="posts">
-          <Feed />
-          <FeedsSection />
-        </TabsContent>
-        <TabsContent value="about">
-          <About />
-        </TabsContent>
-        <TabsContent value="Following Profiles">
-          <FollowingProfileList />
-        </TabsContent>
-        <TabsContent value="Communities">
-          <About />
-        </TabsContent>
-      </Tabs>
-    </>
+    <Tabs value={selectedTab} onValueChange={handleTabChange} className="mt-5 border-t-2">
+      <TabsList className="flex justify-start bg-transparent md:gap-6">
+        {tabOptions.map((tab) => (
+          <TabsTrigger
+            key={tab}
+            value={tab.toLowerCase()}
+            className="px-2 py-1 transition data-[state=active]:rounded-none data-[state=active]:border-b-2 data-[state=active]:border-blue-500 data-[state=active]:text-blue-600 data-[state=active]:shadow-none"
+          >
+            {tab}
+          </TabsTrigger>
+        ))}
+      </TabsList>
+
+      <TabsContent value="posts">
+        <Feed />
+        <FeedsSection />
+      </TabsContent>
+
+      <TabsContent value="about">
+        <About />
+      </TabsContent>
+
+      <TabsContent value="following profiles">
+        <FollowingProfileList />
+      </TabsContent>
+
+      <TabsContent value="communities">
+        <About />
+      </TabsContent>
+    </Tabs>
   );
 }

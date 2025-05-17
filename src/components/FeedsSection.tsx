@@ -4,7 +4,7 @@ import React from "react";
 import Box from "./elements/Box";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "./ui/button";
-import { MessageCircle, Share2, ThumbsUp, X } from "lucide-react";
+import { Bookmark, MessageCircle, Share2, ThumbsUp, X } from "lucide-react";
 import Image from "next/image";
 import { useEditorStore } from "@/stores/editorStore";
 import Linkify from "./Linkify";
@@ -44,7 +44,7 @@ export default function FeedsSection() {
             </Button>
           </div>
 
-          <div className="mt-2 px-3">
+          <div className="mt-2 whitespace-pre-line px-3">
             <Linkify>
               <div>{post.textContent}</div>
             </Linkify>
@@ -90,6 +90,10 @@ export default function FeedsSection() {
                   <button className="flex items-center gap-1 hover:text-blue-600">
                     <Share2 size={16} />
                     Share
+                  </button>
+                  <button className="flex items-center gap-1 hover:text-blue-600">
+                    <Bookmark size={16} />
+                    Bookmark
                   </button>
                 </div>
               </div>

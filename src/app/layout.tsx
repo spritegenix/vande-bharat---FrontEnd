@@ -8,8 +8,8 @@ import Env from "@/lib/env";
 import Script from "next/script";
 import Layout from "@/components/layout/Layout";
 import Providers from "@/providers/Providers";
-import { Toaster } from "@/components/ui/toaster";
 import { ClerkProvider } from "@clerk/nextjs";
+import { Toaster } from "sonner";
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
@@ -78,10 +78,9 @@ export default function RootLayout({
           <Providers>
             {/*  modal portal */}
             <div id="modal-portal" className="relative z-[999999] h-0" />
-
             {children}
           </Providers>
-          <Toaster />
+          <Toaster richColors closeButton position="top-right" />
         </body>
       </html>
     </ClerkProvider>

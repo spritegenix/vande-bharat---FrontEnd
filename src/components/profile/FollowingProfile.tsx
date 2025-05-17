@@ -1,9 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { MoreVertical } from "lucide-react";
+import { MoreVertical, UserPlus } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,6 +10,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
+import { Button } from "../ui/button";
+import Link from "next/link";
 
 type Profile = {
   id: string;
@@ -173,12 +174,20 @@ export default function FollowingProfileList() {
 
   const handleUnfriend = (id: string) => {
     setProfiles((prev) => prev.map((p) => (p.id === id ? { ...p, friend: false } : p)));
-    toast.success("Unfriended successfully.");
+    toast.error("Unfriended successfully.");
   };
 
   return (
-    <div className="mx-auto max-w-6xl p-6">
-      <h2 className="mb-6 text-xl font-bold">Your Saathis</h2>
+    <section className="mx-auto max-w-6xl p-6">
+      <div className="mb-6 flex w-full items-center justify-between">
+        <h2 className="text-xl font-bold">Your Saathis</h2>
+        <Button asChild variant={"default"}>
+          <Link href={"/profile"}>
+            {" "}
+            <UserPlus /> Add Saathis
+          </Link>
+        </Button>
+      </div>
 
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
         {isLoading ? (
@@ -223,7 +232,7 @@ export default function FollowingProfileList() {
                   <p className="flex px-3 text-base font-semibold md:hidden">{profile.name}</p>
                   <div className="flex w-full justify-between">
                     <Button variant="outline" className="dark:bg-slate-600" size="sm">
-                      Friend
+                      Saathi
                     </Button>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -247,6 +256,6 @@ export default function FollowingProfileList() {
           </p>
         )}
       </div>
-    </div>
+    </section>
   );
 }

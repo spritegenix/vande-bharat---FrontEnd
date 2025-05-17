@@ -11,6 +11,9 @@ import {
   Squircle,
   BadgePlus,
   Folder,
+  Users,
+  Plus,
+  UserPlus,
 } from "lucide-react";
 import Modal from "../elements/Modal";
 import CreatePageForm from "./CreatePageForm";
@@ -18,6 +21,10 @@ import CreateCommunityForm from "./CreateCommunityForm";
 import MotionAccordion from "../elements/Accordions/MotionAccordion";
 import { mockProfiles } from "../profile/FollowingProfile";
 import UserAvatar from "./header/UserAvatar";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import Image from "next/image";
+import { Button } from "../ui/button";
+import { useUser } from "@clerk/nextjs";
 
 interface MenuBarProps {
   className?: string;
@@ -33,8 +40,9 @@ interface MenuTabProps {
 
 export default function MenuBar({ className }: MenuBarProps) {
   const [showAllCommunities, setShowAllCommunities] = useState(false);
-  const userProfileSlug = "user-1";
 
+  const user = useUser();
+  const userProfileSlug = user?.user?.id || user?.user?.firstName || "me";
   const [isCreatePageOpen, setIsCreatePageOpen] = useState(false);
   const [isCreateCommunityOpen, setIsCreateCommunityOpen] = useState(false);
 
@@ -52,19 +60,35 @@ export default function MenuBar({ className }: MenuBarProps) {
             href={userProfileSlug && `/profile/${userProfileSlug}`}
           />
           <MenuTab icon={<Bookmark />} label="Bookmarks" href="/bookmarks" />
+          <MenuTab icon={<UserPlus />} label="Add Saathis" href="/profile" />
         </div>
         <hr className="my-4 w-full max-w-52 border-t" />
         {/* ---------------------------Following---------------------------  */}
         <p className="mb-2 pl-3 text-sm font-semibold text-zinc-500">Following</p>
         <div className="flex flex-col gap-y-3">
           {mockProfiles.slice(0, 6).map((item) => (
-            <div key={item.id} className="flex items-center gap-x-5 pl-3">
-              <UserAvatar avatarUrl={item.avatar} size={30} />
+            <Link
+              href={`/profile/${item.id}`}
+              key={item.id}
+              className="flex items-center gap-x-5 pl-3"
+            >
+              <Avatar>
+                <AvatarImage src={item.avatar} sizes="30" />
+                <AvatarFallback>
+                  <Image
+                    src="/images/profile/profileplaceholder.jpg"
+                    alt="fallback"
+                    height={30}
+                    width={30}
+                  />
+                </AvatarFallback>
+              </Avatar>
+
               <p>{item.name}</p>
-            </div>
+            </Link>
           ))}
           <Link
-            href={"/profile"}
+            href={`/profile/${userProfileSlug}?tab=following+profiles`}
             className="ml-4 cursor-pointer text-sm font-semibold text-zinc-500"
           >
             See All
@@ -73,6 +97,11 @@ export default function MenuBar({ className }: MenuBarProps) {
         <hr className="my-4 w-full max-w-52 border-t" />
         {/* --------------------------Communities----------------------------  */}
         <p className="mb-2 pl-5 text-sm font-semibold text-zinc-500">Communities</p>
+        <Button variant={"outline"} className="my-3 ml-4 flex items-center gap-3 border-gray-500">
+          <Plus size={28} />
+          <p className="">Create New Community</p>
+        </Button>
+
         <MotionAccordion
           className="space-y-1"
           title="Your Communities"
