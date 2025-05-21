@@ -97,9 +97,11 @@ export default function MenuBar({ className }: MenuBarProps) {
         <hr className="my-4 w-full max-w-52 border-t" />
         {/* --------------------------Communities----------------------------  */}
         <p className="mb-2 pl-5 text-sm font-semibold text-zinc-500">Communities</p>
-        <Button variant={"outline"} className="my-3 ml-4 flex items-center gap-3 border-gray-500">
-          <Plus size={28} />
-          <p className="">Create New Community</p>
+        <Button variant={"outline"} asChild className="my-3 ml-4 border-gray-500">
+          <Link href={`/community/create`} className="flex items-center gap-3">
+            <Plus size={28} />
+            <p className="">Create New Page</p>
+          </Link>
         </Button>
 
         <MotionAccordion

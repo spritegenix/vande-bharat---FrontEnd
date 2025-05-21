@@ -8,16 +8,19 @@ import { Bookmark, MessageCircle, Share2, ThumbsUp, X } from "lucide-react";
 import Image from "next/image";
 import { useEditorStore } from "@/stores/editorStore";
 import Linkify from "./Linkify";
+import { useFetchPosts } from "@/queries/posts/posts.queries";
+import { formatPublishedDate } from "@/utils/dateSorter";
 
 export default function FeedsSection() {
-  const { posts } = useEditorStore();
+  const { data: posts, isLoading, isError } = useFetchPosts();
+  if (isError) return;
+  if (isLoading) return <p>Loading...</p>;
 
   return (
     <div className="mb-2">
       {posts.map((post) => (
-        <Box key={post.id} className="m-2 my-6 pb-2 md:mx-auto">
+        <Box key={post._id} className="m-2 my-6 pb-2 md:mx-auto">
           <div className="flex items-start justify-between gap-x-2 p-3 pb-0">
-            {/* Avatar + Name/Time */}
             <div className="flex gap-x-2">
               <Avatar>
                 <AvatarImage src="https://github.com/shadcn.png" />
@@ -33,12 +36,11 @@ export default function FeedsSection() {
               <div className="flex flex-col text-sm font-semibold">
                 <p>Ashik Shetty</p>
                 <p className="text-xs font-normal text-gray-500">
-                  {post.createdAt.toLocaleTimeString()}
+                  {formatPublishedDate(post.createdAt)}
                 </p>
               </div>
             </div>
 
-            {/* Follow Button */}
             <Button variant="outline" size="sm" className="text-xs">
               Follow
             </Button>
@@ -46,35 +48,51 @@ export default function FeedsSection() {
 
           <div className="mt-2 whitespace-pre-line px-3">
             <Linkify>
-              <div>{post.textContent}</div>
+              <div>{post.content}</div>
             </Linkify>
           </div>
 
-          {(post.images.length > 0 || post.videos?.length > 0) && (
-            <div className="mt-3 grid grid-cols-1 gap-4 px-3 md:grid-cols-2">
-              {post.images.map((file, index) => (
-                <Image
-                  key={`img-${index}`}
-                  src={URL.createObjectURL(file)}
-                  alt={`feed-image-${index}`}
-                  width={400}
-                  height={300}
-                  className="rounded"
-                />
-              ))}
+          {post.attachments && post.attachments.length > 0 && (
+            <div className="mt-3 px-3">
+              <div
+                className={`grid gap-2 ${
+                  post.attachments.length === 1
+                    ? "grid-cols-1"
+                    : post.attachments.length === 2
+                      ? "grid-cols-2"
+                      : "grid-cols-2"
+                }`}
+              >
+                {post.attachments.slice(0, 4).map((file, index) => (
+                  <div key={index} className="relative w-full overflow-hidden rounded">
+                    {file.type === "IMAGE" ? (
+                      <Image
+                        src={file.url}
+                        alt={`attachment-${index}`}
+                        width={500}
+                        height={300}
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <video
+                        src={file.url}
+                        controls
+                        className="h-full w-full rounded object-cover"
+                      />
+                    )}
 
-              {post.videos?.map((file, index) => (
-                <video
-                  key={`vid-${index}`}
-                  src={URL.createObjectURL(file)}
-                  controls
-                  className="w-full rounded shadow"
-                />
-              ))}
+                    {/* Overlay for additional items */}
+                    {index === 3 && post.attachments.length > 4 && (
+                      <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/60 text-xl font-bold text-white">
+                        +{post.attachments.length - 4}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
           )}
 
-          {/* Like / Comment / Share Section */}
           <div className="mx-4 mt-4 border-t border-gray-400 px-3 pt-4 text-sm text-gray-500">
             <div className="flex items-center justify-between">
               <div className="flex w-full items-center justify-between gap-x-4">
