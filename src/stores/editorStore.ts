@@ -3,6 +3,9 @@ import axios from "@/lib/axios";
 import { CreatePostPayload } from "@/types/post";
 import { isAxiosError } from "axios";
 import { extractHashtags } from "@/utils/HashTagExtractor";
+import { queryClient } from "@/lib/react-query";
+import { getPresignedUrl, uploadToS3 } from "@/queries/user/user.api";
+
 // Utility: Get image dimensions
 const getImageMetadata = (file: File): Promise<{ width: number; height: number }> => {
   return new Promise((resolve) => {
@@ -34,7 +37,8 @@ interface EditorStore {
   setUploading: (uploading: boolean) => void;
   clearEditorState: () => void;
 
-  submitPost: () => Promise<void>;
+  submitPost: () => Promise<CreatePostPayload | undefined>;
+
 }
 
 export const useEditorStore = create<EditorStore>((set, get) => ({
@@ -68,59 +72,46 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
     const extractedTags = extractHashtags(draftText);
     set({ tags: extractedTags });
 
-    const attachments: any[] = [];
+  
+ const attachments = await uploadMediaFiles(draftFiles)
+//     for (const file of draftFiles) {
+//       try {
 
-    for (const file of draftFiles) {
-      try {
-  const { data: response } = await axios.post("/media/upload-url", {
-    fileName: file.name,
-    fileType: file.type,
-    folder: "posts",
-  });
+//         const { uploadUrl, fileUrl } = await getPresignedUrl(file, "covers");
 
-  const uploadUrl = response?.data?.uploadUrl;
-  const fileUrl = response?.data?.fileUrl;
+//   if (!uploadUrl || !fileUrl) {
+//     console.error("❌ Missing S3 URL in upload-url response");
+//     throw new Error(`Missing uploadUrl or fileUrl for ${file.name}`);
+//   }
 
-  if (!uploadUrl || !fileUrl) {
-    console.error("❌ Missing S3 URL in upload-url response", response);
-    throw new Error(`Missing uploadUrl or fileUrl for ${file.name}`);
-  }
 
-  const uploadRes = await axios.put(uploadUrl, file, {
-    headers: { "Content-Type": file.type },
-  });
+// await uploadToS3(uploadUrl, file);
+//   const attachment: any = {
+//     url: fileUrl,
+//     type: file.type.startsWith("image/") ? "IMAGE" : "VIDEO",
+//     fileName: file.name,
+//     mimeType: file.type,
+//     size: file.size,
+//     uploadedAt: new Date().toISOString(),
+//   };
 
-  if (uploadRes.status !== 200) {
-    console.error("❌ Upload to S3 failed", uploadRes);
-    throw new Error(`S3 upload failed for file: ${file.name}`);
-  }
+//   if (file.type.startsWith("image/")) {
+//     const { width, height } = await getImageMetadata(file);
+//     attachment.width = width;
+//     attachment.height = height;
+//   }
 
-  const attachment: any = {
-    url: fileUrl,
-    type: file.type.startsWith("image/") ? "IMAGE" : "VIDEO",
-    fileName: file.name,
-    mimeType: file.type,
-    size: file.size,
-    uploadedAt: new Date().toISOString(),
-  };
+//   if (file.type.startsWith("video/")) {
+//     const duration = await getVideoDuration(file);
+//     attachment.duration = duration;
+//   }
 
-  if (file.type.startsWith("image/")) {
-    const { width, height } = await getImageMetadata(file);
-    attachment.width = width;
-    attachment.height = height;
-  }
-
-  if (file.type.startsWith("video/")) {
-    const duration = await getVideoDuration(file);
-    attachment.duration = duration;
-  }
-
-  attachments.push(attachment);
-}  catch (uploadErr) {
-        console.error(`❌ Failed to process file: ${file.name}`, uploadErr);
-        continue; // move on to the next file
-      }
-    }
+//   attachments.push(attachment);
+// }  catch (uploadErr) {
+//         console.error(`❌ Failed to process file: ${file.name}`, uploadErr);
+//         continue; // move on to the next file
+//       }
+//     }
 
     const payload: CreatePostPayload = {
       content: draftText.trim(),
@@ -129,15 +120,17 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
       attachments,
     };
 
-   
+    return payload;
 
-    const res = await axios.post("/posts/create-post", payload);
+    // const res = await axios.post("/posts/create-post", payload);
 
-    if (res.status !== 200 && res.status !== 201) {
-      throw new Error("❌ Post creation failed at backend");
-    }
+    // if (res.status !== 200 && res.status !== 201) {
+    //   throw new Error("❌ Post creation failed at backend");
+    // }
+    //  await queryClient.invalidateQueries({ queryKey: ["fetch-posts"] });
+    // await queryClient.invalidateQueries({ queryKey: ["user-posts"] });
 
-    get().clearEditorState();
+    // get().clearEditorState();
   } catch (error: any) {
     if (isAxiosError(error)) {
       console.error("❌ Validation Error:", {
@@ -154,3 +147,123 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
 },
 
 }));
+
+
+
+
+
+
+
+
+// export const updatePost = async (
+//   postId: string,
+//   newText: string,
+//   newFiles: File[],
+//   existingAttachments: any[] // unchanged media
+// ) => {
+//   const attachments: any[] = [...existingAttachments];
+//   const tags = extractHashtags(newText);
+
+//   for (const file of newFiles) {
+//     try {
+//       const { data: response } = await axios.post("/media/upload-url", {
+//         fileName: file.name,
+//         fileType: file.type,
+//         folder: "posts",
+//       });
+
+//       const uploadUrl = response?.data?.uploadUrl;
+//       const fileUrl = response?.data?.fileUrl;
+
+//       if (!uploadUrl || !fileUrl) throw new Error("Missing S3 upload details");
+
+//       await axios.put(uploadUrl, file, {
+//         headers: { "Content-Type": file.type },
+//       });
+
+//       const attachment: any = {
+//         url: fileUrl,
+//         type: file.type.startsWith("image/") ? "IMAGE" : "VIDEO",
+//         fileName: file.name,
+//         mimeType: file.type,
+//         size: file.size,
+//         uploadedAt: new Date().toISOString(),
+//       };
+
+//       if (file.type.startsWith("image/")) {
+//         const { width, height } = await getImageMetadata(file);
+//         attachment.width = width;
+//         attachment.height = height;
+//       }
+
+//       if (file.type.startsWith("video/")) {
+//         const duration = await getVideoDuration(file);
+//         attachment.duration = duration;
+//       }
+
+//       attachments.push(attachment);
+//     } catch (err) {
+//       console.error("❌ File upload failed", file.name, err);
+//     }
+//   }
+
+//   const payload = {
+//     content: newText.trim(),
+//     tags,
+//     attachments,
+//     isHidden: false,
+//   };
+
+//   await axios.patch(`/posts/${postId}`, payload);
+// };
+
+
+
+export const uploadMediaFiles = async (files: File[]): Promise<any[]> => {
+  const uploaded: any[] = [];
+
+  for (const file of files) {
+    try {
+      const { data: response } = await axios.post("/media/upload-url", {
+        fileName: file.name,
+        fileType: file.type,
+        folder: "posts",
+      });
+
+      const uploadUrl = response?.data?.uploadUrl;
+      const fileUrl = response?.data?.fileUrl;
+
+      if (!uploadUrl || !fileUrl) throw new Error("Missing uploadUrl or fileUrl");
+
+      await axios.put(uploadUrl, file, {
+        headers: { "Content-Type": file.type },
+      });
+
+      const media: any = {
+        url: fileUrl,
+        type: file.type.startsWith("image/") ? "IMAGE" : "VIDEO",
+        fileName: file.name,
+        mimeType: file.type,
+        size: file.size,
+        uploadedAt: new Date().toISOString(),
+      };
+
+      if (file.type.startsWith("image/")) {
+        const { width, height } = await getImageMetadata(file);
+        media.width = width;
+        media.height = height;
+      }
+
+      if (file.type.startsWith("video/")) {
+        const duration = await getVideoDuration(file);
+        media.duration = duration;
+      }
+
+      uploaded.push(media);
+    } catch (err) {
+      console.error("Upload failed:", file.name, err);
+    }
+  }
+
+  return uploaded;
+};

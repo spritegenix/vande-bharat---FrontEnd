@@ -8,10 +8,12 @@ import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 import { $getRoot, EditorState } from "lexical";
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
+
+import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import "./editor.css";
 import Image from "next/image";
 import { useEditorStore } from "@/stores/editorStore";
-import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
+import { useCreatePost } from "@/queries/posts/posts.mutation";
 
 const editorConfig = {
   namespace: "FacebookStyleEditor",
@@ -26,9 +28,17 @@ const MAX_IMAGE_SIZE = 1 * 1024 * 1024;
 const MAX_VIDEO_SIZE = 10 * 1024 * 1024;
 
 export default function EditorWithImage() {
-  const { draftFiles, setDraftText, setDraftFiles, removeDraftFile, submitPost, uploading } =
-    useEditorStore();
+  const {
+    draftFiles,
+    setDraftText,
+    setDraftFiles,
+    removeDraftFile,
+    submitPost,
+    uploading,
+    clearEditorState,
+  } = useEditorStore();
   const [shouldClearEditor, setShouldClearEditor] = React.useState(false);
+  const { mutateAsync: createPost } = useCreatePost();
 
   const handleTextChange = (editorState: EditorState) => {
     editorState.read(() => {
@@ -42,13 +52,13 @@ export default function EditorWithImage() {
     const validFiles = files.filter((file) => {
       const { type, size } = file;
       return (
-        (["image/jpeg", "image/webp"].includes(type) && size <= MAX_IMAGE_SIZE) ||
+        (["image/jpeg", "image/webp", "image/png"].includes(type) && size <= MAX_IMAGE_SIZE) ||
         (type === "video/mp4" && size <= MAX_VIDEO_SIZE)
       );
     });
 
     if (validFiles.length !== files.length) {
-      alert("Some files were skipped: JPG/WEBP ≤1MB, MP4 ≤10MB only.");
+      alert("Some files were skipped: JPG,PNG/WEBP ≤1MB, MP4 ≤10MB only.");
     }
 
     setDraftFiles([...draftFiles, ...validFiles]);
@@ -56,8 +66,11 @@ export default function EditorWithImage() {
   };
 
   const handlePost = async () => {
-    await submitPost();
-    setShouldClearEditor(true); // to clear Lexical content
+    const payload = await submitPost();
+    if (payload) {
+      await createPost(payload); // ← Await this!
+      setShouldClearEditor(true); // ← or clearEditorState();
+    }
   };
 
   return (

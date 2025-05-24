@@ -1,10 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
 import { fetchCurrentUser } from './user.api';
 
-export const useCurrentUser = () =>
+export const useCurrentUser = (queryParams?: Record<string, any>) =>
   useQuery({
-    queryKey: ['current-user'],
-    queryFn: fetchCurrentUser,
-    staleTime: 1000 * 60 * 5, // 5 mins
+    queryKey: ['current-user', queryParams], 
+    queryFn: () => fetchCurrentUser(queryParams),
+    staleTime: 1000 * 60 * 5,
     retry: 1,
   });

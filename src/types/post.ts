@@ -3,11 +3,11 @@ export interface Attachment {
   type: "IMAGE" | "VIDEO";
   fileName: string;
   mimeType: string;
-  size: number;
+  size?: number;
   width?: number;
   height?: number;
   duration?: number;
-  uploadedAt: string;
+  uploadedAt?: string;
 }
 
 export interface CreatePostPayload {
@@ -18,3 +18,57 @@ export interface CreatePostPayload {
   communityId?: string | null;
   isHidden?: boolean;
 }
+
+
+
+
+export type PostUser = {
+  _id: string;
+  userId: string;
+  slug: string;
+  name: string;
+  avatar: string;
+};
+
+interface UserInfo {
+  slug: string;
+  name: string;
+  avatar: string;
+}
+
+interface CommunityInfo {
+  name: string;
+  slug: string;
+  avatar: string;
+}
+
+
+
+export interface Post {
+  _id: string;
+  content: string;
+  tags: string[];
+  userId: UserInfo
+  communityId?: CommunityInfo | null;
+  pageId?: string | null;
+  attachments: Attachment[];
+
+  createdAt: string;
+  updatedAt?: string;
+
+  likeCount: number;
+  commentCount?: number;
+  comments?: Comment[]; // If available, otherwise you can replace with your actual Comment[] type
+
+  score?: number;
+  isDeleted?: boolean;
+  deletedAt?: string | null;
+  isHidden?: boolean;
+  linkedNotifications?: string[];
+
+  // Add any other fields dynamically returned by your backend if needed
+}
+
+
+
+

@@ -7,12 +7,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { useState } from "react";
+import { SetStateAction, useRef, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import Cropper from "react-easy-crop";
 import getCroppedImg from "@/lib/cropImage";
 import { toast } from "sonner";
+import ImageCropper from "../common/ImageCropper";
+import ImageCropperModal from "../common/ImageCropperModal";
 
 const MAX_IMAGE_SIZE = 500 * 1024; // 500KB
 
@@ -30,8 +32,9 @@ export default function CreateCommunityPage() {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [croppedImage, setCroppedImage] = useState<Blob | null>(null);
-  const [crop, setCrop] = useState({ x: 0, y: 0 });
-  const [zoom, setZoom] = useState(1);
+  const [openCropper, setOpenCropper] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<null | {
     x: number;
     y: number;
@@ -64,7 +67,7 @@ export default function CreateCommunityPage() {
     },
   });
 
-  const onCropComplete = (_: any, croppedPixels: any) => {
+  const onCropComplete = (croppedPixels: any) => {
     setCroppedAreaPixels(croppedPixels);
   };
 
@@ -116,6 +119,7 @@ export default function CreateCommunityPage() {
             <div className="space-y-2">
               <Label htmlFor="image">Community Image</Label>
               <Input
+                ref={fileInputRef}
                 id="image"
                 type="file"
                 accept="image/*"
@@ -127,6 +131,7 @@ export default function CreateCommunityPage() {
                     const reader = new FileReader();
                     reader.onloadend = () => {
                       setImagePreview(reader.result as string);
+                      setOpenCropper(true);
                     };
                     reader.readAsDataURL(file);
                   }
@@ -135,23 +140,42 @@ export default function CreateCommunityPage() {
               {errors.image && <p className="text-sm text-red-500">{errors.image.message}</p>}
 
               {imagePreview && (
-                <div className="relative h-[200px] w-full bg-gray-100">
-                  <Cropper
-                    image={imagePreview}
-                    crop={crop}
-                    zoom={zoom}
-                    aspect={820 / 312}
-                    onCropChange={setCrop}
-                    onZoomChange={setZoom}
-                    onCropComplete={onCropComplete}
-                  />
-                </div>
+                <ImageCropperModal
+                  imageSrc={imagePreview}
+                  open={openCropper}
+                  onClose={() => {
+                    setOpenCropper(false);
+                    setImageFile(null);
+                    setValue("image", null);
+                    if (fileInputRef.current) {
+                      fileInputRef.current.value = "";
+                    }
+                  }}
+                  onCropped={(blob: SetStateAction<Blob | null>) => setCroppedImage(blob)}
+                />
+                // <ImageCropper
+                //   imageSrc={imagePreview}
+                //   onComplete={(blob) => setCroppedImage(blob)}
+                //   onCancel={() => setImagePreview(null)}
+                //   aspect={820 / 312}
+                // />
+                // <div className="relative h-[200px] w-full bg-gray-100">
+                //   <Cropper
+                //     image={imagePreview}
+                //     crop={crop}
+                //     zoom={zoom}
+                //     aspect={820 / 312}
+                //     onCropChange={setCrop}
+                //     onZoomChange={setZoom}
+                //     onCropComplete={onCropComplete}
+                //   />
+                // </div>
               )}
-              {imagePreview && (
+              {/* {imagePreview && (
                 <Button type="button" className="w-full" onClick={showCroppedImage}>
                   Crop Image
                 </Button>
-              )}
+              )} */}
 
               {croppedImage && (
                 <img

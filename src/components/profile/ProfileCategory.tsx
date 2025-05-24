@@ -7,6 +7,8 @@ import FeedsSection from "../FeedsSection";
 import Feed from "../Feed";
 import FollowingProfileList from "./FollowingProfile";
 import About from "./about/About";
+import { useFetchUserPosts } from "@/queries/posts/posts.queries";
+import { useUserStore } from "@/stores/userStore";
 
 const tabOptions = ["posts", "about", "Following Profiles", "Communities"];
 
@@ -14,10 +16,10 @@ export default function ProfileTabs() {
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const router = useRouter();
-
+  const { data, isLoading, isError } = useFetchUserPosts();
   const queryTab = searchParams.get("tab")?.toLowerCase() || "posts";
   const [selectedTab, setSelectedTab] = useState(queryTab);
-
+  const { user } = useUserStore();
   useEffect(() => {
     setSelectedTab(queryTab);
   }, [queryTab]);
@@ -44,7 +46,7 @@ export default function ProfileTabs() {
 
       <TabsContent value="posts">
         <Feed />
-        <FeedsSection />
+        <FeedsSection posts={data} isError={isError} isLoading={isLoading} showOwnPostsOnly />
       </TabsContent>
 
       <TabsContent value="about">

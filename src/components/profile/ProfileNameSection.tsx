@@ -1,7 +1,12 @@
 import Image from "next/image";
-import React from "react";
+import React, { useRef, useState } from "react";
 import { Button } from "../ui/button";
 import { Camera, Pencil } from "lucide-react";
+import { Input } from "../ui/input";
+import ImageCropperModal from "../common/ImageCropperModal";
+import { useMutation } from "@tanstack/react-query";
+import { getPresignedUrl, updateUserProfile, uploadToS3 } from "@/queries/user/user.api";
+import { toast } from "sonner";
 
 export default function ProfileNameSection({
   profileImage,
@@ -10,6 +15,52 @@ export default function ProfileNameSection({
   profileImage: string;
   name: string;
 }) {
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  const [imageSrc, setImageSrc] = useState<string>(
+    profileImage || "/images/profile/profile-img.webp",
+  );
+  const [openModal, setOpenModal] = useState(false);
+  const [croppedImage, setCroppedImage] = useState<string | null>(null);
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setImageSrc(reader.result as string);
+      setOpenModal(true);
+    };
+    reader.readAsDataURL(file);
+  };
+  const updateCoverMutation = useMutation({
+    mutationFn: async (blob: Blob) => {
+      try {
+        const file = new File([blob], "profile.jpg", { type: blob.type });
+
+        const { uploadUrl, fileUrl } = await getPresignedUrl(file, "avatars");
+
+        if (!uploadUrl || !fileUrl) {
+          throw new Error("2. Failed to get pre-signed URL from backend");
+        }
+
+        await uploadToS3(uploadUrl, file);
+
+        await updateUserProfile(fileUrl);
+
+        return fileUrl;
+      } catch (err) {
+        console.error("❌ Mutation failed:", err);
+        throw err; // rethrow so onError gets triggered
+      }
+    },
+    onSuccess: (fileUrl) => {
+      toast.success("Profile photo updated!");
+    },
+    onError: (err: any) => {
+      toast.error("Failed to update profile photo.");
+      console.error("onError:", err?.message || err);
+    },
+  });
+
   return (
     <div className="absolute bottom-6 w-full md:-bottom-4 lg:-bottom-0">
       <div className="relative flex w-full flex-col items-center justify-between md:flex-row md:items-end">
@@ -18,15 +69,49 @@ export default function ProfileNameSection({
 
           <div className="relative h-40 w-40 md:left-1/3 md:h-44 md:w-44 lg:left-4">
             <Image
-              src={profileImage}
+              src={croppedImage || imageSrc}
               alt="Profile"
-              width={128}
-              height={128}
-              className="h-full w-full rounded-full border-4 border-white object-cover shadow-lg dark:border-black"
+              fill
+              className="aspect-square rounded-full border-4 border-white shadow-lg dark:border-black"
             />
-            <div className="bg-offwhite absolute bottom-5 right-2 rounded-full p-1 dark:bg-gray-900">
-              <Camera />
+            <div className="absolute bottom-5 right-2 rounded-full bg-offwhite p-1 dark:bg-gray-900">
+              <Button
+                type="button"
+                variant={"ghost"}
+                className="h-8 w-8 rounded-full p-0"
+                onClick={() => {
+                  if (inputRef.current) {
+                    inputRef.current.value = ""; // ✅ reset before opening picker
+                    inputRef.current.click();
+                  }
+                }}
+              >
+                <Camera />
+              </Button>
+              <Input
+                ref={inputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                className="hidden"
+              />
             </div>
+            {openModal && (
+              <ImageCropperModal
+                imageSrc={imageSrc}
+                open={openModal}
+                onClose={() => {
+                  setOpenModal(false);
+                }}
+                aspect={1 / 1}
+                onCropped={(blob) => {
+                  setOpenModal(false);
+                  const url = URL.createObjectURL(blob);
+                  setCroppedImage(url); // set preview
+                  updateCoverMutation.mutate(blob);
+                }}
+              />
+            )}
           </div>
 
           {/* Name */}
@@ -37,10 +122,10 @@ export default function ProfileNameSection({
           </div>
         </div>
         <div className="md:m-5 md:mr-9">
-          <Button className="bg-offwhite px-4 py-2 text-gray-900">
+          {/* <Button className="bg-offwhite px-4 py-2 text-gray-900">
             <Pencil />
             Edit Profile
-          </Button>
+          </Button> */}
         </div>
       </div>
     </div>

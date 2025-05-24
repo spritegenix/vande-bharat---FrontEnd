@@ -1,29 +1,20 @@
 "use client";
 import React from "react";
 import Box from "./elements/Box";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import Image from "next/image";
+
 import Editor from "./Editor";
-import { useUser } from "@clerk/nextjs";
+import { useCurrentUser } from "@/queries/user/user.queries";
+import LoadingSpinner from "./common/LoadingSpinner";
+import UserAvatar from "./common/UserAvatar";
 
 export default function Feed() {
-  const { user, isLoaded } = useUser();
-
-  if (!isLoaded || !user) return null;
+  const { data: user, isError, isLoading } = useCurrentUser();
+  if (isError) return <p>Error loading user.</p>;
+  if (isLoading) return <LoadingSpinner />;
   return (
     <Box className="m-2 px-3 pb-3 pt-2 md:mx-auto">
       <div className="flex gap-x-4">
-        <Avatar>
-          <AvatarImage src="https://github.com/shadcn.png" />
-          <AvatarFallback>
-            <Image
-              src="/images/profile/profileplaceholder.jpg"
-              alt="image"
-              height={50}
-              width={50}
-            />
-          </AvatarFallback>
-        </Avatar>
+        <UserAvatar avatar={user?.avatar} />
         <Editor />
       </div>
     </Box>

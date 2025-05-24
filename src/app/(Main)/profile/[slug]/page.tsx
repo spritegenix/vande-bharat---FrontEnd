@@ -1,24 +1,25 @@
 "use client";
+import LoadingSpinner from "@/components/common/LoadingSpinner";
 import CoverImage from "@/components/profile/CoverImage";
 import ProfileCategory from "@/components/profile/ProfileCategory";
 import { useCurrentUser } from "@/queries/user/user.queries";
-import { useAuth } from "@clerk/nextjs";
-import axios from "axios";
+import { useUserStore } from "@/stores/userStore";
 import React, { useEffect } from "react";
 
 export default function IndividualProfilePage() {
-  const { data: user, isLoading, isError } = useCurrentUser();
-
-  if (isLoading) return <p>Loading...</p>;
+  const { data: user, isLoading, isError } = useCurrentUser({ fields: "banner,name,avatar,slug" });
+  const { setUser } = useUserStore();
+  useEffect(() => {
+    if (user) {
+      setUser(user);
+    }
+  }, [user]);
+  if (isLoading) return <LoadingSpinner />;
   if (isError) return <p>Failed to load user.</p>;
 
   return (
     <div>
-      <CoverImage
-        coverImage={"/images/profile/profile-cover.jpg"}
-        profileImage={"/images/profile/profile-img.webp"}
-        name={user?.firstName}
-      />
+      <CoverImage coverImage={user?.banner} profileImage={user?.avatar} name={user?.name} />
       <ProfileCategory />
     </div>
   );

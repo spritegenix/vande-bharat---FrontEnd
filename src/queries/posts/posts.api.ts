@@ -15,3 +15,8 @@ export const fetchPosts = async () => {
   const response = await axios.get("/posts/all-posts", {withCredentials: true});
   return response.data.data;
 };
+
+export const userPosts = async () => {
+  const response = await axios.get("/posts/my-posts", {withCredentials: true});
+  return response.data.data;
+};
