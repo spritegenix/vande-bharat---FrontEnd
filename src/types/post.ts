@@ -65,7 +65,8 @@ export interface Post {
   deletedAt?: string | null;
   isHidden?: boolean;
   linkedNotifications?: string[];
-
+  isLiked?: boolean;         
+  isBookmarked?: boolean;    
   // Add any other fields dynamically returned by your backend if needed
 }
 

@@ -45,7 +45,7 @@ export default function ProfileTabs() {
       </TabsList>
 
       <TabsContent value="posts">
-        <Feed />
+        <Feed user={user} />
         <FeedsSection posts={data} isError={isError} isLoading={isLoading} showOwnPostsOnly />
       </TabsContent>
 

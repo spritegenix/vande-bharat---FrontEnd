@@ -8,11 +8,19 @@ import Wrapper from "../elements/Wrappers";
 import { AnimatePresence, motion } from "framer-motion";
 import { Button } from "../ui/button";
 import { toast } from "sonner";
+import { useCurrentUser } from "@/queries/user/user.queries";
+import { useUserStore } from "@/stores/userStore";
 
 export default function LayoutClient({ children }: any) {
   const [isLeftMenuOpen, setIsLeftMenuOpen] = useState(false);
   const [isSearchOpen, setSearchOpen] = useState(false);
-
+  const { data: user, isLoading, isError } = useCurrentUser({ fields: "banner,name,avatar,slug" });
+  const { setUser } = useUserStore();
+  useEffect(() => {
+    if (user) {
+      setUser(user);
+    }
+  }, [user]);
   return (
     <>
       <Header

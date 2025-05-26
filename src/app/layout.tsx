@@ -5,8 +5,6 @@ import "./css/loader.css";
 import "./css/typeHead.css";
 import "./css/swiper.css";
 import Env from "@/lib/env";
-import Script from "next/script";
-import Layout from "@/components/layout/Layout";
 import Providers from "@/providers/Providers";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Toaster } from "sonner";

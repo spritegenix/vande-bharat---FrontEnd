@@ -36,17 +36,21 @@ import Button from "@/components/elements/Button";
 import { PiUserSwitch } from "react-icons/pi";
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { SignOutButton, UserButton, useUser } from "@clerk/nextjs";
+import { SignOutButton, useClerk, UserButton, useUser } from "@clerk/nextjs";
+import { useUserStore } from "@/stores/userStore";
 interface UserButtonProps {
   className?: string;
 }
 
 export default function UserProfile({ className }: UserButtonProps) {
-  const { user } = useUser();
-
+  const { user, setUser } = useUserStore();
+  const { signOut } = useClerk();
   const { theme, setTheme } = useTheme();
   const [isProfileSwitchTab, setIsProfileSwitchTab] = useState(false);
-
+  const handleLogout = async () => {
+    await signOut();
+    setUser("");
+  };
   // const queryClient = useQueryClient();
 
   return (
@@ -109,9 +113,7 @@ export default function UserProfile({ className }: UserButtonProps) {
               exit={{ x: "-100%" }}
               transition={{ type: "tween", duration: 0.2 }}
             >
-              <DropdownMenuLabel className="m-3">
-                Logged in as @{user?.username || user?.firstName}
-              </DropdownMenuLabel>
+              <DropdownMenuLabel className="m-3">Logged in as @{user?.name}</DropdownMenuLabel>
               {/* <DropdownMenuLabel className="flex justify-center">
                 <Button
                   leftIcon={<PiUserSwitch className="text-xl" />}
@@ -166,7 +168,10 @@ export default function UserProfile({ className }: UserButtonProps) {
               </DropdownMenuSub>
               <DropdownMenuSeparator />
               <DropdownMenuItem>
-                <SignOutButton />
+                <Button variant="ghost" className="w-full justify-start" onClick={handleLogout}>
+                  SignOut
+                  {/* <SignOutButton /> */}
+                </Button>
                 {/* <LogOutIcon className="mr-2 size-4" />
                 Logout */}
               </DropdownMenuItem>

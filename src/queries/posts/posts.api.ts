@@ -12,7 +12,10 @@ export const createPost = async (payload: CreatePostPayload) => {
 
 // GET /api/v1/posts
 export const fetchPosts = async () => {
-  const response = await axios.get("/posts/all-posts", {withCredentials: true});
+  const response = await axios.get("/posts/all-posts", {params:{
+    isLiked: true,
+    isBookmarked: true,
+  }, withCredentials: true});
   return response.data.data;
 };
 
@@ -20,3 +23,9 @@ export const userPosts = async () => {
   const response = await axios.get("/posts/my-posts", {withCredentials: true});
   return response.data.data;
 };
+
+
+// export const deletePost = async(postId:string)=> {
+//   const respone = await axios.delete(`/posts/${postId}`, {withCredentials: true});
+//   return respone.data.data
+// }

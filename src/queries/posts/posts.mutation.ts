@@ -117,3 +117,37 @@ export const useCreatePost = () => {
     },
   });
 };
+
+
+export const useDeletePost = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (postId: string) => {
+      const response = await axios.delete(`/posts/${postId}`);
+      return response.data.data;
+    },
+
+    onMutate: async (postId) => {
+      await queryClient.cancelQueries({ queryKey: ["user-posts"] });
+
+      const previousPosts = queryClient.getQueryData<Post[]>(["user-posts"]);
+
+      queryClient.setQueryData<Post[]>(["user-posts"], (old) =>
+        old?.filter((p) => p._id !== postId) ?? []
+      );
+
+      return { previousPosts };
+    },
+
+    onError: (err, _vars, context) => {
+      if (context?.previousPosts) {
+        queryClient.setQueryData(["user-posts"], context.previousPosts);
+      }
+    },
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["user-posts"] });
+    },
+  });
+}

@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Box from "./elements/Box";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "./ui/button";
@@ -19,7 +19,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import InlineEditorWithMedia from "./InlineEditorWithMedia";
-import { useUpdatePost } from "@/queries/posts/posts.mutation";
+import { useDeletePost, useUpdatePost } from "@/queries/posts/posts.mutation";
+import { toast } from "sonner";
+import { useUserStore } from "@/stores/userStore";
+import { redirect } from "next/navigation";
+import { useMutation } from "@tanstack/react-query";
+import axios from "@/lib/axios";
 
 interface FeedsSectionProps {
   posts: Post[];
@@ -34,10 +39,77 @@ export default function FeedsSection({
   showOwnPostsOnly = false,
 }: FeedsSectionProps) {
   const [editingPostId, setEditingPostId] = React.useState<string | null>(null);
-  const { mutate: updatePost } = useUpdatePost();
+  const [liked, setLiked] = useState<Record<string, boolean>>({});
+  const [bookmarked, setBookmarked] = useState(false);
+  const [likeCounts, setLikeCounts] = useState<Record<string, number>>({});
 
+  const { mutate: updatePost } = useUpdatePost();
+  const { mutate: deletePost } = useDeletePost();
+  const { user } = useUserStore();
+
+  useEffect(() => {
+    if (!posts) return;
+    const initialLiked: Record<string, boolean> = {};
+    const initialCounts: Record<string, number> = {};
+    posts.forEach((post) => {
+      initialLiked[post._id] = post.isLiked ?? false;
+      initialCounts[post._id] = post.likeCount ?? 0;
+    });
+    setLiked(initialLiked);
+    setLikeCounts(initialCounts);
+  }, [posts]);
+
+  const handleDelete = (postId: string) => {
+    deletePost(postId, {
+      onSuccess: () => {
+        toast.success("Post deleted successfully");
+      },
+      onError: (error) => {
+        console.error("Error deleting post:", error);
+      },
+    });
+  };
+  const { mutate: toggleLikeMutation } = useMutation({
+    mutationFn: (postId: string) =>
+      axios.post(`/posts/likes/${postId}/toggle`).then((res) => res.data),
+
+    onMutate: async (postId) => {
+      setLiked((prev) => ({ ...prev, [postId]: !prev[postId] }));
+      setLikeCounts((prev) => ({
+        ...prev,
+        [postId]: prev[postId] + (liked[postId] ? -1 : 1),
+      }));
+    },
+
+    onError: (_err, postId) => {
+      // rollback
+      setLiked((prev) => ({ ...prev, [postId]: !prev[postId] }));
+      setLikeCounts((prev) => ({
+        ...prev,
+        [postId]: prev[postId] + (liked[postId] ? 1 : -1),
+      }));
+    },
+
+    onSuccess: (data, postId) => {
+      // Optional: if the response contains `liked`, you can correct state with it
+      setLiked((prev) => ({ ...prev, [postId]: data.liked }));
+    },
+  });
+
+  const toggleLike = (id: string) => {
+    toggleLikeMutation(id);
+  };
+
+  const toggleBookmark = () => {
+    setBookmarked((prev) => !prev);
+    // TODO: call backend mutation to sync
+  };
+  const handleFollow = () => {
+    if (!user) redirect("/login");
+  };
   if (isLoading || !posts) return <LoadingSpinner />;
   if (isError) return <p>Error loading posts.</p>;
+  console.log(posts);
   return (
     <div className="mb-2">
       {posts.map((post: Post) => (
@@ -83,7 +155,7 @@ export default function FeedsSection({
 
                 <div className="flex items-center gap-2">
                   {!showOwnPostsOnly && (
-                    <Button variant="outline" size="sm" className="text-xs">
+                    <Button variant="outline" size="sm" className="text-xs" onClick={handleFollow}>
                       Follow
                     </Button>
                   )}
@@ -108,7 +180,7 @@ export default function FeedsSection({
                         Edit
                       </DropdownMenuItem>
                       <DropdownMenuItem
-                        // onClick={() => handleDelete(post._id)}
+                        onClick={() => handleDelete(post._id)}
                         className="text-red-500"
                       >
                         Delete
@@ -162,23 +234,42 @@ export default function FeedsSection({
               <div className="mx-4 mt-4 border-t border-gray-400 px-3 pt-4 text-sm text-gray-500">
                 <div className="flex items-center justify-between">
                   <div className="flex w-full items-center justify-between gap-x-4">
-                    <button className="flex items-center gap-1 hover:text-blue-600">
+                    <Button
+                      variant={"ghost"}
+                      onClick={() => toggleLike(post._id)}
+                      className={`flex items-center gap-1 ${post?.isLiked ? "text-blue-600" : ""}`}
+                    >
                       <ThumbsUp size={16} />
-                      Like
-                    </button>
+                      {post?.likeCount > 0 && <span className="text-sm">{post.likeCount}</span>}
+                      <span className="hidden md:flex">Like</span>
+                    </Button>
+
                     <div className="flex items-center justify-center gap-x-4">
-                      <button className="flex items-center gap-1 hover:text-blue-600">
+                      <Button
+                        variant={"ghost"}
+                        className="flex items-center gap-1 hover:text-blue-600"
+                      >
                         <MessageCircle size={16} />
-                        Comment
-                      </button>
-                      <button className="flex items-center gap-1 hover:text-blue-600">
+                        {/* {post?.commentCount && post?.commentCount > 0 && (
+                          <span className="text-sm text-gray-600">{post?.commentCount}</span>
+                        )} */}
+                        <span className="hidden md:flex">Comment</span>
+                      </Button>
+                      <Button
+                        variant={"ghost"}
+                        className="flex items-center gap-1 hover:text-blue-600"
+                      >
                         <Share2 size={16} />
-                        Share
-                      </button>
-                      <button className="flex items-center gap-1 hover:text-blue-600">
+                        <span className="hidden md:flex">Share</span>
+                      </Button>
+                      <Button
+                        variant={"ghost"}
+                        onClick={toggleBookmark}
+                        className={`flex items-center gap-1 ${bookmarked ? "text-blue-600" : ""} `}
+                      >
                         <Bookmark size={16} />
-                        Bookmark
-                      </button>
+                        <span className="hidden md:flex">Bookmark</span>
+                      </Button>
                     </div>
                   </div>
                 </div>

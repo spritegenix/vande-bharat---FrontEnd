@@ -25,6 +25,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import Image from "next/image";
 import { Button } from "../ui/button";
 import { useUser } from "@clerk/nextjs";
+import { useUserStore } from "@/stores/userStore";
 
 interface MenuBarProps {
   className?: string;
@@ -41,8 +42,8 @@ interface MenuTabProps {
 export default function MenuBar({ className }: MenuBarProps) {
   const [showAllCommunities, setShowAllCommunities] = useState(false);
 
-  const user = useUser();
-  const userProfileSlug = user?.user?.id || user?.user?.firstName || "me";
+  const user = useUserStore((state) => state.user);
+  const userProfileSlug = user?.slug || user?.id;
   const [isCreatePageOpen, setIsCreatePageOpen] = useState(false);
   const [isCreateCommunityOpen, setIsCreateCommunityOpen] = useState(false);
 

@@ -6,7 +6,6 @@ export const fetchCurrentUser = async (query?: Record<string, any>) => {
     withCredentials: true,
     params: query, // ✅ this appends query to the URL
   });
-
   return res.data.data;
 };
 
