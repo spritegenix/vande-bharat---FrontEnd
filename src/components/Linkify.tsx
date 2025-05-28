@@ -1,5 +1,5 @@
 import Link from "next/link";
-import React, { Children } from "react";
+import React from "react";
 import { LinkIt, LinkItUrl } from "react-linkify-it";
 interface LinkifyProps {
   children: React.ReactNode;

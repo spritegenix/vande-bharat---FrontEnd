@@ -1,30 +1,24 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import Box from "./elements/Box";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "./ui/button";
-import { Bookmark, MessageCircle, MoreHorizontal, Share2, ThumbsUp, X } from "lucide-react";
+import { MessageCircle } from "lucide-react";
 import Image from "next/image";
 import Linkify from "./Linkify";
-import { formatPublishedDate } from "@/utils/dateSorter";
 import LoadingSpinner from "./common/LoadingSpinner";
-import Link from "next/link";
 import { Post } from "@/types/post";
-
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import InlineEditorWithMedia from "./InlineEditorWithMedia";
-import { useDeletePost, useUpdatePost } from "@/queries/posts/posts.mutation";
-import { toast } from "sonner";
+import { useUpdatePost } from "@/queries/posts/posts.mutation";
 import { useUserStore } from "@/stores/userStore";
 import { redirect } from "next/navigation";
-import { useMutation } from "@tanstack/react-query";
-import axios from "@/lib/axios";
+import LikeButton from "./posts/like/LikeButton";
+import PostHeader from "./posts/PostHeader";
+import PostUpdateButton from "./posts/dropdown/PostUpdateButton";
+import ShareMenu from "./posts/ShareMenu";
+import BookmarkButton from "./posts/BookmarkButton";
+import { PostCommentSection } from "./posts/comments/PostCommentSection";
+import CommentButton from "./posts/comments/CommentButton";
 
 interface FeedsSectionProps {
   posts: Post[];
@@ -39,77 +33,15 @@ export default function FeedsSection({
   showOwnPostsOnly = false,
 }: FeedsSectionProps) {
   const [editingPostId, setEditingPostId] = React.useState<string | null>(null);
-  const [liked, setLiked] = useState<Record<string, boolean>>({});
-  const [bookmarked, setBookmarked] = useState(false);
-  const [likeCounts, setLikeCounts] = useState<Record<string, number>>({});
-
   const { mutate: updatePost } = useUpdatePost();
-  const { mutate: deletePost } = useDeletePost();
   const { user } = useUserStore();
 
-  useEffect(() => {
-    if (!posts) return;
-    const initialLiked: Record<string, boolean> = {};
-    const initialCounts: Record<string, number> = {};
-    posts.forEach((post) => {
-      initialLiked[post._id] = post.isLiked ?? false;
-      initialCounts[post._id] = post.likeCount ?? 0;
-    });
-    setLiked(initialLiked);
-    setLikeCounts(initialCounts);
-  }, [posts]);
-
-  const handleDelete = (postId: string) => {
-    deletePost(postId, {
-      onSuccess: () => {
-        toast.success("Post deleted successfully");
-      },
-      onError: (error) => {
-        console.error("Error deleting post:", error);
-      },
-    });
-  };
-  const { mutate: toggleLikeMutation } = useMutation({
-    mutationFn: (postId: string) =>
-      axios.post(`/posts/likes/${postId}/toggle`).then((res) => res.data),
-
-    onMutate: async (postId) => {
-      setLiked((prev) => ({ ...prev, [postId]: !prev[postId] }));
-      setLikeCounts((prev) => ({
-        ...prev,
-        [postId]: prev[postId] + (liked[postId] ? -1 : 1),
-      }));
-    },
-
-    onError: (_err, postId) => {
-      // rollback
-      setLiked((prev) => ({ ...prev, [postId]: !prev[postId] }));
-      setLikeCounts((prev) => ({
-        ...prev,
-        [postId]: prev[postId] + (liked[postId] ? 1 : -1),
-      }));
-    },
-
-    onSuccess: (data, postId) => {
-      // Optional: if the response contains `liked`, you can correct state with it
-      setLiked((prev) => ({ ...prev, [postId]: data.liked }));
-    },
-  });
-
-  const toggleLike = (id: string) => {
-    toggleLikeMutation(id);
-  };
-
-  const toggleBookmark = () => {
-    setBookmarked((prev) => !prev);
-    // TODO: call backend mutation to sync
-  };
   const handleFollow = () => {
     if (!user) redirect("/login");
   };
   if (isLoading || !posts) return <LoadingSpinner />;
   if (isError) return <p>Error loading posts.</p>;
-  console.log(posts);
+
   return (
     <div className="mb-2">
       {posts.map((post: Post) => (
@@ -129,29 +61,7 @@ export default function FeedsSection({
           ) : (
             <Box key={post._id} className="m-2 my-6 pb-2 md:mx-auto">
               <div className="flex items-start justify-between gap-x-2 p-3 pb-0">
-                {!showOwnPostsOnly && (
-                  <div className="flex gap-x-2">
-                    <Avatar>
-                      <AvatarImage src={post?.userId?.avatar} />
-                      <AvatarFallback>
-                        <Image
-                          src="/images/profile/profileplaceholder.jpg"
-                          alt="fallback"
-                          height={50}
-                          width={50}
-                        />
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex flex-col text-sm font-semibold">
-                      <Link href={`/profile/${post?.userId?.slug}`}>
-                        <p>{post?.userId?.name}</p>
-                      </Link>
-                      <p className="text-xs font-normal text-gray-500">
-                        {formatPublishedDate(post.createdAt)}
-                      </p>
-                    </div>
-                  </div>
-                )}
+                {!showOwnPostsOnly && <PostHeader post={post} />}
 
                 <div className="flex items-center gap-2">
                   {!showOwnPostsOnly && (
@@ -169,24 +79,7 @@ export default function FeedsSection({
                 </div>
 
                 {showOwnPostsOnly && (
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon">
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-32">
-                      <DropdownMenuItem onClick={() => setEditingPostId(post._id)}>
-                        Edit
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => handleDelete(post._id)}
-                        className="text-red-500"
-                      >
-                        Delete
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                  <PostUpdateButton post={post} setEditingPostId={setEditingPostId} />
                 )}
               </div>
 
@@ -234,46 +127,25 @@ export default function FeedsSection({
               <div className="mx-4 mt-4 border-t border-gray-400 px-3 pt-4 text-sm text-gray-500">
                 <div className="flex items-center justify-between">
                   <div className="flex w-full items-center justify-between gap-x-4">
-                    <Button
-                      variant={"ghost"}
-                      onClick={() => toggleLike(post._id)}
-                      className={`flex items-center gap-1 ${post?.isLiked ? "text-blue-600" : ""}`}
-                    >
-                      <ThumbsUp size={16} />
-                      {post?.likeCount > 0 && <span className="text-sm">{post.likeCount}</span>}
-                      <span className="hidden md:flex">Like</span>
-                    </Button>
+                    <LikeButton posts={posts} post={post} />
 
                     <div className="flex items-center justify-center gap-x-4">
-                      <Button
+                      <CommentButton postId={post._id} />
+                      {/* <Button
                         variant={"ghost"}
                         className="flex items-center gap-1 hover:text-blue-600"
                       >
                         <MessageCircle size={16} />
-                        {/* {post?.commentCount && post?.commentCount > 0 && (
-                          <span className="text-sm text-gray-600">{post?.commentCount}</span>
-                        )} */}
+
                         <span className="hidden md:flex">Comment</span>
-                      </Button>
-                      <Button
-                        variant={"ghost"}
-                        className="flex items-center gap-1 hover:text-blue-600"
-                      >
-                        <Share2 size={16} />
-                        <span className="hidden md:flex">Share</span>
-                      </Button>
-                      <Button
-                        variant={"ghost"}
-                        onClick={toggleBookmark}
-                        className={`flex items-center gap-1 ${bookmarked ? "text-blue-600" : ""} `}
-                      >
-                        <Bookmark size={16} />
-                        <span className="hidden md:flex">Bookmark</span>
-                      </Button>
+                      </Button> */}
+                      <ShareMenu postUrl={`/posts/${post._id}`} />
+                      <BookmarkButton posts={posts} post={post} />
                     </div>
                   </div>
                 </div>
               </div>
+              <PostCommentSection postId={post._id} />
             </Box>
           )}
         </React.Fragment>

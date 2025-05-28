@@ -55,11 +55,13 @@ export default function MenuBar({ className }: MenuBarProps) {
           <MenuTab icon={<MessageSquareShare />} label="Popular" href="/popular" />
           <MenuTab icon={<BellRing />} label="Notifications" href="/notifications" />
           <hr className="my-4 w-full max-w-52 border-t" />
-          <MenuTab
-            icon={<UserRound />}
-            label="Profile"
-            href={userProfileSlug && `/profile/${userProfileSlug}`}
-          />
+          {userProfileSlug && (
+            <MenuTab
+              icon={<UserRound />}
+              label="Profile"
+              href={userProfileSlug && `/profile/${userProfileSlug}`}
+            />
+          )}
           <MenuTab icon={<Bookmark />} label="Bookmarks" href="/bookmarks" />
           <MenuTab icon={<UserPlus />} label="Add Saathis" href="/profile" />
         </div>

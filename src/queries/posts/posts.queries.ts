@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { CreatePostPayload } from "@/types/post";
-import { createPost, fetchPosts, userPosts } from "./posts.api";
+import { createPost, fetchBookmarkedPosts, fetchPosts, userPosts } from "./posts.api";
 
 export const useCreatePost = () => {
   return useMutation({
@@ -26,3 +26,13 @@ export const useFetchUserPosts = () => {
     retry: 1,
   });
 };
+
+
+export const useFetchBookmarkedPosts = ()=> {
+  return useQuery({
+    queryKey:['bookmarked-posts'],
+    queryFn: fetchBookmarkedPosts,
+    staleTime: 1000 * 60 * 5,
+    retry: 1,
+  })
+}

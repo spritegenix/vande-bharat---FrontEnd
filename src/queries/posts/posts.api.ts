@@ -25,7 +25,8 @@ export const userPosts = async () => {
 };
 
 
-// export const deletePost = async(postId:string)=> {
-//   const respone = await axios.delete(`/posts/${postId}`, {withCredentials: true});
-//   return respone.data.data
-// }
+//bookmark posts
+export const fetchBookmarkedPosts = async()=> {
+  const response = await axios.get("/posts/bookmarks/my-bookmarks", {params:{isLiked:true, isBookmarked:true},withCredentials: true});
+    return response.data.bookmarks;
+}
