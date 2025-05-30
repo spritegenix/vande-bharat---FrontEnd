@@ -71,6 +71,7 @@ export const useUpdatePost = () => {
 // hooks/posts/useCreatePost.ts
 import { useEditorStore } from "@/stores/editorStore";
 import { CreatePostPayload } from "@/types/post";
+import { deleteComment, updateComment } from "./posts.api";
 
 export const useCreatePost = () => {
   const queryClient = useQueryClient();
@@ -151,3 +152,61 @@ export const useDeletePost = () => {
     },
   });
 }
+
+
+
+
+
+
+export const useUpdateComment = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: updateComment,  
+
+    // 👇 Optimistic Update
+    onMutate: async ({ commentId, content }) => {
+      await queryClient.cancelQueries({ queryKey: ["comments"] });
+
+      const previousComments = queryClient.getQueryData<any>(["comments"]);
+
+      queryClient.setQueryData(["comments"], (oldData: any) => {
+        if (!oldData) return oldData;
+        return {
+          ...oldData,
+          comments: oldData.comments.map((c: any) =>
+            c._id === commentId ? { ...c, content } : c
+          ),
+        };
+      });
+
+      return { previousComments };
+    },
+
+    // 👇 Rollback on error
+    onError: (err, _vars, context) => {
+      if (context?.previousComments) {
+        queryClient.setQueryData(["comments"], context.previousComments);
+      }
+    },
+
+    // 👇 Refetch on success
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["comments"] });
+    },
+  });
+};
+
+
+export const useDeleteComment = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (commentId: string) => deleteComment(commentId),
+
+    onSuccess: (_data, commentId, _context) => {
+      // Invalidate the comments cache for any matching post
+      queryClient.invalidateQueries({ queryKey: ["comments"] });
+    },
+  });
+};

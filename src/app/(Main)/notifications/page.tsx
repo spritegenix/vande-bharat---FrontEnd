@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Dot, MessageSquareDot } from "lucide-react";
+import { MessageSquareDot } from "lucide-react";
 
 type NotificationType = {
   id: string;

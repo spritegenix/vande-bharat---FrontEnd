@@ -5,7 +5,7 @@ import Box from "./elements/Box";
 import Editor from "./Editor";
 import UserAvatar from "./common/UserAvatar";
 
-export default function Feed({ user }: { user: any }) {
+export default function Feed({ user }: { user?: any }) {
   return (
     <>
       {user && (

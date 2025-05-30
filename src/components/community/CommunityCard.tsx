@@ -1,11 +1,9 @@
 "use client";
 
 import { Card } from "@/components/ui/card";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useState } from "react";
-import { Skeleton } from "@/components/ui/skeleton";
 
 interface CommunityCardProps {
   id: string;

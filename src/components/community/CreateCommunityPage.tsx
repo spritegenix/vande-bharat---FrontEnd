@@ -137,7 +137,7 @@ export default function CreateCommunityPage() {
                   }
                 }}
               />
-              {errors.image && <p className="text-sm text-red-500">{errors.image.message}</p>}
+              {/* {errors.image && <p className="text-sm text-red-500">{errors?.description}</p>} */}
 
               {imagePreview && (
                 <ImageCropperModal
@@ -186,8 +186,8 @@ export default function CreateCommunityPage() {
               )}
             </div>
 
-            <Button type="submit" className="w-full" disabled={createCommunityMutation.isLoading}>
-              {createCommunityMutation.isLoading ? "Creating..." : "Create Community"}
+            <Button type="submit" className="w-full" disabled={createCommunityMutation.isPending}>
+              {createCommunityMutation.isPending ? "Creating..." : "Create Community"}
             </Button>
           </form>
         </CardContent>

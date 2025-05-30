@@ -3,14 +3,6 @@
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-} from "@/components/ui/dropdown-menu";
-import { MoreVertical } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
 import SkeletonCard from "@/components/common/SkeletonCard";
 
 interface Profile {
