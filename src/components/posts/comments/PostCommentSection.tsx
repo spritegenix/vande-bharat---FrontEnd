@@ -9,17 +9,17 @@ import CreateComment from "./CreateComment";
 interface PostCommentSectionProps {
   postId: string;
 }
-
-interface Comment {
-  _id: string;
-  userId: string;
-  content: string;
-  createdAt: string;
-}
 interface UserInfo {
+  _id: string;
   slug: string;
   name: string;
   avatar: string;
+}
+interface Comment {
+  _id: string;
+  userId: UserInfo;
+  content: string;
+  createdAt: string;
 }
 
 const fetchComments = async (postId: string) => {
@@ -54,7 +54,7 @@ export const PostCommentSection = ({ postId }: PostCommentSectionProps) => {
 
               {!isLoading &&
                 !isError &&
-                comments?.map((c: Comment & { userId: UserInfo }) => (
+                comments?.map((c: Comment) => (
                   <CommentItem c={c} key={c._id} />
                   // <div key={c._id} className="mb-4 flex items-start gap-3">
                   //   {/* Avatar */}

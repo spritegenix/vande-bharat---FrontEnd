@@ -31,6 +31,7 @@ export type PostUser = {
 };
 
 interface UserInfo {
+  
   slug: string;
   name: string;
   avatar: string;
@@ -47,7 +48,7 @@ interface CommunityInfo {
 export interface Post {
   _id: string;
   content: string;
-  tags: string[];
+  tags?: string[];
   userId: UserInfo
   communityId?: CommunityInfo | null;
   pageId?: string | null;

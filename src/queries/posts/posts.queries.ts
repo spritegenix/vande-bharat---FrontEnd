@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useMutation, useQuery } from "@tanstack/react-query";
 import { CreatePostPayload } from "@/types/post";
 import { createPost, fetchBookmarkedPosts, fetchPosts, userPosts } from "./posts.api";
 
@@ -9,11 +9,13 @@ export const useCreatePost = () => {
 };
 
 export const useFetchPosts = () => {
-  return useQuery({
+  return useInfiniteQuery({
     queryKey: ['fetch-posts'],
     queryFn: fetchPosts,
-       staleTime: 1000 * 60 * 5, 
-    retry: 1,
+  initialPageParam:null,
+  getNextPageParam:(lastPage)=>{
+    return lastPage?.nextCursor?? undefined
+  }
   });
 };
 

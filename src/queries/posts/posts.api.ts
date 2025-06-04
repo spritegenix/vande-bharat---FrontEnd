@@ -1,24 +1,32 @@
 // api/posts.api.ts
 
 import axios from "@/lib/axios";
-import { CreatePostPayload } from "@/types/post";
+import { CreatePostPayload, Post } from "@/types/post";
 
 // POST /api/v1/posts/create-post
 export const createPost = async (payload: CreatePostPayload) => {
   const response = await axios.post("/posts/create-post", payload, { withCredentials: true });
   return response.data;
 };
-
+export type AllPosts = {
+  success: boolean;
+  data: Post[];
+  nextCursor: string | null;
+  sort?: string;
+  limit?: number;
+}
 // GET /api/v1/posts
-export const fetchPosts = async () => {
-  const response = await axios.get("/posts/all-posts", {
+export const fetchPosts = async({ pageParam = null }: { pageParam?: string | null })  => {
+  const response = await axios.get<AllPosts>("/posts/all-posts", {
     params: {
       isLiked: true,
       isBookmarked: true,
+      cursor:pageParam
     },
     withCredentials: true,
   });
-  return response.data.data;
+  console.log(response.data)
+  return response?.data;
 };
 
 export const userPosts = async () => {

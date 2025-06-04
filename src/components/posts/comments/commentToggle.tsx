@@ -11,11 +11,20 @@ import { useDeleteComment, useUpdateComment } from "@/queries/posts/posts.mutati
 import { useUserStore } from "@/stores/userStore";
 import { CustomTextarea } from "@/components/CustomTextArea";
 import { ConfirmDeleteDialog } from "@/components/common/ConfirmDeleteModal";
-interface UpdateCommentPayload {
-  commentId: string;
-  content: string;
+
+interface UserInfo {
+  _id: string;
+  slug: string;
+  name: string;
+  avatar: string;
 }
-export default function CommentItem({ c }) {
+interface Comment {
+  _id: string;
+  userId: UserInfo;
+  content: string;
+  createdAt: string;
+}
+export default function CommentItem({ c }: { c: Comment }) {
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(c.content);
   const { mutate: updateCommentMutate, isPending } = useUpdateComment();

@@ -25,12 +25,18 @@ interface FeedsSectionProps {
   isLoading: boolean;
   isError: boolean;
   showOwnPostsOnly?: boolean;
+  fetchNextPage: () => void;
+  isFetchingNextPage?: boolean;
+  hasNextPage?: Boolean;
 }
 export default function FeedsSection({
   posts,
   isLoading,
   isError,
   showOwnPostsOnly = false,
+  fetchNextPage,
+  hasNextPage,
+  isFetchingNextPage,
 }: FeedsSectionProps) {
   const [editingPostId, setEditingPostId] = React.useState<string | null>(null);
   const { mutate: updatePost } = useUpdatePost();
@@ -150,6 +156,14 @@ export default function FeedsSection({
           )}
         </React.Fragment>
       ))}
+      <Button
+        onClick={() => {
+          if (hasNextPage) fetchNextPage();
+        }}
+        disabled={!hasNextPage || isFetchingNextPage}
+      >
+        {isFetchingNextPage ? "Loading..." : "Fetch More"}
+      </Button>
     </div>
   );
 }

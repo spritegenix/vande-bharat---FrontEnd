@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { InfiniteData, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "@/lib/axios";
 import { Post } from "@/types/post";
 import { uploadMediaFiles } from "@/stores/editorStore";
@@ -71,53 +71,76 @@ export const useUpdatePost = () => {
 // hooks/posts/useCreatePost.ts
 import { useEditorStore } from "@/stores/editorStore";
 import { CreatePostPayload } from "@/types/post";
-import { deleteComment, updateComment } from "./posts.api";
+import { AllPosts, deleteComment, updateComment } from "./posts.api";
 
 export const useCreatePost = () => {
   const queryClient = useQueryClient();
-  const {clearEditorState} = useEditorStore();
+  const { clearEditorState } = useEditorStore();
 
   return useMutation({
     mutationFn: async (payload: CreatePostPayload) => {
- 
       const res = await axios.post("/posts/create-post", payload);
-
-      return res.data.data;
+      return res.data.data; // actual created post
     },
 
     onMutate: async (newPost) => {
       await queryClient.cancelQueries({ queryKey: ["fetch-posts"] });
 
-      const previousPosts = queryClient.getQueryData<any[]>(["fetch-posts"]);
+      const previousData = queryClient.getQueryData<InfiniteData<AllPosts>>(["fetch-posts"]);
 
-      queryClient.setQueryData<any[]>(["fetch-posts"], (old) => [
-        {
-          ...newPost,
-          _id: "temp-id-" + Date.now(),
-          createdAt: new Date().toISOString(),
-          likeCount: 0,
-          userId: {}, // or your current logged-in user info
+      const optimisticPost: Post = {
+        ...newPost,
+        _id: "temp-id-" + Date.now(),
+        createdAt: new Date().toISOString(),
+        likeCount: 0,
+        isLiked: false,
+        isBookmarked: false,
+        userId: {
+          slug: "",
+          name: "",
+          avatar: ""
         },
-        ...(old || []),
-      ]);
+          communityId: newPost.communityId
+    ? {
+        slug: "",
+        name: "",
+        avatar: "",
+      }
+    : null,
+      };
 
-      return { previousPosts };
+      queryClient.setQueryData<InfiniteData<AllPosts>>(["fetch-posts"], (old) => {
+        if (!old) return old;
+
+        return {
+          ...old,
+          pages: [
+            {
+              ...old.pages[0],
+              data: [optimisticPost, ...old.pages[0].data],
+            },
+            ...old.pages.slice(1),
+          ],
+        };
+      });
+
+      return { previousData };
     },
 
     onError: (_err, _newPost, context) => {
-      if (context?.previousPosts) {
-        queryClient.setQueryData(["fetch-posts"], context.previousPosts);
+      if (context?.previousData) {
+        queryClient.setQueryData(["fetch-posts"], context.previousData);
       }
     },
 
     onSuccess: () => {
-       
-        queryClient.invalidateQueries({ queryKey: ["user-posts"] });
       queryClient.invalidateQueries({ queryKey: ["fetch-posts"] });
+      queryClient.invalidateQueries({ queryKey: ["user-posts"] });
       clearEditorState();
     },
   });
 };
+
 
 
 export const useDeletePost = () => {

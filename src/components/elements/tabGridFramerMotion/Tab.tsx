@@ -1,4 +1,4 @@
-import React from "react";
+import React, { JSX } from "react";
 import { motion } from "framer-motion";
 
 interface TabProps {
@@ -19,15 +19,13 @@ const Tab: React.FC<TabProps> = ({ tabs, activeTab, setActiveTab }) => {
           <li
             onClick={() => setActiveTab(tab?.label)}
             className={`${
-              activeTab === tab?.label
-                ? "mb-0 text-white"
-                : "text-black hover:text-bg1"
+              activeTab === tab?.label ? "mb-0 text-white" : "hover:text-bg1 text-black"
             } relative flex w-full cursor-pointer flex-nowrap items-center gap-2 rounded-full px-0.5 py-1.5 font-medium transition-all focus-visible:outline-2 max-lg:justify-center md:px-5`}
           >
             {activeTab === tab?.label && (
               <motion.span
                 layoutId="bubble"
-                className="absolute inset-0 z-10 gap-x-2 rounded-full bg-bg1 shadow-lg"
+                className="bg-bg1 absolute inset-0 z-10 gap-x-2 rounded-full shadow-lg"
                 transition={{ type: "spring", bounce: 0.5, duration: 0.6 }}
               />
             )}
