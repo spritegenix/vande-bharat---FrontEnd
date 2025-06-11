@@ -19,14 +19,17 @@ export type AllPosts = {
 export const fetchPosts = async({ pageParam = null }: { pageParam?: string | null })  => {
   const response = await axios.get<AllPosts>("/posts/all-posts", {
     params: {
-      isLiked: true,
-      isBookmarked: true,
-      cursor:pageParam
+      isLiked:true,
+      isBookmarked:true,
+      cursor:pageParam,
+  limit: 100   
     },
     withCredentials: true,
   });
-  console.log(response.data)
-  return response?.data;
+  return {
+    posts: response.data.data,
+    nextCursor: response.data.nextCursor ?? undefined,
+  };
 };
 
 export const userPosts = async () => {
@@ -68,3 +71,11 @@ export const deleteComment = async (commentId: string) => {
   const res = await axios.delete(`/posts/comments/${commentId}`);
   return res.data;
 };
+
+
+
+export async function getPostById(postId: string) {
+  const res = await axios.get(`/posts/${postId}`);
+console.log(res.data.data)
+  return res.data.data
+}

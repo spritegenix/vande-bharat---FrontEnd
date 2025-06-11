@@ -44,8 +44,14 @@ interface CommunityInfo {
 }
 
 
-
+export interface Comment {
+   _id: string;
+  userId: UserInfo;
+  content: string;
+  createdAt: string;
+}
 export interface Post {
+  imageUrl: string | undefined;
   _id: string;
   content: string;
   tags?: string[];

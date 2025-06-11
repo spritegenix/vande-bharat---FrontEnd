@@ -12,12 +12,14 @@ export const useFetchPosts = () => {
   return useInfiniteQuery({
     queryKey: ['fetch-posts'],
     queryFn: fetchPosts,
-  initialPageParam:null,
-  getNextPageParam:(lastPage)=>{
-    return lastPage?.nextCursor?? undefined
-  }
+     getNextPageParam: (lastPage) => {
+      console.log("lastPage in getNextPageParam", lastPage);
+      return lastPage?.nextCursor ?? undefined;
+    },
+    initialPageParam: null,
   });
 };
+
 
 
 export const useFetchUserPosts = () => {

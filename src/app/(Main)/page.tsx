@@ -10,12 +10,12 @@ export default function HomePage() {
   const { user } = useUserStore();
   console.log("hasNextPage:", hasNextPage);
   console.log("nextCursor:", data?.pages.at(-1)?.nextCursor);
-
+  console.log(data?.pages, "pages");
   return (
     <>
       <Feed user={user} />
       <FeedsSection
-        posts={data?.pages.flatMap((page) => page.data) ?? []}
+        posts={data?.pages.flatMap((page) => page.posts) ?? []}
         isLoading={isLoading}
         isError={isError}
         fetchNextPage={fetchNextPage}

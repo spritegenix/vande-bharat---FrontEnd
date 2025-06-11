@@ -15,6 +15,8 @@ import getCroppedImg from "@/lib/cropImage";
 import { toast } from "sonner";
 import ImageCropper from "../common/ImageCropper";
 import ImageCropperModal from "../common/ImageCropperModal";
+import { Switch } from "../ui/switch";
+import GeneratedForm from "./GenerateForm";
 
 const MAX_IMAGE_SIZE = 500 * 1024; // 500KB
 
@@ -24,6 +26,7 @@ const communitySchema = z.object({
   image: z.any().refine((file) => !file || (file instanceof File && file.size <= MAX_IMAGE_SIZE), {
     message: "Image must be under 500KB",
   }),
+  isPrivate: z.boolean().default(false).optional(),
 });
 
 type CommunityFormData = z.infer<typeof communitySchema>;
@@ -88,14 +91,15 @@ export default function CreateCommunityPage() {
     const form = new FormData();
     form.append("name", data.name);
     form.append("description", data.description);
-    if (croppedImage) form.append("image", croppedImage, imageFile?.name);
+    if (croppedImage) form.append("banner", croppedImage, imageFile?.name);
+    form.append("isPrivate", data.isPrivate);
     createCommunityMutation.mutate(form);
   };
 
   return (
     <div className="mx-auto max-w-xl px-4 py-12">
       <h1 className="mb-6 text-2xl font-semibold">Create a Community</h1>
-      <Card>
+      {/* <Card>
         <CardContent className="space-y-6 p-6">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             <div className="space-y-2">
@@ -137,7 +141,7 @@ export default function CreateCommunityPage() {
                   }
                 }}
               />
-              {/* {errors.image && <p className="text-sm text-red-500">{errors?.description}</p>} */}
+              {errors.image && <p className="text-sm text-red-500">{errors?.description}</p>}
 
               {imagePreview && (
                 <ImageCropperModal
@@ -153,29 +157,7 @@ export default function CreateCommunityPage() {
                   }}
                   onCropped={(blob: SetStateAction<Blob | null>) => setCroppedImage(blob)}
                 />
-                // <ImageCropper
-                //   imageSrc={imagePreview}
-                //   onComplete={(blob) => setCroppedImage(blob)}
-                //   onCancel={() => setImagePreview(null)}
-                //   aspect={820 / 312}
-                // />
-                // <div className="relative h-[200px] w-full bg-gray-100">
-                //   <Cropper
-                //     image={imagePreview}
-                //     crop={crop}
-                //     zoom={zoom}
-                //     aspect={820 / 312}
-                //     onCropChange={setCrop}
-                //     onZoomChange={setZoom}
-                //     onCropComplete={onCropComplete}
-                //   />
-                // </div>
               )}
-              {/* {imagePreview && (
-                <Button type="button" className="w-full" onClick={showCroppedImage}>
-                  Crop Image
-                </Button>
-              )} */}
 
               {croppedImage && (
                 <img
@@ -185,11 +167,19 @@ export default function CreateCommunityPage() {
                 />
               )}
             </div>
-
+            <div className="space-x-2 space-y-2">
+              <Switch id="private" />
+              <Label htmlFor="private">Private</Label>
+            </div>
             <Button type="submit" className="w-full" disabled={createCommunityMutation.isPending}>
               {createCommunityMutation.isPending ? "Creating..." : "Create Community"}
             </Button>
           </form>
+        </CardContent>
+      </Card> */}
+      <Card>
+        <CardContent className="space-y-6 p-6">
+          <GeneratedForm />
         </CardContent>
       </Card>
     </div>

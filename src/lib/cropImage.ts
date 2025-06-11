@@ -36,6 +36,6 @@ export default async function getCroppedImg(
     canvas.toBlob((blob) => {
       if (blob) resolve(blob);
       else reject(new Error('Canvas is empty'));
-    }, 'image/jpeg', 0.95);
+    }, 'image/jpeg', 0.55);
   });
 }

@@ -1,5 +1,6 @@
 
 import axios from '@/lib/axios';
+import { toast } from 'sonner';
 
 export const fetchCurrentUser = async (query?: Record<string, any>) => {
   const res = await axios.get('/users/me', {
@@ -25,11 +26,16 @@ export const fetchCurrentUser = async (query?: Record<string, any>) => {
 
 
 export const uploadToS3 = async (uploadUrl: string, file: File | Blob) => {
-  await axios.put(uploadUrl, file, {
-    headers: {
-      "Content-Type": file.type,
-    },
-  });
+  try {
+    await axios.put(uploadUrl, file, {
+      headers: {
+        "Content-Type": file.type,
+      },
+    });
+  } catch (error: any) {
+    toast.error("Image upload failed. Please try again.");
+    throw new Error("Failed to upload file to S3");
+  }
 };
 
 export const updateUserCover = async (imageUrl: string) => {
