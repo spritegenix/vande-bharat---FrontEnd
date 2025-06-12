@@ -75,7 +75,6 @@ export const deleteComment = async (commentId: string) => {
 
 
 export async function getPostById(postId: string) {
-  const res = await axios.get(`/posts/${postId}`);
-console.log(res.data.data)
+  const res = await axios.get(`/posts/${postId}`, {params: {isLiked:true,isBookmarked: true}, withCredentials:true });
   return res.data.data
 }

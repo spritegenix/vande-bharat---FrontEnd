@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { X, ThumbsUp, ThumbsUpIcon } from "lucide-react";
+import { X } from "lucide-react";
 import { Post } from "@/types/post";
 import { getPostById } from "@/queries/posts/posts.api";
 import {
@@ -13,6 +13,12 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import PostHeader from "../posts/PostHeader";
+import LikeButton from "../posts/like/LikeButton";
+import CommentButton from "../posts/comments/CommentButton";
+import ShareMenu from "../posts/ShareMenu";
+import BookmarkButton from "../posts/BookmarkButton";
+import { PostCommentSection } from "../posts/comments/PostCommentSection";
 
 type Props = {
   isOpen: boolean;
@@ -32,17 +38,16 @@ export default function SinglePostModal({ isOpen, onClose, postId }: Props) {
   }, [postId, isOpen]);
 
   if (!post) return null;
-
   const attachments = post.attachments || [];
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="h-[90vh] w-full max-w-6xl overflow-hidden p-0">
+      <DialogContent className="h-[90vh] w-full max-w-6xl overflow-hidden rounded-lg border bg-white p-0 shadow-lg dark:border-gray-700 dark:bg-gray-900">
         <div className="flex h-full flex-col md:flex-row">
           {/* Left: Media Preview */}
-          <div className="relative my-auto flex w-full items-center justify-center bg-black md:w-1/2">
+          <div className="relative my-auto flex h-full w-full items-center justify-center rounded-lg border-r bg-black dark:border-gray-700 md:w-1/2">
             {attachments.length > 0 && (
-              <Carousel className="h-full w-full">
+              <Carousel className="my-auto flex h-full w-full">
                 <CarouselContent className="h-full">
                   {attachments.map((att, idx) => (
                     <CarouselItem key={idx} className="flex h-full items-center justify-center">
@@ -50,13 +55,13 @@ export default function SinglePostModal({ isOpen, onClose, postId }: Props) {
                         <img
                           src={att.url}
                           alt={att.fileName}
-                          className="max-h-full max-w-full object-contain"
+                          className="max-h-full max-w-full rounded-lg object-contain"
                         />
                       ) : (
                         <video
                           src={att.url}
                           controls
-                          className="max-h-full max-w-full object-contain"
+                          className="max-h-full max-w-full rounded-lg object-contain"
                         />
                       )}
                     </CarouselItem>
@@ -73,40 +78,35 @@ export default function SinglePostModal({ isOpen, onClose, postId }: Props) {
           </div>
 
           {/* Right: Post Info */}
-          <div className="flex w-full flex-col p-4 md:w-1/2">
-            <DialogHeader className="flex items-center justify-between border-b pb-2">
-              <DialogTitle>Post Details</DialogTitle>
-              {/* <Button variant="ghost" size="icon" onClick={onClose}>
-                <X className="h-5 w-5" />
-              </Button> */}
+          <div className="flex w-full flex-col bg-white p-4 dark:bg-gray-900 md:w-1/2">
+            <DialogHeader className="border-b pb-2 dark:border-gray-700">
+              <DialogTitle>
+                <PostHeader post={post} />
+              </DialogTitle>
             </DialogHeader>
 
-            <ScrollArea className="mt-4 flex-1">
-              <div className="mb-4">
-                <p className="whitespace-pre-line text-sm text-gray-600 dark:text-white">
+            <ScrollArea className="mt-4 flex-1 pr-2">
+              <div className="mb-4 px-2">
+                <p className="whitespace-pre-line text-sm text-gray-700 dark:text-gray-300">
                   {post.content}
                 </p>
               </div>
 
-              <div className="mb-4 flex items-center gap-2">
-                {/* <p className="text-sm font-semibold text-gray-800">Likes</p> */}
-                <ThumbsUp
-                  className={`h-5 w-5 ${post.likeCount ? "fill-blue-600 text-blue-600" : "text-gray-400"}`}
-                />
-                <p className="text-sm text-gray-500">{post.likeCount || 0}</p>
+              <div className="mx-2 mt-4 border-t border-gray-200 pt-4 text-sm text-gray-600 dark:border-gray-700 dark:text-gray-400">
+                <div className="flex items-center justify-between">
+                  <div className="flex w-full items-center justify-between gap-x-4">
+                    <LikeButton post={post} />
+                    <div className="flex items-center justify-center gap-x-4">
+                      <CommentButton postId={post._id} />
+                      <ShareMenu postUrl={`/posts/${post._id}`} />
+                      <BookmarkButton post={post} />
+                    </div>
+                  </div>
+                </div>
               </div>
 
-              <div className="mb-4">
-                <p className="text-sm font-semibold text-gray-800 dark:text-white">Comments</p>
-                {post.comments?.length ? (
-                  <ul className="space-y-1 text-sm text-gray-700">
-                    {post.comments.map((c) => (
-                      <li key={c._id}>{c.content}</li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p className="text-sm text-gray-400">No comments yet.</p>
-                )}
+              <div className="mb-4 mt-2 px-2">
+                <PostCommentSection postId={post._id} />
               </div>
             </ScrollArea>
           </div>

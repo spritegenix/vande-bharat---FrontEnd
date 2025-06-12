@@ -7,6 +7,7 @@ import ImageCropperModal from "../common/ImageCropperModal";
 import { useMutation } from "@tanstack/react-query";
 import { getPresignedUrl, updateUserProfile, uploadToS3 } from "@/queries/user/user.api";
 import { toast } from "sonner";
+import { useUserStore } from "@/stores/userStore";
 
 export default function ProfileNameSection({
   profileImage,
@@ -19,8 +20,10 @@ export default function ProfileNameSection({
   const [imageSrc, setImageSrc] = useState<string>(
     profileImage || "/images/profile/profile-img.webp",
   );
+
   const [openModal, setOpenModal] = useState(false);
   const [croppedImage, setCroppedImage] = useState<string | null>(null);
+  const { user } = useUserStore();
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -75,19 +78,21 @@ export default function ProfileNameSection({
               className="aspect-square rounded-full border-4 border-white shadow-lg dark:border-black"
             />
             <div className="absolute bottom-5 right-2 rounded-full bg-offwhite p-1 dark:bg-gray-900">
-              <Button
-                type="button"
-                variant={"ghost"}
-                className="h-8 w-8 rounded-full p-0"
-                onClick={() => {
-                  if (inputRef.current) {
-                    inputRef.current.value = ""; // ✅ reset before opening picker
-                    inputRef.current.click();
-                  }
-                }}
-              >
-                <Camera />
-              </Button>
+              {user.id && (
+                <Button
+                  type="button"
+                  variant={"ghost"}
+                  className="h-8 w-8 rounded-full p-0"
+                  onClick={() => {
+                    if (inputRef.current) {
+                      inputRef.current.value = ""; // ✅ reset before opening picker
+                      inputRef.current.click();
+                    }
+                  }}
+                >
+                  <Camera />
+                </Button>
+              )}
               <Input
                 ref={inputRef}
                 type="file"
