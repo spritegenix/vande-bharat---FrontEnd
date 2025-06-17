@@ -22,6 +22,7 @@ import CommentButton from "./posts/comments/CommentButton";
 import { useInView } from "react-intersection-observer";
 import { useEffect, useState } from "react";
 import SinglePostModal from "./common/SinglePostModal";
+import PostAttachment from "./posts/PostAttachment";
 
 interface FeedsSectionProps {
   posts: Post[];
@@ -45,9 +46,7 @@ export default function FeedsSection({
   const { mutate: updatePost } = useUpdatePost();
   const { user } = useUserStore();
   const [ref, inView] = useInView({ threshold: 0.1 });
-  const [modalOpen, setModalOpen] = useState(false);
-  const [currentIndex, setCurrentIndex] = useState<number | null>(null);
-  const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
+
   useEffect(() => {
     if (inView && hasNextPage && !isFetchingNextPage) {
       fetchNextPage();
@@ -62,7 +61,7 @@ export default function FeedsSection({
   if (isError) return <p>Error loading posts.</p>;
   return (
     <div className="mb-2">
-      {posts.map((post: Post, index) => (
+      {posts.map((post: Post) => (
         <React.Fragment key={post._id}>
           {editingPostId === post._id ? (
             <Box className="m-2 my-6 pb-2 md:mx-auto">
@@ -98,52 +97,8 @@ export default function FeedsSection({
                   <PostUpdateButton post={post} setEditingPostId={setEditingPostId} />
                 )}
               </div>
-              {post.attachments && post.attachments.length > 0 && (
-                <div className="mt-3 px-3">
-                  <div
-                    className={`grid gap-2 ${
-                      post.attachments.length === 1
-                        ? "grid-cols-1"
-                        : post.attachments.length === 2
-                          ? "grid-cols-2"
-                          : "grid-cols-2"
-                    }`}
-                  >
-                    {post.attachments.slice(0, 4).map((file, fileIndex) => (
-                      <div
-                        key={fileIndex}
-                        className="relative w-full cursor-pointer overflow-hidden rounded"
-                        onClick={() => {
-                          setCurrentIndex(index);
-                          setSelectedPostId(post._id);
-                          setModalOpen(true);
-                        }}
-                      >
-                        {file.type === "IMAGE" ? (
-                          <Image
-                            src={file.url}
-                            alt={`attachment-${fileIndex}`}
-                            width={500}
-                            height={300}
-                            className="h-full w-full object-cover"
-                          />
-                        ) : (
-                          <video
-                            src={file.url}
-                            controls
-                            className="h-full w-full rounded object-cover"
-                          />
-                        )}
-                        {fileIndex === 3 && post.attachments.length > 4 && (
-                          <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/60 text-xl font-bold text-white">
-                            +{post.attachments.length - 4}
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
+              <PostAttachment post={post} />
+
               <div className="mx-4 mt-4 border-t border-gray-400 px-3 pt-4 text-sm text-gray-500">
                 <div className="flex items-center justify-between">
                   <div className="flex w-full items-center justify-between gap-x-4">
@@ -163,13 +118,13 @@ export default function FeedsSection({
       ))}
 
       {/* 👇 Modal for single post view */}
-      {modalOpen && selectedPostId && (
+      {/* {modalOpen && selectedPostId && (
         <SinglePostModal
           isOpen={modalOpen}
           onClose={() => setModalOpen(false)}
           postId={selectedPostId}
         />
-      )}
+      )} */}
 
       <div ref={ref} className="h-8"></div>
       {isFetchingNextPage && (

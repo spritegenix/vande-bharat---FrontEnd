@@ -3,7 +3,10 @@ import LoadingSpinner from "@/components/common/LoadingSpinner";
 import Box from "@/components/elements/Box";
 import Linkify from "@/components/Linkify";
 import BookmarkButton from "@/components/posts/BookmarkButton";
+import CommentButton from "@/components/posts/comments/CommentButton";
+import { PostCommentSection } from "@/components/posts/comments/PostCommentSection";
 import LikeButton from "@/components/posts/like/LikeButton";
+import PostAttachment from "@/components/posts/PostAttachment";
 import PostHeader from "@/components/posts/PostHeader";
 import ShareMenu from "@/components/posts/ShareMenu";
 import { Button } from "@/components/ui/button";
@@ -38,43 +41,7 @@ export default function page() {
           </Linkify>
         </div>
       </div>
-
-      {post.postId.attachments && post.postId.attachments.length > 0 && (
-        <div className="mt-3 px-3">
-          <div
-            className={`grid gap-2 ${
-              post.postId.attachments.length === 1
-                ? "grid-cols-1"
-                : post.postId.attachments.length === 2
-                  ? "grid-cols-2"
-                  : "grid-cols-2"
-            }`}
-          >
-            {post.postId.attachments.slice(0, 4).map((file, index) => (
-              <div key={index} className="relative w-full overflow-hidden rounded">
-                {file.type === "IMAGE" ? (
-                  <Image
-                    src={file.url}
-                    alt={`attachment-${index}`}
-                    width={500}
-                    height={300}
-                    className="h-full w-full object-cover"
-                  />
-                ) : (
-                  <video src={file.url} controls className="h-full w-full rounded object-cover" />
-                )}
-
-                {/* Overlay for additional items */}
-                {index === 3 && post.postId.attachments.length > 4 && (
-                  <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/60 text-xl font-bold text-white">
-                    +{post.postId.attachments.length - 4}
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+      <PostAttachment post={post.postId} />
 
       <div className="mx-4 mt-4 border-t border-gray-400 px-3 pt-4 text-sm text-gray-500">
         <div className="flex items-center justify-between">
@@ -85,11 +52,7 @@ export default function page() {
             />
 
             <div className="flex items-center justify-center gap-x-4">
-              <Button variant={"ghost"} className="flex items-center gap-1 hover:text-blue-600">
-                <MessageCircle size={16} />
-
-                <span className="hidden md:flex">Comment</span>
-              </Button>
+              <CommentButton postId={post.postId._id} />
               <ShareMenu postUrl={`/posts/${post.postId._id}`} />
               <BookmarkButton
                 posts={posts.map((post: { postId: any }) => post.postId)}
@@ -98,6 +61,7 @@ export default function page() {
             </div>
           </div>
         </div>
+        <PostCommentSection postId={post.postId._id} />
       </div>
     </Box>
   ));

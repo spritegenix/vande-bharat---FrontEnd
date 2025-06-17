@@ -78,3 +78,21 @@ export async function getPostById(postId: string) {
   const res = await axios.get(`/posts/${postId}`, {params: {isLiked:true,isBookmarked: true}, withCredentials:true });
   return res.data.data
 }
+
+
+export const fetchPopularPosts = async({ pageParam = null }: { pageParam?: string | null })  => {
+  const response = await axios.get<AllPosts>("/posts/all-posts", {
+    params: {
+      isLiked:true,
+      isBookmarked:true,
+      sort:"popular",
+      cursor:pageParam,
+  limit: 10   
+    },
+    withCredentials: true,
+  });
+  return {
+    posts: response.data.data,
+    nextCursor: response.data.nextCursor ?? undefined,
+  };
+};

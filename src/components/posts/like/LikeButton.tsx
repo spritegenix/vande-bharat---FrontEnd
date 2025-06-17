@@ -43,6 +43,7 @@ export default function LikeButton({ post, posts }: { post: { _id: string }; pos
         ...prev,
         [postId]: prev[postId] + (liked[postId] ? 1 : -1),
       }));
+      console.log("cannot like the post", _err);
     },
 
     onSuccess: (data, postId) => {
