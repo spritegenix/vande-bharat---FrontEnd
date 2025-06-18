@@ -8,9 +8,9 @@ export default function HomePage() {
   const { data, isLoading, isError, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useFetchPosts();
   const { user } = useUserStore();
-  console.log("hasNextPage:", hasNextPage);
-  console.log("nextCursor:", data?.pages.at(-1)?.nextCursor);
-  console.log(data?.pages, "pages");
+  // console.log("hasNextPage:", hasNextPage);
+  // console.log("nextCursor:", data?.pages.at(-1)?.nextCursor);
+  // console.log(data?.pages, "pages");
   return (
     <>
       <Feed user={user} />

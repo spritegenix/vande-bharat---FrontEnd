@@ -5,11 +5,22 @@ import { toast } from 'sonner';
 export const fetchCurrentUser = async (query?: Record<string, any>) => {
   const res = await axios.get('/users/me', {
     withCredentials: true,
-    params: query, // ✅ this appends query to the URL
+    params: query, 
   });
   return res.data.data;
 };
 
+export const fetchFollowingProfiles = async()=>{
+  const res = await axios.get("/users/followed", {withCredentials:true})
+  console.log("users",res)
+  return res.data
+}
+
+export const fetchSuggestions = async()=> {
+  const res = await axios.get("/users/suggestions", {withCredentials:true})
+ 
+  return res.data.data
+}
 
 
  export const getPresignedUrl = async (file: File, folder:string) => {
@@ -50,3 +61,7 @@ export const updateUserProfile = async (imageUrl: string) => {
     avatar: imageUrl,
   });
 };
+
+// export const sendRequest = async(id:string){
+//   const response = await axios
+// }

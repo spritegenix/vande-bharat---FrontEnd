@@ -22,7 +22,7 @@ export const fetchPosts = async({ pageParam = null }: { pageParam?: string | nul
       isLiked:true,
       isBookmarked:true,
       cursor:pageParam,
-  limit: 100   
+  limit: 3   
     },
     withCredentials: true,
   });

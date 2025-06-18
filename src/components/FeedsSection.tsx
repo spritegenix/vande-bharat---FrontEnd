@@ -117,15 +117,6 @@ export default function FeedsSection({
         </React.Fragment>
       ))}
 
-      {/* 👇 Modal for single post view */}
-      {/* {modalOpen && selectedPostId && (
-        <SinglePostModal
-          isOpen={modalOpen}
-          onClose={() => setModalOpen(false)}
-          postId={selectedPostId}
-        />
-      )} */}
-
       <div ref={ref} className="h-8"></div>
       {isFetchingNextPage && (
         <div className="my-4 flex justify-center">
