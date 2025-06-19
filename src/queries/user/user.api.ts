@@ -62,6 +62,12 @@ export const updateUserProfile = async (imageUrl: string) => {
   });
 };
 
-// export const sendRequest = async(id:string){
-//   const response = await axios
-// }
+export const sendFollowRequest = async(id:string)=>{
+  const response = await axios.post(`users/follow-request/${id}`)
+  return response.data
+}
+
+export const allSentRequests = async()=> {
+  const res = await axios.get("users/sent-requests", {withCredentials:true})
+  return res.data.data
+}

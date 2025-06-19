@@ -51,7 +51,7 @@ export interface Comment {
   createdAt: string;
 }
 export interface Post {
-  imageUrl: string | undefined;
+  imageUrl?: string | undefined;
   _id: string;
   content: string;
   tags?: string[];

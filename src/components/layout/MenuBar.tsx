@@ -63,6 +63,7 @@ export default function MenuBar({ className }: MenuBarProps) {
             />
           )}
           <MenuTab icon={<Bookmark />} label="Bookmarks" href="/bookmarks" />
+          <MenuTab icon={<Users />} label="Requests" href="/profile/requests" />
           <MenuTab icon={<UserPlus />} label="Add Saathis" href="/profile" />
         </div>
         <hr className="my-4 w-full max-w-52 border-t" />

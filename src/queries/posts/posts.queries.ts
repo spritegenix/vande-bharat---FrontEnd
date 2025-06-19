@@ -13,7 +13,7 @@ export const useFetchPosts = () => {
     queryKey: ['fetch-posts'],
     queryFn: fetchPosts,
      getNextPageParam: (lastPage) => {
-      console.log("lastPage in getNextPageParam", lastPage);
+     
       return lastPage?.nextCursor ?? undefined;
     },
     initialPageParam: null,
