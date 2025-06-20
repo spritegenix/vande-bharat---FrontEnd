@@ -71,3 +71,13 @@ export const allSentRequests = async()=> {
   const res = await axios.get("users/sent-requests", {withCredentials:true})
   return res.data.data
 }
+
+export const cancelRequest = async(toUserId:string)=> {
+  const res = await axios.patch(`users/follow-request/${toUserId}/cancel`)
+  return res.data
+}
+
+export const removeSuggestion = async(toUserId:string)=> {
+  const res = await axios.patch(`users/suggestions/${toUserId}/delete`)
+  return res.data
+}

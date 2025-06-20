@@ -6,6 +6,9 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import Image from "next/image";
+import { useCancelRequest } from "@/queries/user/user.mutation";
+import { toast } from "sonner";
+import { useQueryClient } from "@tanstack/react-query";
 type user = {
   name: string;
   slug: string;
@@ -14,14 +17,31 @@ type user = {
 type SentRequest = {
   _id: string;
   toUser: user;
+  toUserId: string;
 };
 export default function SentRequest() {
   const { data: sentRequests, isLoading, isError } = useAllsentRequest();
-  //   const cancelMutation = useCancelSentRequest();
 
+  //   const cancelMutation = useCancelSentRequest();
+  const queryClient = useQueryClient();
+  const { mutate: cancelRequest, isPending } = useCancelRequest();
   if (isLoading) return <p>Loading...</p>;
   if (isError) return <p>Something went wrong.</p>;
-
+  const handleCancel = (toUserId: string) => {
+    cancelRequest(
+      { toUserId },
+      {
+        onSuccess: () => {
+          toast.success("Request Cancelled");
+          queryClient.invalidateQueries({ queryKey: ["friend-suggestions"] });
+          queryClient.invalidateQueries({ queryKey: ["allSent-requests"] });
+        },
+        onError: (err: any) => {
+          toast.error(err?.response?.data?.message || "Refresh and Try again");
+        },
+      },
+    );
+  };
   return (
     <div className="mt-4 space-y-4">
       {sentRequests?.length === 0 ? (
@@ -59,14 +79,14 @@ export default function SentRequest() {
                     disabled
                     variant="outline"
                     //   onClick={() => handleRemove(profile._id)}
-                    className="w-full px-3 py-2 text-sm md:w-full md:px-5 md:py-3 md:text-base"
+                    className="w-full bg-gray-600 px-3 py-2 text-sm md:w-full md:px-5 md:py-3 md:text-base"
                   >
                     Request Sent
                   </Button>
 
                   <Button
                     variant="destructive"
-                    //   onClick={() => handleRemove(profile._id)}
+                    onClick={() => handleCancel(req.toUserId)}
                     className="w-full px-3 py-2 text-sm md:w-full md:px-5 md:py-3 md:text-base"
                   >
                     Cancel Request

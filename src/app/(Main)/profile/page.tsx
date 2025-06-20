@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import SkeletonCard from "@/components/common/SkeletonCard";
 import { useSuggestions } from "@/queries/user/user.queries";
 import Link from "next/link";
-import { useSendRequest } from "@/queries/user/user.mutation";
+import { useRemoveSuggestion, useSendRequest } from "@/queries/user/user.mutation";
 import { useQueryClient } from "@tanstack/react-query";
 type ProfileSuggestion = {
   avatar?: string;
@@ -17,7 +17,7 @@ type ProfileSuggestion = {
 export default function PeopleYouMayKnowPage() {
   const { data: suggestions, isLoading, isError } = useSuggestions();
   const { mutate: sendFriendRequest, isPending } = useSendRequest();
-
+  const { mutate: removeSuggested } = useRemoveSuggestion();
   const [sentIds, setSentIds] = useState<string>("");
   const queryClient = useQueryClient();
   const handleAddFriend = (toUserId: string) => {
@@ -28,6 +28,7 @@ export default function PeopleYouMayKnowPage() {
           setSentIds(toUserId);
           toast.success(`Friend request sent`);
           queryClient.invalidateQueries({ queryKey: ["friend-suggestions"] });
+          queryClient.invalidateQueries({ queryKey: ["allSent-requests"] });
         },
         onError: (err: any) => {
           toast.error(err?.response?.data?.message || "Failed to send request");
@@ -36,8 +37,21 @@ export default function PeopleYouMayKnowPage() {
     );
   };
 
-  const handleRemove = (id: string) => {
-    toast.error(`Removed from suggestions.`);
+  const handleRemove = (toUserId: string) => {
+    removeSuggested(
+      {
+        toUserId,
+      },
+      {
+        onSuccess: () => {
+          toast.error(`Removed from suggestions.`);
+          queryClient.invalidateQueries({ queryKey: ["friend-suggestions"] });
+        },
+        onError: (err: any) => {
+          toast.error(err?.response?.data?.message || "Failed to remove suggested");
+        },
+      },
+    );
   };
 
   return (
