@@ -63,7 +63,7 @@ export const updateUserProfile = async (imageUrl: string) => {
 };
 
 export const sendFollowRequest = async(id:string)=>{
-  const response = await axios.post(`users/follow-request/${id}`)
+  const response = await axios.post(`users/follow-request/${id}/send`)
   return response.data
 }
 
@@ -80,4 +80,14 @@ export const cancelRequest = async(toUserId:string)=> {
 export const removeSuggestion = async(toUserId:string)=> {
   const res = await axios.patch(`users/suggestions/${toUserId}/delete`)
   return res.data
+}
+
+export const acceptFollowRequest = async(fromUserId:string)=> {
+  const res = await axios.patch(`users/follow-request/${fromUserId}/accept`)
+  return res.data
+}
+
+export const allFollowRequests = async()=>{
+  const res = await axios.get("users/recieved-requests", {withCredentials:true})
+  return res.data.data
 }

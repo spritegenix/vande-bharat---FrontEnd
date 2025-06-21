@@ -38,20 +38,9 @@ export default function PeopleYouMayKnowPage() {
   };
 
   const handleRemove = (toUserId: string) => {
-    removeSuggested(
-      {
-        toUserId,
-      },
-      {
-        onSuccess: () => {
-          toast.error(`Removed from suggestions.`);
-          queryClient.invalidateQueries({ queryKey: ["friend-suggestions"] });
-        },
-        onError: (err: any) => {
-          toast.error(err?.response?.data?.message || "Failed to remove suggested");
-        },
-      },
-    );
+    removeSuggested({
+      toUserId,
+    });
   };
 
   return (

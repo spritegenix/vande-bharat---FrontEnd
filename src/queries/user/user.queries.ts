@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { allSentRequests, fetchCurrentUser, fetchSuggestions } from './user.api';
+import { allFollowRequests, allSentRequests, fetchCurrentUser, fetchSuggestions } from './user.api';
 
 export const useCurrentUser = (queryParams?: Record<string, any>) =>
   useQuery({
@@ -24,4 +24,10 @@ export const useCurrentUser = (queryParams?: Record<string, any>) =>
     retry:1
   })
 
+  export const useFollowRequests = () => 
+   useQuery({
+    queryKey: ['recieved-requests'],
+    queryFn: () => allFollowRequests(),
+    retry: 1,
+  });
  

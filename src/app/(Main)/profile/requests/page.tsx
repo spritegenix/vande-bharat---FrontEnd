@@ -1,5 +1,6 @@
 "use client";
 
+import RecievedRequest from "@/components/profile/requests/RecievedRequest";
 import SentRequest from "@/components/profile/requests/sentRequest";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Inbox, Send } from "lucide-react";
@@ -23,7 +24,7 @@ export default function RequestsPage() {
 
         <TabsContent value="received">
           {/* Replace with your actual received requests component */}
-          <div className="mt-4">You have no received requests.</div>
+          <RecievedRequest />
         </TabsContent>
 
         <TabsContent value="sent">

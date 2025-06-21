@@ -2,7 +2,13 @@ import { InfiniteData, useMutation, useQueryClient } from "@tanstack/react-query
 import axios from "@/lib/axios";
 import { Post } from "@/types/post";
 import { uploadMediaFiles } from "@/stores/editorStore";
-
+export type AllPosts = {
+  success: boolean;
+  posts: Post[];
+  nextCursor: string | null;
+  sort?: string;
+  limit?: number;
+}
 export const useUpdatePost = () => {
   const queryClient = useQueryClient();
 
@@ -71,7 +77,7 @@ export const useUpdatePost = () => {
 // hooks/posts/useCreatePost.ts
 import { useEditorStore } from "@/stores/editorStore";
 import { CreatePostPayload } from "@/types/post";
-import { AllPosts, deleteComment, updateComment } from "./posts.api";
+import {  deleteComment, updateComment } from "./posts.api";
 
 export const useCreatePost = () => {
   const queryClient = useQueryClient();
@@ -111,13 +117,13 @@ export const useCreatePost = () => {
 
       queryClient.setQueryData<InfiniteData<AllPosts>>(["fetch-posts"], (old) => {
         if (!old) return old;
-
+console.log("old ",old)
         return {
           ...old,
           pages: [
             {
               ...old.pages[0],
-              data: [optimisticPost, ...old.pages[0].data],
+              posts: [optimisticPost, ...old.pages?.[0]?.posts ?? []],
             },
             ...old.pages.slice(1),
           ],
