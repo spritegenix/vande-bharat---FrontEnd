@@ -12,6 +12,8 @@ import {
 import { toast } from "sonner";
 import { Button } from "../ui/button";
 import Link from "next/link";
+import { useFollowingUsers } from "@/queries/user/user.queries";
+import { ImageChecker } from "@/lib/ImagesChecker";
 
 type Profile = {
   id: string;
@@ -162,21 +164,14 @@ export const mockProfiles: Profile[] = [
 ];
 
 export default function FollowingProfileList() {
-  const [isLoading, setIsLoading] = useState(true);
   const [profiles, setProfiles] = useState<Profile[]>([]);
-
-  useEffect(() => {
-    setTimeout(() => {
-      setProfiles(mockProfiles);
-      setIsLoading(false);
-    }, 2000);
-  }, []);
+  const { data, isFetchingNextPage, fetchNextPage, isError, isLoading } = useFollowingUsers();
 
   const handleUnfriend = (id: string) => {
     setProfiles((prev) => prev.map((p) => (p.id === id ? { ...p, friend: false } : p)));
     toast.error("Unfriended successfully.");
   };
-
+  const allProfiles = data?.pages?.flatMap((page) => page.data) || [];
   return (
     <section className="mx-auto max-w-6xl p-6">
       <div className="mb-6 flex w-full items-center justify-between">
@@ -210,46 +205,44 @@ export default function FollowingProfileList() {
               </div>
             </div>
           ))
-        ) : profiles.filter((p) => p.friend).length > 0 ? (
-          profiles
-            .filter((p) => p.friend)
-            .map((profile) => (
-              <div
-                key={profile.id}
-                className="flex gap-3 border-b-2 border-gray-500 shadow-sm transition hover:shadow-md md:flex-col md:rounded-md md:border"
-              >
-                <div className="h-full md:w-full">
-                  <img
-                    src={profile.avatar}
-                    alt={profile.name}
-                    className="w-full rounded-full object-cover md:rounded-none md:rounded-t-md"
-                  />
-                </div>
+        ) : allProfiles.length > 0 ? (
+          allProfiles.map((profile) => (
+            <div
+              key={profile._id}
+              className="flex gap-3 border-b-2 border-gray-500 shadow-sm transition hover:shadow-md md:flex-col md:rounded-md md:border"
+            >
+              <div className="h-full md:w-full">
+                <img
+                  src={ImageChecker(profile.avatar)}
+                  alt={profile.name}
+                  className="w-full rounded-full object-cover md:rounded-none md:rounded-t-md"
+                />
+              </div>
 
-                <p className="hidden px-3 text-base font-semibold md:flex">{profile.name}</p>
+              <p className="hidden px-3 text-base font-semibold md:flex">{profile.name}</p>
 
-                <div className="flex w-full flex-col space-y-5 p-3 md:mt-auto">
-                  <p className="flex px-3 text-base font-semibold md:hidden">{profile.name}</p>
-                  <div className="flex w-full justify-between">
-                    <Button variant="outline" className="dark:bg-slate-600" size="sm">
-                      Saathi
-                    </Button>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon">
-                          <MoreVertical className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => handleUnfriend(profile.id)}>
-                          Unfriend
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
+              <div className="flex w-full flex-col space-y-5 p-3 md:mt-auto">
+                <p className="flex px-3 text-base font-semibold md:hidden">{profile.name}</p>
+                <div className="flex w-full justify-between">
+                  <Button variant="outline" className="dark:bg-slate-600" size="sm">
+                    Saathi
+                  </Button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="icon">
+                        <MoreVertical className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={() => handleUnfriend(profile.id)}>
+                        Unfriend
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
               </div>
-            ))
+            </div>
+          ))
         ) : (
           <p className="col-span-full text-center text-sm text-gray-500">
             You're not following anyone yet.

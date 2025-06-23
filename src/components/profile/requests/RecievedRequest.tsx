@@ -1,4 +1,6 @@
+import SkeletonCard from "@/components/common/SkeletonCard";
 import { Button } from "@/components/ui/button";
+import { ImageChecker } from "@/lib/ImagesChecker";
 import {
   useAcceptRequest,
   useRejectRecievedRequest,
@@ -8,6 +10,7 @@ import { useFollowRequests } from "@/queries/user/user.queries";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
+import { useInView } from "react-intersection-observer";
 type user = {
   name: string;
   slug: string;
@@ -19,7 +22,22 @@ type RecievedRequest = {
   fromUserId: string;
 };
 export default function RecievedRequest() {
-  const { data: recievedRequests, isLoading, isError } = useFollowRequests();
+  const {
+    data: recievedRequests,
+    isLoading,
+    isError,
+    isFetchingNextPage,
+    fetchNextPage,
+    hasNextPage,
+  } = useFollowRequests();
+  const { ref } = useInView({
+    threshold: 0,
+    onChange: (inView) => {
+      if (inView && hasNextPage && !isFetchingNextPage) {
+        fetchNextPage();
+      }
+    },
+  });
   const { mutate: removeSuggested } = useRejectRecievedRequest();
   const handleReject = (fromUserId: string) => {
     removeSuggested({
@@ -30,24 +48,22 @@ export default function RecievedRequest() {
   const handleAccept = (toUserId: string) => {
     acceptRequest({ toUserId });
   };
+  const allRecievedRequests = recievedRequests?.pages.flatMap((page) => page.data) || [];
   return (
     <div className="mt-4 space-y-4">
-      {recievedRequests?.length === 0 ? (
+      {allRecievedRequests?.length === 0 ? (
         <div className="mt-4">You have no received requests.</div>
       ) : (
         <div className="grid grid-cols-1 gap-x-4 md:grid-cols-3 lg:grid-cols-4">
-          {recievedRequests?.map((req: RecievedRequest) => (
+          {allRecievedRequests?.map((req: RecievedRequest, i: number) => (
             <div
               key={req._id}
               className="flex gap-2 border-b-2 border-gray-500 pb-2 shadow-sm transition hover:shadow-md md:flex-col md:rounded-md md:border md:pb-0"
+              ref={i === allRecievedRequests.length - 1 ? ref : undefined}
             >
               <div className="md:w-full">
                 <Image
-                  src={
-                    req?.fromUser.avatar?.includes("amazonaws")
-                      ? req.fromUser.avatar
-                      : "/images/profile/profileplaceholder.jpg"
-                  }
+                  src={ImageChecker(req?.fromUser.avatar)}
                   alt={req.fromUser.name}
                   className="w-full rounded-full object-cover md:rounded-none md:rounded-t-md"
                   width={200}
@@ -84,6 +100,7 @@ export default function RecievedRequest() {
           ))}
         </div>
       )}
+      {isFetchingNextPage && <SkeletonCard />}
     </div>
   );
 }

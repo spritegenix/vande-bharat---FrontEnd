@@ -1,4 +1,5 @@
 
+import page from '@/app/(Main)/bookmarks/page';
 import axios from '@/lib/axios';
 import { toast } from 'sonner';
 
@@ -16,10 +17,13 @@ export const fetchFollowingProfiles = async()=>{
   return res.data
 }
 
-export const fetchSuggestions = async()=> {
-  const res = await axios.get("/users/suggestions", {withCredentials:true})
+export const fetchSuggestions = async(pageParam = "")=> {
+  const res = await axios.get("/users/suggestions",  {params:{
+    cursor: pageParam,
+    limit:3
+  }, withCredentials:true})
  
-  return res.data.data
+  return res.data
 }
 
 
@@ -67,9 +71,12 @@ export const sendFollowRequest = async(id:string)=>{
   return response.data
 }
 
-export const allSentRequests = async()=> {
-  const res = await axios.get("users/sent-requests", {withCredentials:true})
-  return res.data.data
+export const allSentRequests = async(pageParam = "")=> {
+  const res = await axios.get("users/sent-requests", {params:{
+    limit:3,
+    cursor: pageParam,
+  } , withCredentials:true})
+  return res.data
 }
 
 export const cancelRequest = async(toUserId:string)=> {
@@ -87,7 +94,19 @@ export const acceptFollowRequest = async(fromUserId:string)=> {
   return res.data
 }
 
-export const allFollowRequests = async()=>{
-  const res = await axios.get("users/recieved-requests", {withCredentials:true})
-  return res.data.data
+export const allFollowRequests = async(pageParam = "")=>{
+  const res = await axios.get("users/recieved-requests",  {params:{
+    limit:3,
+    cursor: pageParam,
+  } , withCredentials:true})
+  return res.data
+}
+
+
+export const followingUsers = async(pageParam = "") => {
+  const res = await axios.get("users/following", {params:{
+    limit:3,
+    cursor: pageParam,
+  } , withCredentials:true})
+  return res.data
 }

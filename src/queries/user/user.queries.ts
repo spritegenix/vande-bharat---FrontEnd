@@ -1,5 +1,5 @@
-import { useQuery } from '@tanstack/react-query';
-import { allFollowRequests, allSentRequests, fetchCurrentUser, fetchSuggestions } from './user.api';
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
+import { allFollowRequests, allSentRequests, fetchCurrentUser, fetchSuggestions, followingUsers } from './user.api';
 
 export const useCurrentUser = (queryParams?: Record<string, any>) =>
   useQuery({
@@ -9,25 +9,43 @@ export const useCurrentUser = (queryParams?: Record<string, any>) =>
     retry: 1,
   });
 
-  export const useSuggestions = ()=> useQuery({
-    queryKey:["friend-suggestions"],
-    queryFn: ()=> fetchSuggestions(),
+export const useSuggestions = () =>
+  useInfiniteQuery({
+    queryKey: ["friend-suggestions"],
+    queryFn: ({ pageParam }) => fetchSuggestions(pageParam),
+    initialPageParam: "",
+    getNextPageParam: (lastPage) => lastPage?.nextCursor ?? null,
     staleTime: 1000 * 60 * 2,
-    retry:1,
-  })
+    retry: 1,
+  });
 
 
-  export const useAllsentRequest = ()=> useQuery({
+  export const useAllsentRequest = ()=> useInfiniteQuery({
     queryKey:["allSent-requests"],
-    queryFn:()=> allSentRequests(),
+    queryFn:({pageParam})=> allSentRequests(pageParam),
+    initialPageParam:"",
+    getNextPageParam:(lastpage) => lastpage?.nextCursor ?? null,
     staleTime: 1000 * 60 * 5,
     retry:1
   })
 
   export const useFollowRequests = () => 
-   useQuery({
+   useInfiniteQuery({
     queryKey: ['recieved-requests'],
-    queryFn: () => allFollowRequests(),
+    queryFn: ({pageParam}) => allFollowRequests(pageParam),
+    initialPageParam: "",
+    getNextPageParam: (lastPage) => lastPage?.nextCursor ?? null,
+    staleTime: 1000 * 60 * 5,
     retry: 1,
   });
+
+
+  export const useFollowingUsers = ()=> useInfiniteQuery({
+    queryKey:["following-Users"],
+    queryFn:({pageParam})=> followingUsers(pageParam),
+    initialPageParam:"",
+    getNextPageParam:(lastPage)=> lastPage?.nextCursor ?? null,
+    staleTime: 1000 * 60 * 5,
+    retry: 1,
+  })
  
