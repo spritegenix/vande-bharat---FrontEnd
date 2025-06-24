@@ -9,8 +9,9 @@ import FollowingProfileList from "./FollowingProfile";
 import About from "./about/About";
 import { useFetchUserPosts } from "@/queries/posts/posts.queries";
 import { useUserStore } from "@/stores/userStore";
+import FollowersProfileList from "./FollowersProfile";
 
-const tabOptions = ["posts", "about", "Following Profiles", "Communities"];
+const tabOptions = ["posts", "about", "Following", "Followers", "Communities"];
 
 export default function ProfileTabs() {
   const searchParams = useSearchParams();
@@ -53,8 +54,11 @@ export default function ProfileTabs() {
         <About />
       </TabsContent>
 
-      <TabsContent value="following profiles">
+      <TabsContent value="following">
         <FollowingProfileList />
+      </TabsContent>
+      <TabsContent value="followers">
+        <FollowersProfileList />
       </TabsContent>
 
       <TabsContent value="communities">

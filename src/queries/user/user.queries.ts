@@ -1,5 +1,5 @@
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
-import { allFollowRequests, allSentRequests, fetchCurrentUser, fetchSuggestions, followingUsers } from './user.api';
+import { allFollowRequests, allSentRequests, fetchCurrentUser, fetchSuggestions, followingUsers, Usersfollowers } from './user.api';
 
 export const useCurrentUser = (queryParams?: Record<string, any>) =>
   useQuery({
@@ -49,3 +49,11 @@ export const useSuggestions = () =>
     retry: 1,
   })
  
+    export const useFollowerUsers = ()=> useInfiniteQuery({
+    queryKey:["follower-Users"],
+    queryFn:({pageParam})=> Usersfollowers(pageParam),
+    initialPageParam:"",
+    getNextPageParam:(lastPage)=> lastPage?.nextCursor ?? null,
+    staleTime: 1000 * 60 * 5,
+    retry: 1,
+  })

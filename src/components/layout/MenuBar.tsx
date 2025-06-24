@@ -19,7 +19,7 @@ import Modal from "../elements/Modal";
 import CreatePageForm from "./CreatePageForm";
 import CreateCommunityForm from "./CreateCommunityForm";
 import MotionAccordion from "../elements/Accordions/MotionAccordion";
-import { mockProfiles } from "../profile/FollowingProfile";
+// import { mockProfiles } from "../profile/FollowingProfile";
 import UserAvatar from "./header/UserAvatar";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import Image from "next/image";
@@ -70,7 +70,7 @@ export default function MenuBar({ className }: MenuBarProps) {
         {/* ---------------------------Following---------------------------  */}
         <p className="mb-2 pl-3 text-sm font-semibold text-zinc-500">Following</p>
         <div className="flex flex-col gap-y-3">
-          {mockProfiles.slice(0, 6).map((item) => (
+          {/* {mockProfiles.slice(0, 6).map((item) => (
             <Link
               href={`/profile/${item.id}`}
               key={item.id}
@@ -90,7 +90,7 @@ export default function MenuBar({ className }: MenuBarProps) {
 
               <p>{item.name}</p>
             </Link>
-          ))}
+          ))} */}
           <Link
             href={`/profile/${userProfileSlug}?tab=following+profiles`}
             className="ml-4 cursor-pointer text-sm font-semibold text-zinc-500"

@@ -42,7 +42,7 @@ export default function PeopleYouMayKnowPage() {
       {
         onSuccess: () => {
           setSentIds(toUserId);
-          toast.success(`Friend request sent`);
+          toast.success("Friend request sent");
           queryClient.invalidateQueries({ queryKey: ["friend-suggestions"] });
           queryClient.invalidateQueries({ queryKey: ["allSent-requests"] });
         },
@@ -56,11 +56,12 @@ export default function PeopleYouMayKnowPage() {
   const handleRemove = (toUserId: string) => {
     removeSuggested({ toUserId });
   };
+
   const allProfiles = data?.pages.flatMap((page) => page.data) || [];
 
   return (
-    <div className="p-4">
-      <h1 className="mb-6 text-2xl font-bold text-gray-800 dark:text-white">People You May Know</h1>
+    <section className="p-4">
+      <h1 className="mb-6 text-2xl font-bold text-gray-900 dark:text-white">People You May Know</h1>
 
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
         {isLoading ? (
@@ -69,32 +70,32 @@ export default function PeopleYouMayKnowPage() {
           allProfiles.map((profile: ProfileSuggestion, i: number) => (
             <div
               key={profile._id}
-              className="flex gap-3 border-b-2 border-gray-500 pb-2 shadow-sm transition hover:shadow-md md:flex-col md:rounded-md md:border md:pb-0"
-              ref={i === allProfiles.length - 1 ? ref : null} // track last element
+              ref={i === allProfiles.length - 1 ? ref : null}
+              className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition hover:shadow-md dark:border-gray-700 dark:bg-slate-900"
             >
-              <div className="h-full md:w-full">
+              <div className="relative h-48 w-full overflow-hidden">
                 <img
                   src={ImageChecker(profile?.avatar)}
                   alt={profile?.name}
-                  className="w-full rounded-full object-cover md:rounded-none md:rounded-t-md"
+                  className="h-full w-full object-cover transition-transform duration-300 hover:scale-105"
                 />
               </div>
 
-              <Link href={profile.slug}>
-                <p className="hidden px-3 text-base font-semibold md:flex">{profile.name}</p>
-              </Link>
+              <div className="space-y-4 p-4">
+                <Link href={`/${profile.slug}`}>
+                  <h3 className="truncate text-lg font-semibold text-gray-800 hover:underline dark:text-white">
+                    {profile.name}
+                  </h3>
+                </Link>
 
-              <div className="flex w-full flex-col justify-between p-3 md:mt-auto">
-                <p className="flex px-3 text-base font-semibold md:hidden">{profile.name}</p>
-
-                <div className="flex w-full items-center justify-between gap-x-3 md:flex-col md:space-y-2">
+                <div className="flex flex-col gap-2">
                   <Button
                     variant={sentIds === profile._id ? "default" : "outline"}
-                    className={`${
+                    className={`w-full ${
                       sentIds === profile._id
                         ? "bg-green-600 text-white hover:bg-green-700"
-                        : "dark:bg-slate-600"
-                    } px-3 py-2 text-sm md:mx-2 md:w-full md:px-5 md:py-3 md:text-base`}
+                        : "dark:bg-slate-700"
+                    }`}
                     onClick={() => handleAddFriend(profile._id)}
                     disabled={sentIds === profile._id || isPending}
                   >
@@ -104,7 +105,7 @@ export default function PeopleYouMayKnowPage() {
                   <Button
                     variant="destructive"
                     onClick={() => handleRemove(profile._id)}
-                    className="w-full px-3 py-2 text-sm md:w-full md:px-5 md:py-3 md:text-base"
+                    className="w-full"
                   >
                     Remove
                   </Button>
@@ -113,10 +114,13 @@ export default function PeopleYouMayKnowPage() {
             </div>
           ))
         ) : (
-          <p>No more Suggestions</p>
+          <p className="text-center text-sm text-gray-500 dark:text-gray-400">
+            No more suggestions.
+          </p>
         )}
-        {isFetchingNextPage && <SkeletonCard />}
       </div>
-    </div>
+
+      {isFetchingNextPage && <SkeletonCard />}
+    </section>
   );
 }

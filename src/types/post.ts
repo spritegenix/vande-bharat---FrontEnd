@@ -31,7 +31,7 @@ export type PostUser = {
 };
 
 interface UserInfo {
-  
+  _id:string
   slug: string;
   name: string;
   avatar: string;

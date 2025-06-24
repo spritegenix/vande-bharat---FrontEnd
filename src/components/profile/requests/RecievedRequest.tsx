@@ -1,16 +1,15 @@
+"use client";
+
 import SkeletonCard from "@/components/common/SkeletonCard";
 import { Button } from "@/components/ui/button";
 import { ImageChecker } from "@/lib/ImagesChecker";
-import {
-  useAcceptRequest,
-  useRejectRecievedRequest,
-  useRemoveSuggestion,
-} from "@/queries/user/user.mutation";
+import { useAcceptRequest, useRejectRecievedRequest } from "@/queries/user/user.mutation";
 import { useFollowRequests } from "@/queries/user/user.queries";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 import { useInView } from "react-intersection-observer";
+
 type user = {
   name: string;
   slug: string;
@@ -21,6 +20,7 @@ type RecievedRequest = {
   fromUser: user;
   fromUserId: string;
 };
+
 export default function RecievedRequest() {
   const {
     data: recievedRequests,
@@ -30,6 +30,7 @@ export default function RecievedRequest() {
     fetchNextPage,
     hasNextPage,
   } = useFollowRequests();
+
   const { ref } = useInView({
     threshold: 0,
     onChange: (inView) => {
@@ -38,60 +39,59 @@ export default function RecievedRequest() {
       }
     },
   });
+
   const { mutate: removeSuggested } = useRejectRecievedRequest();
   const handleReject = (fromUserId: string) => {
-    removeSuggested({
-      fromUserId,
-    });
+    removeSuggested({ fromUserId });
   };
+
   const { mutate: acceptRequest } = useAcceptRequest();
   const handleAccept = (toUserId: string) => {
     acceptRequest({ toUserId });
   };
+
   const allRecievedRequests = recievedRequests?.pages.flatMap((page) => page.data) || [];
+
   return (
-    <div className="mt-4 space-y-4">
+    <div className="mt-6 space-y-6">
+      <h2 className="text-xl font-bold text-gray-900 dark:text-white">Received Requests</h2>
+
       {allRecievedRequests?.length === 0 ? (
-        <div className="mt-4">You have no received requests.</div>
+        <div className="text-center text-sm text-gray-500 dark:text-gray-400">
+          You have no received requests.
+        </div>
       ) : (
-        <div className="grid grid-cols-1 gap-x-4 md:grid-cols-3 lg:grid-cols-4">
-          {allRecievedRequests?.map((req: RecievedRequest, i: number) => (
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+          {allRecievedRequests.map((req: RecievedRequest, i: number) => (
             <div
               key={req._id}
-              className="flex gap-2 border-b-2 border-gray-500 pb-2 shadow-sm transition hover:shadow-md md:flex-col md:rounded-md md:border md:pb-0"
               ref={i === allRecievedRequests.length - 1 ? ref : undefined}
+              className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-md dark:border-gray-700 dark:bg-slate-900"
             >
-              <div className="md:w-full">
+              <div className="relative h-48 w-full">
                 <Image
                   src={ImageChecker(req?.fromUser.avatar)}
                   alt={req.fromUser.name}
-                  className="w-full rounded-full object-cover md:rounded-none md:rounded-t-md"
-                  width={200}
-                  height={200}
+                  fill
+                  className="object-cover"
                 />
               </div>
 
-              <Link href={req.fromUser.slug}>
-                <p className="hidden px-3 text-base font-semibold md:flex">{req.fromUser.name}</p>
-              </Link>
+              <div className="space-y-3 p-4">
+                <Link href={`/${req.fromUser.slug}`}>
+                  <h3 className="truncate text-lg font-semibold text-gray-800 hover:underline dark:text-white">
+                    {req.fromUser.name}
+                  </h3>
+                </Link>
 
-              <div className="flex w-full flex-col justify-between p-3 md:mt-auto">
-                <p className="flex px-3 text-base font-semibold md:hidden">{req.fromUser.name}</p>
-
-                <div className="flex w-full items-center justify-between gap-x-3 md:flex-col md:space-y-2">
+                <div className="flex flex-col gap-2">
                   <Button
-                    variant="default"
                     onClick={() => handleAccept(req.fromUserId)}
-                    className="w-full bg-green-600 px-3 py-2 text-sm md:w-full md:px-5 md:py-3 md:text-base"
+                    className="bg-green-600 text-white hover:bg-green-700"
                   >
                     Accept Request
                   </Button>
-
-                  <Button
-                    variant="destructive"
-                    onClick={() => handleReject(req.fromUserId)}
-                    className="w-full px-3 py-2 text-sm md:w-full md:px-5 md:py-3 md:text-base"
-                  >
+                  <Button variant="destructive" onClick={() => handleReject(req.fromUserId)}>
                     Reject
                   </Button>
                 </div>
@@ -100,6 +100,7 @@ export default function RecievedRequest() {
           ))}
         </div>
       )}
+
       {isFetchingNextPage && <SkeletonCard />}
     </div>
   );

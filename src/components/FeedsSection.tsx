@@ -1,17 +1,13 @@
 "use client";
 
-import React from "react";
-import Box from "./elements/Box";
+import React, { useEffect, useState } from "react";
 import { Button } from "./ui/button";
-import { MessageCircle } from "lucide-react";
-import Image from "next/image";
-import Linkify from "./Linkify";
+import Box from "./elements/Box";
 import LoadingSpinner from "./common/LoadingSpinner";
+import { useUserStore } from "@/stores/userStore";
+import { useUpdatePost } from "@/queries/posts/posts.mutation";
 import { Post } from "@/types/post";
 import InlineEditorWithMedia from "./InlineEditorWithMedia";
-import { useUpdatePost } from "@/queries/posts/posts.mutation";
-import { useUserStore } from "@/stores/userStore";
-import { redirect } from "next/navigation";
 import LikeButton from "./posts/like/LikeButton";
 import PostHeader from "./posts/PostHeader";
 import PostUpdateButton from "./posts/dropdown/PostUpdateButton";
@@ -19,10 +15,11 @@ import ShareMenu from "./posts/ShareMenu";
 import BookmarkButton from "./posts/BookmarkButton";
 import { PostCommentSection } from "./posts/comments/PostCommentSection";
 import CommentButton from "./posts/comments/CommentButton";
-import { useInView } from "react-intersection-observer";
-import { useEffect, useState } from "react";
-import SinglePostModal from "./common/SinglePostModal";
+import Linkify from "./Linkify";
 import PostAttachment from "./posts/PostAttachment";
+import { useInView } from "react-intersection-observer";
+import { redirect } from "next/navigation";
+import { useSendRequest } from "@/queries/user/user.mutation";
 
 interface FeedsSectionProps {
   posts: Post[];
@@ -31,9 +28,10 @@ interface FeedsSectionProps {
   showOwnPostsOnly?: boolean;
   fetchNextPage: () => void;
   isFetchingNextPage?: boolean;
-  hasNextPage?: Boolean;
+  hasNextPage?: boolean;
 }
-export default function FeedsSection({
+
+const FeedsSection: React.FC<FeedsSectionProps> = ({
   posts,
   isLoading,
   isError,
@@ -41,7 +39,7 @@ export default function FeedsSection({
   fetchNextPage,
   hasNextPage,
   isFetchingNextPage,
-}: FeedsSectionProps) {
+}) => {
   const [editingPostId, setEditingPostId] = useState<string | null>(null);
   const { mutate: updatePost } = useUpdatePost();
   const { user } = useUserStore();
@@ -52,16 +50,18 @@ export default function FeedsSection({
       fetchNextPage();
     }
   }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
-
-  const handleFollow = () => {
+  const { mutate: sendRequest } = useSendRequest();
+  const handleFollow = (toUserId: string) => {
     if (!user) redirect("/login");
+    sendRequest({ toUserId });
   };
 
-  if (isLoading || !posts) return <LoadingSpinner />;
-  if (isError) return <p>Error loading posts.</p>;
+  if (isLoading) return <LoadingSpinner />;
+  if (isError) return <p className="text-center text-red-500">Error loading posts.</p>;
+  console.log("posts", posts);
   return (
     <div className="mb-2">
-      {posts.map((post: Post) => (
+      {posts.map((post) => (
         <React.Fragment key={post._id}>
           {editingPostId === post._id ? (
             <Box className="m-2 my-6 pb-2 md:mx-auto">
@@ -69,24 +69,33 @@ export default function FeedsSection({
                 initialText={post.content}
                 initialFiles={post.attachments}
                 onCancel={() => setEditingPostId(null)}
-                onSave={(text, newFiles, existingAttachments) => {
-                  updatePost({ postId: post._id, newText: text, newFiles, existingAttachments });
+                onSave={(newText, newFiles, existingAttachments) => {
+                  updatePost({
+                    postId: post._id,
+                    newText,
+                    newFiles,
+                    existingAttachments,
+                  });
                   setEditingPostId(null);
                 }}
               />
             </Box>
           ) : (
-            <Box key={post._id} className="m-2 my-6 pb-2 md:mx-auto">
+            <Box className="m-2 my-6 pb-2 md:mx-auto">
               <div className="flex items-start justify-between gap-x-2 p-3 pb-0">
                 {!showOwnPostsOnly && <PostHeader post={post} />}
-                <div className="flex items-center gap-2">
-                  {!showOwnPostsOnly && (
-                    <Button variant="outline" size="sm" className="text-xs" onClick={handleFollow}>
-                      Follow
-                    </Button>
-                  )}
-                </div>
+                {!showOwnPostsOnly && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="text-xs"
+                    onClick={() => handleFollow(post?.userId?._id)}
+                  >
+                    Follow
+                  </Button>
+                )}
               </div>
+
               <div className="flex items-center justify-between">
                 <div className="mt-2 whitespace-pre-line px-3">
                   <Linkify>
@@ -97,27 +106,28 @@ export default function FeedsSection({
                   <PostUpdateButton post={post} setEditingPostId={setEditingPostId} />
                 )}
               </div>
+
               <PostAttachment post={post} />
 
               <div className="mx-4 mt-4 border-t border-gray-400 px-3 pt-4 text-sm text-gray-500">
-                <div className="flex items-center justify-between">
-                  <div className="flex w-full items-center justify-between gap-x-4">
-                    <LikeButton posts={posts} post={post} />
-                    <div className="flex items-center justify-center gap-x-4">
-                      <CommentButton postId={post._id} />
-                      <ShareMenu postUrl={`/posts/${post._id}`} />
-                      <BookmarkButton posts={posts} post={post} />
-                    </div>
+                <div className="flex w-full items-center justify-between gap-x-4">
+                  <LikeButton posts={posts} post={post} />
+                  <div className="flex items-center gap-x-4">
+                    <CommentButton postId={post._id} />
+                    <ShareMenu postUrl={`/posts/${post._id}`} />
+                    <BookmarkButton posts={posts} post={post} />
                   </div>
                 </div>
               </div>
+
               <PostCommentSection postId={post._id} />
             </Box>
           )}
         </React.Fragment>
       ))}
 
-      <div ref={ref} className="h-8"></div>
+      {hasNextPage && <div ref={ref} className="h-8" />}
+
       {isFetchingNextPage && (
         <div className="my-4 flex justify-center">
           <LoadingSpinner />
@@ -125,4 +135,6 @@ export default function FeedsSection({
       )}
     </div>
   );
-}
+};
+
+export default React.memo(FeedsSection);

@@ -110,3 +110,17 @@ export const followingUsers = async(pageParam = "") => {
   } , withCredentials:true})
   return res.data
 }
+
+export const Usersfollowers = async(pageParam = "") => {
+  const res = await axios.get("users/followers", {params:{
+    limit:3,
+    cursor: pageParam,
+  } , withCredentials:true})
+  return res.data
+}
+
+export const unfriendUser = async(toUserId:string) => {
+  const res = await axios.patch(`users/following/${toUserId}/unfriend`)
+  return res.data
+}
+

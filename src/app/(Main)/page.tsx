@@ -9,18 +9,6 @@ export default function HomePage() {
   const { data, isLoading, isError, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useFetchPosts();
   const { user } = useUserStore();
-  // const { getToken } = useAuth();
-
-  // useEffect(() => {
-  //   async function fetchToken() {
-  //     const token = await getToken();
-  //     console.log("Clerk JWT:", token);
-  //   }
-  //   fetchToken();
-  // }, []);
-  // console.log("hasNextPage:", hasNextPage);
-  // console.log("nextCursor:", data?.pages.at(-1)?.nextCursor);
-  // console.log(data?.pages, "pages");
   return (
     <>
       <Feed user={user} />
