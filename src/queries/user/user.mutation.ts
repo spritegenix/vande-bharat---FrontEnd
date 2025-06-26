@@ -21,7 +21,9 @@ export const useSendRequest = () => {
         onSuccess: () => {
         
           toast.success("Friend request sent");
+              queryClient.invalidateQueries({queryKey:["fetch-posts"]})
           queryClient.invalidateQueries({ queryKey: ["friend-suggestions"] });
+          
           queryClient.invalidateQueries({ queryKey: ["allSent-requests"] });
         },
         onError: (err: any) => {
@@ -98,6 +100,7 @@ export const useUnfriend = ()=> {
     },
     onSuccess:()=> {
       queryClient.invalidateQueries({queryKey:["following-Users"]})
+      queryClient.invalidateQueries({queryKey:["fetch-posts"]})
       toast.error("unfriended successfully.")
     },
     onError:(err:any)=>{

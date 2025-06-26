@@ -15,8 +15,8 @@ export default function LikeButton({ post, posts }: { post: { _id: string }; pos
     const initialLiked: Record<string, boolean> = {};
     const initialCounts: Record<string, number> = {};
     posts.forEach((post: Post) => {
-      initialLiked[post._id] = post.isLiked ?? false;
-      initialCounts[post._id] = post.likeCount ?? 0;
+      initialLiked[post?._id] = post?.isLiked ?? false;
+      initialCounts[post?._id] = post?.likeCount ?? 0;
     });
     setLiked(initialLiked);
     setLikeCounts(initialCounts);
@@ -59,17 +59,17 @@ export default function LikeButton({ post, posts }: { post: { _id: string }; pos
   return (
     <Button
       variant={"ghost"}
-      onClick={() => toggleLike(post._id)}
+      onClick={() => toggleLike(post?._id)}
       className={`flex items-center gap-1 ${
-        liked[post._id] ? "text-blue-600 hover:text-blue-700" : "text-gray-600 hover:text-gray-600"
+        liked[post?._id] ? "text-blue-600 hover:text-blue-700" : "text-gray-600 hover:text-gray-600"
       } focus:outline-none`}
     >
-      {liked[post._id] ? (
+      {liked[post?._id] ? (
         <ThumbsUp className="h-4 w-4 fill-blue-600" />
       ) : (
         <ThumbsUp className="h-4 w-4 text-gray-600" />
       )}
-      {likeCounts[post._id] > 0 && <span className="text-sm">{likeCounts[post._id]}</span>}
+      {likeCounts[post?._id] > 0 && <span className="text-sm">{likeCounts[post?._id]}</span>}
       <span className="hidden md:flex">Like</span>
     </Button>
   );

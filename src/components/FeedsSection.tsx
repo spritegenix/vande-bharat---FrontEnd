@@ -19,7 +19,7 @@ import Linkify from "./Linkify";
 import PostAttachment from "./posts/PostAttachment";
 import { useInView } from "react-intersection-observer";
 import { redirect } from "next/navigation";
-import { useSendRequest } from "@/queries/user/user.mutation";
+import { useSendRequest, useUnfriend } from "@/queries/user/user.mutation";
 
 interface FeedsSectionProps {
   posts: Post[];
@@ -51,14 +51,20 @@ const FeedsSection: React.FC<FeedsSectionProps> = ({
     }
   }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
   const { mutate: sendRequest } = useSendRequest();
+  const { mutate: unfriend } = useUnfriend();
   const handleFollow = (toUserId: string) => {
     if (!user) redirect("/login");
     sendRequest({ toUserId });
   };
 
+  const handleUnFollow = (toUserId: string) => {
+    if (!user) redirect("/login");
+    unfriend({ toUserId });
+  };
+  console.log("posts", posts);
   if (isLoading) return <LoadingSpinner />;
   if (isError) return <p className="text-center text-red-500">Error loading posts.</p>;
-  console.log("posts", posts);
+
   return (
     <div className="mb-2">
       {posts.map((post) => (
@@ -84,16 +90,38 @@ const FeedsSection: React.FC<FeedsSectionProps> = ({
             <Box className="m-2 my-6 pb-2 md:mx-auto">
               <div className="flex items-start justify-between gap-x-2 p-3 pb-0">
                 {!showOwnPostsOnly && <PostHeader post={post} />}
-                {!showOwnPostsOnly && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="text-xs"
-                    onClick={() => handleFollow(post?.userId?._id)}
-                  >
-                    Follow
-                  </Button>
-                )}
+
+                {user &&
+                  !showOwnPostsOnly &&
+                  post.userId._id !== user._id &&
+                  (!post.isFollowed && post.requestStatus !== "PENDING" ? (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="text-xs"
+                      onClick={() => handleFollow(post?.userId?._id)}
+                    >
+                      Follow
+                    </Button>
+                  ) : post.requestStatus === "PENDING" ? (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="cursor-not-allowed bg-green-300 text-xs text-gray-800"
+                      disabled
+                    >
+                      Request Sent
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="text-xs"
+                      onClick={() => handleUnFollow(post?.userId?._id)}
+                    >
+                      Unfollow
+                    </Button>
+                  ))}
               </div>
 
               <div className="flex items-center justify-between">

@@ -23,7 +23,7 @@ export default function PostHeader({ post }: { post: Post }) {
         <Link href={`/profile/${post?.userId?.slug}`}>
           <p>{post?.userId?.name}</p>
         </Link>
-        <p className="text-xs font-normal text-gray-500">{formatPublishedDate(post.createdAt)}</p>
+        <p className="text-xs font-normal text-gray-500">{formatPublishedDate(post?.createdAt)}</p>
       </div>
     </div>
   );

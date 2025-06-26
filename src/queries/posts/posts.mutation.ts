@@ -90,7 +90,7 @@ export const useCreatePost = () => {
     },
 
     onMutate: async (newPost) => {
-      await queryClient.cancelQueries({ queryKey: ["fetch-posts"] });
+      // await queryClient.cancelQueries({ queryKey: ["fetch-posts"] });
 
       const previousData = queryClient.getQueryData<InfiniteData<AllPosts>>(["fetch-posts"]);
 
@@ -102,17 +102,19 @@ export const useCreatePost = () => {
         isLiked: false,
         isBookmarked: false,
         userId: {
+          _id: "",
           slug: "",
           name: "",
           avatar: ""
         },
-          communityId: newPost.communityId
-    ? {
-        slug: "",
-        name: "",
-        avatar: "",
-      }
-    : null,
+        communityId: newPost.communityId
+          ? {
+            slug: "",
+            name: "",
+            avatar: "",
+          }
+          : null,
+        requestStatus: ""
       };
 
       queryClient.setQueryData<InfiniteData<AllPosts>>(["fetch-posts"], (old) => {
@@ -140,7 +142,7 @@ console.log("old ",old)
     },
 
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["fetch-posts"] });
+      // queryClient.invalidateQueries({ queryKey: ["fetch-posts"] });
       queryClient.invalidateQueries({ queryKey: ["user-posts"] });
       clearEditorState();
     },

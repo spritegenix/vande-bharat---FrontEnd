@@ -14,7 +14,7 @@ export default function BookmarkButton({ posts, post }: { posts?: Post[]; post: 
     if (!posts) return;
     const initialBookmarks: Record<string, boolean> = {};
     posts.forEach((post: Post) => {
-      initialBookmarks[post._id] = post.isBookmarked ?? false;
+      initialBookmarks[post?._id] = post?.isBookmarked ?? false;
       setBookmarked(initialBookmarks);
     });
   }, [posts]);
@@ -43,10 +43,10 @@ export default function BookmarkButton({ posts, post }: { posts?: Post[]; post: 
   return (
     <Button
       variant={"ghost"}
-      onClick={() => toggleBookmark(post._id)}
-      className={`flex items-center gap-1 ${bookmarked[post._id] ? "text-blue-600 hover:text-blue-600" : "hover:text-gray-600"} focus:outline-none`}
+      onClick={() => toggleBookmark(post?._id)}
+      className={`flex items-center gap-1 ${bookmarked[post?._id] ? "text-blue-600 hover:text-blue-600" : "hover:text-gray-600"} focus:outline-none`}
     >
-      {bookmarked[post._id] ? (
+      {bookmarked[post?._id] ? (
         <Bookmark size={16} className="fill-blue-600" />
       ) : (
         <Bookmark size={16} />

@@ -51,8 +51,10 @@ export interface Comment {
   createdAt: string;
 }
 export interface Post {
+  requestStatus: string;
   imageUrl?: string | undefined;
   _id: string;
+  isFollowed?: boolean;
   content: string;
   tags?: string[];
   userId: UserInfo
