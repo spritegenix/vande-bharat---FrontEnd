@@ -82,7 +82,7 @@ export default function PeopleYouMayKnowPage() {
               </div>
 
               <div className="space-y-4 p-4">
-                <Link href={`/${profile.slug}`}>
+                <Link href={`/profile/${profile.slug}`}>
                   <h3 className="truncate text-lg font-semibold text-gray-800 hover:underline dark:text-white">
                     {profile.name}
                   </h3>

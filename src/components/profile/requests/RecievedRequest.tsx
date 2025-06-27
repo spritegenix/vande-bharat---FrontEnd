@@ -78,7 +78,7 @@ export default function RecievedRequest() {
               </div>
 
               <div className="space-y-3 p-4">
-                <Link href={`/${req.fromUser.slug}`}>
+                <Link href={`/profile/${req.fromUser.slug}`}>
                   <h3 className="truncate text-lg font-semibold text-gray-800 hover:underline dark:text-white">
                     {req.fromUser.name}
                   </h3>

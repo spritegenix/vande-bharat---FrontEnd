@@ -33,11 +33,16 @@ export const useFetchUserPosts = () => {
 
 
 export const useFetchBookmarkedPosts = ()=> {
-  return useQuery({
+  return useInfiniteQuery({
     queryKey:['bookmarked-posts'],
-    queryFn: fetchBookmarkedPosts,
+    queryFn:fetchBookmarkedPosts,
+    getNextPageParam: (lastPage) => {
+      return lastPage?.nextCursor ?? undefined;
+    },
+    initialPageParam:null,
     staleTime: 1000 * 60 * 5,
-    retry: 1,
+     retry: 1,
+    refetchOnWindowFocus: false,
   })
 }
 
@@ -45,10 +50,12 @@ export const useFetchPopularPosts = () => {
   return useInfiniteQuery({
     queryKey: ['fetch-popularPosts'],
     queryFn: fetchPopularPosts,
-     getNextPageParam: (lastPage) => {
-     
+     getNextPageParam: (lastPage) => {     
       return lastPage?.nextCursor ?? undefined;
     },
     initialPageParam: null,
+      staleTime: 1000 * 60 * 5,
+     retry: 1,
+     refetchOnWindowFocus: false,
   });
 };

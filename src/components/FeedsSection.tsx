@@ -61,7 +61,6 @@ const FeedsSection: React.FC<FeedsSectionProps> = ({
     if (!user) redirect("/login");
     unfriend({ toUserId });
   };
-  console.log("posts", posts);
   if (isLoading) return <LoadingSpinner />;
   if (isError) return <p className="text-center text-red-500">Error loading posts.</p>;
 

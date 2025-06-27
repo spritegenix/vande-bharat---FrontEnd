@@ -9,9 +9,10 @@ export default function HomePage() {
   const { data, isLoading, isError, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useFetchPosts();
   const { user } = useUserStore();
+
   return (
     <>
-      <Feed user={user} />
+      {user && <Feed user={user} />}
       <FeedsSection
         posts={data?.pages.flatMap((page) => page.posts) ?? []}
         isLoading={isLoading}

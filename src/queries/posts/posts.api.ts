@@ -2,6 +2,7 @@
 
 import axios from "@/lib/axios";
 import { CreatePostPayload, Post } from "@/types/post";
+import { li } from "framer-motion/m";
 
 // POST /api/v1/posts/create-post
 export const createPost = async (payload: CreatePostPayload) => {
@@ -38,12 +39,15 @@ export const userPosts = async () => {
 };
 
 //bookmark posts
-export const fetchBookmarkedPosts = async () => {
+export const fetchBookmarkedPosts = async ({ pageParam = null }: { pageParam?: string | null }) => {
   const response = await axios.get("/posts/bookmarks/my-bookmarks", {
-    params: { isLiked: true, isBookmarked: true },
+    params: { isLiked: true, isBookmarked: true,cursor:pageParam, limit: 3 },
     withCredentials: true,
   });
-  return response.data.bookmarks;
+   return {
+    posts: response.data.bookmarks,
+    nextCursor: response.data.nextCursor ?? undefined,
+  };
 };
 
 interface UpdateCommentPayload {
@@ -87,7 +91,7 @@ export const fetchPopularPosts = async({ pageParam = null }: { pageParam?: strin
       isBookmarked:true,
       sort:"popular",
       cursor:pageParam,
-  limit: 10   
+  limit: 3   
     },
     withCredentials: true,
   });

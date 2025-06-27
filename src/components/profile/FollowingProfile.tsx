@@ -62,7 +62,7 @@ export default function FollowingProfileList() {
 
               <div className="p-4">
                 <h3 className="truncate text-lg font-semibold text-gray-800 dark:text-white">
-                  {profile.name}
+                  <Link href={`/profile/${profile.slug}`}>{profile.name}</Link>
                 </h3>
 
                 <div className="mt-3 flex items-center justify-between">

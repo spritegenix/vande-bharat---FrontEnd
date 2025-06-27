@@ -9,6 +9,8 @@ import Image from "next/image";
 import { useMutation } from "@tanstack/react-query";
 import { getPresignedUrl, updateUserCover, uploadToS3 } from "@/queries/user/user.api";
 import { toast } from "sonner";
+import { useUserStore } from "@/stores/userStore";
+import { useParams } from "next/navigation";
 export default function CoverImage({ coverImage }: { coverImage?: string }) {
   const [modelOpen, setModelOpen] = useState(false);
   const [imageSrc, setImageSrc] = useState<string>(
@@ -16,7 +18,8 @@ export default function CoverImage({ coverImage }: { coverImage?: string }) {
   );
   const [croppedImage, setCroppedImage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-
+  const { user } = useUserStore();
+  const params = useParams();
   const updateCoverMutation = useMutation({
     mutationFn: async (blob: Blob) => {
       try {
@@ -58,6 +61,7 @@ export default function CoverImage({ coverImage }: { coverImage?: string }) {
     };
     reader.readAsDataURL(file);
   };
+  const slug = params.slug as string;
 
   return (
     <div className="relative h-[150px] w-full md:h-[350px] lg:h-[400px]">
@@ -68,28 +72,30 @@ export default function CoverImage({ coverImage }: { coverImage?: string }) {
         className="object-cover object-center"
         priority
       />
-      <div className="absolute bottom-0 right-0 z-20 m-5">
-        <Button
-          type="button"
-          className="bg-offwhite text-gray-900"
-          onClick={() => {
-            if (fileInputRef.current) {
-              fileInputRef.current.value = "";
-              fileInputRef.current.click();
-            }
-          }}
-        >
-          <Camera className="mr-2 h-4 w-4" />
-          <span className="hidden md:flex">Add cover photo</span>
-        </Button>
-        <Input
-          ref={fileInputRef}
-          type="file"
-          accept="image/*"
-          onChange={handleFileChange}
-          className="hidden"
-        />
-      </div>
+      {user?.slug && slug && user.slug === slug && (
+        <div className="absolute bottom-0 right-0 z-20 m-5">
+          <Button
+            type="button"
+            className="bg-offwhite text-gray-900"
+            onClick={() => {
+              if (fileInputRef.current) {
+                fileInputRef.current.value = "";
+                fileInputRef.current.click();
+              }
+            }}
+          >
+            <Camera className="mr-2 h-4 w-4" />
+            <span className="hidden md:flex">Add cover photo</span>
+          </Button>
+          <Input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            onChange={handleFileChange}
+            className="hidden"
+          />
+        </div>
+      )}
 
       {modelOpen && (
         <ImageCropperModal

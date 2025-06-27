@@ -8,6 +8,7 @@ import { useMutation } from "@tanstack/react-query";
 import { getPresignedUrl, updateUserProfile, uploadToS3 } from "@/queries/user/user.api";
 import { toast } from "sonner";
 import { useUserStore } from "@/stores/userStore";
+import { useParams } from "next/navigation";
 
 export default function ProfileNameSection({
   profileImage,
@@ -20,10 +21,11 @@ export default function ProfileNameSection({
   const [imageSrc, setImageSrc] = useState<string>(
     profileImage || "/images/profile/profile-img.webp",
   );
-
+  const params = useParams();
   const [openModal, setOpenModal] = useState(false);
   const [croppedImage, setCroppedImage] = useState<string | null>(null);
   const { user } = useUserStore();
+  const slug = params.slug as string;
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -78,7 +80,7 @@ export default function ProfileNameSection({
               className="aspect-square rounded-full border-4 border-white shadow-lg dark:border-black"
             />
             <div className="absolute bottom-5 right-2 rounded-full bg-offwhite p-1 dark:bg-gray-900">
-              {user.id && (
+              {user && slug && user.slug === slug && (
                 <Button
                   type="button"
                   variant={"ghost"}

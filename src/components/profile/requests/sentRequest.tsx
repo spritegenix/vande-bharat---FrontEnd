@@ -92,7 +92,7 @@ export default function SentRequest() {
               </div>
 
               <div className="space-y-3 p-4">
-                <Link href={`/${req.toUser.slug}`}>
+                <Link href={`/profile/${req.toUser.slug}`}>
                   <h3 className="truncate text-lg font-semibold text-gray-800 hover:underline dark:text-white">
                     {req.toUser.name}
                   </h3>

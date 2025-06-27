@@ -9,12 +9,12 @@ import React, { useEffect } from "react";
 
 export default function IndividualProfilePage() {
   const { data: user, isLoading, isError } = useCurrentUser({ fields: "banner,name,avatar,slug" });
-  const { setUser } = useUserStore();
-  useEffect(() => {
-    if (user) {
-      setUser(user);
-    }
-  }, [user]);
+  // const { setUser } = useUserStore();
+  // useEffect(() => {
+  //   if (user) {
+  //     setUser(user);
+  //   }
+  // }, [user]);
   if (isLoading) return <LoadingSpinner />;
   if (isError) return <p>Failed to load user.</p>;
   // fetchFollowingProfiles();
