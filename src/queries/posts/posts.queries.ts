@@ -21,15 +21,18 @@ export const useFetchPosts = () => {
 };
 
 
-
-export const useFetchUserPosts = () => {
-  return useQuery({
-    queryKey: ['user-posts'],
-    queryFn: userPosts,
-       staleTime: 1000 * 60 * 5, 
+export const useFetchUserPosts = (slug: string) => {
+  return useInfiniteQuery({
+    queryKey: ['user-posts', slug],
+    queryFn: ({ pageParam = null }) => userPosts({ pageParam, slug }),
+    getNextPageParam: (lastPage) => lastPage?.nextCursor ?? undefined,
+    initialPageParam: null,
+    refetchOnWindowFocus: false,
+    staleTime: 1000 * 60 * 5,
     retry: 1,
   });
 };
+
 
 
 export const useFetchBookmarkedPosts = ()=> {

@@ -11,11 +11,18 @@ export const fetchCurrentUser = async (query?: Record<string, any>) => {
   return res.data.data;
 };
 
-export const fetchFollowingProfiles = async()=>{
-  const res = await axios.get("/users/followed", {withCredentials:true})
-  console.log("users",res)
-  return res.data
-}
+export const fetchUserById = async (slug?:string) => {
+  const res = await axios.get(`/users/${slug}/single`, {
+    withCredentials: true,
+  });
+  return res.data.data;
+};
+
+// export const fetchFollowingProfiles = async()=>{
+//   const res = await axios.get("/users/followed", {withCredentials:true})
+//   console.log("users",res)
+//   return res.data
+// }
 
 export const fetchSuggestions = async(pageParam = "")=> {
   const res = await axios.get("/users/suggestions",  {params:{
@@ -59,8 +66,12 @@ export const updateUserCover = async (imageUrl: string) => {
   });
 };
 
-
-export const updateUserProfile = async (imageUrl: string) => {
+export const updateUserProfile = async (payload: unknown) => {
+  return await axios.patch("/users/me", {
+    payload
+  });
+};
+export const updateUserProfilePic = async (imageUrl: string) => {
   return await axios.patch("/users/me", {
     avatar: imageUrl,
   });
@@ -103,22 +114,30 @@ export const allFollowRequests = async(pageParam = "")=>{
 }
 
 
-export const followingUsers = async(pageParam = "") => {
-  const res = await axios.get("users/following", {params:{
+// export const followingUsers = async(pageParam = "") => {
+//   const res = await axios.get("users/following", {params:{
+//     limit:3,
+//     cursor: pageParam,
+//   } , withCredentials:true})
+//   return res.data
+// }
+
+export const Usersfollowers = async(slug: string,pageParam = "") => {
+  const res = await axios.get(`users/followers/${slug}`, {params:{
     limit:3,
     cursor: pageParam,
   } , withCredentials:true})
   return res.data
 }
+export const followingUsers = async (slug: string, pageParam = "") => {
+  const res = await axios.get(`/users/followed/${slug}`, {
+    params: {  limit:3,
+    cursor: pageParam},
+    withCredentials: true,
+  });
 
-export const Usersfollowers = async(pageParam = "") => {
-  const res = await axios.get("users/followers", {params:{
-    limit:3,
-    cursor: pageParam,
-  } , withCredentials:true})
-  return res.data
-}
-
+  return res.data;
+};
 export const unfriendUser = async(toUserId:string) => {
   const res = await axios.patch(`users/following/${toUserId}/unfriend`)
   return res.data

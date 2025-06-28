@@ -13,11 +13,12 @@ import FollowersProfileList from "./FollowersProfile";
 
 const tabOptions = ["posts", "about", "Following", "Followers", "Communities"];
 
-export default function ProfileTabs() {
+export default function ProfileTabs({ slug }: { slug: string }) {
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const router = useRouter();
-  const { data, isLoading, isError } = useFetchUserPosts();
+  const { data, isLoading, isError, isFetchingNextPage, fetchNextPage, hasNextPage } =
+    useFetchUserPosts(slug);
   const queryTab = searchParams.get("tab")?.toLowerCase() || "posts";
   const [selectedTab, setSelectedTab] = useState(queryTab);
   const { user } = useUserStore();
@@ -46,23 +47,32 @@ export default function ProfileTabs() {
       </TabsList>
 
       <TabsContent value="posts">
-        <Feed user={user} />
-        <FeedsSection posts={data} isError={isError} isLoading={isLoading} showOwnPostsOnly />
+        {user.slug === slug && <Feed user={user} />}
+        <FeedsSection
+          isLoading={isLoading}
+          isError={isError}
+          fetchNextPage={fetchNextPage}
+          hasNextPage={hasNextPage}
+          isFetchingNextPage={isFetchingNextPage}
+          posts={data?.pages.flatMap((page) => page.posts) || []}
+          showOwnPostsOnly={true}
+          slug={slug}
+        />
       </TabsContent>
 
       <TabsContent value="about">
-        <About />
+        <About slug={slug} />
       </TabsContent>
 
       <TabsContent value="following">
-        <FollowingProfileList />
+        <FollowingProfileList slug={slug} />
       </TabsContent>
       <TabsContent value="followers">
-        <FollowersProfileList />
+        <FollowersProfileList slug={slug} />
       </TabsContent>
 
       <TabsContent value="communities">
-        <About />
+        <About slug={slug} />
       </TabsContent>
     </Tabs>
   );

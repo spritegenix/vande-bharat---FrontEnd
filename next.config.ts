@@ -15,6 +15,16 @@ const nextConfig: NextConfig = {
         hostname: "your-s3-bucket.s3.amazonaws.com",
         pathname: "/**",
       },
+      {
+        protocol: "https",
+        hostname: "avatars.githubusercontent.com",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "cdn.jsdelivr.net",
+        pathname: "/**",
+      },
   ],
 },
 

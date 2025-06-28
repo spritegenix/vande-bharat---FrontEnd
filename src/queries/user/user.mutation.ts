@@ -7,30 +7,47 @@ import {
   sendFollowRequest,
   unfriendUser,
   updateUserCover,
+  updateUserProfile,
   uploadToS3,
 } from "./user.api";
 import { toast } from "sonner";
+import { User } from "@/types/user";
+export const useUpdateProfile = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (payload:User) => {
+      return updateUserProfile(payload);
+    },
+    onSuccess:()=>{
+      toast.success("Profile updated successfully");
+      queryClient.invalidateQueries({ queryKey: ["user-by-id"] });
+    }, onError:(err: any) => {
+      toast.error(err?.response?.data?.message || "Failed to update profile");
+    }
+  });
+};
+
+
+
+
 
 export const useSendRequest = () => {
-   const queryClient = useQueryClient();
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({ toUserId }: { toUserId: string }) => {
       return sendFollowRequest(toUserId);
     },
-     
-        onSuccess: () => {
-        
-          toast.success("Friend request sent");
-          
-              queryClient.invalidateQueries({queryKey:["fetch-posts"]})
-          queryClient.invalidateQueries({ queryKey: ["friend-suggestions"] });
-           queryClient.invalidateQueries({ queryKey: ["bookmarked-posts"] });
-          queryClient.invalidateQueries({ queryKey: ["allSent-requests"] });
-        },
-        onError: (err: any) => {
-          toast.error(err?.response?.data?.message || "Failed to send request");
-        },
-      
+
+    onSuccess: () => {
+      toast.success("Friend request sent");
+      queryClient.invalidateQueries({ queryKey: ["fetch-posts"] });
+      queryClient.invalidateQueries({ queryKey: ["friend-suggestions"] });
+      queryClient.invalidateQueries({ queryKey: ["bookmarked-posts"] });
+      queryClient.invalidateQueries({ queryKey: ["allSent-requests"] });
+    },
+    onError: (err: any) => {
+      toast.error(err?.response?.data?.message || "Failed to send request");
+    },
   });
 };
 
@@ -92,22 +109,21 @@ export const useRejectRecievedRequest = () => {
   });
 };
 
-
-export const useUnfriend = ()=> {
+export const useUnfriend = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn:async({toUserId}:{toUserId:string})=>{
-      return unfriendUser(toUserId)
+    mutationFn: async ({ toUserId }: { toUserId: string }) => {
+      return unfriendUser(toUserId);
     },
-    onSuccess:()=> {
-      queryClient.invalidateQueries({queryKey:["following-Users"]})
-      
-           queryClient.invalidateQueries({ queryKey: ["bookmarked-posts"] });
-      queryClient.invalidateQueries({queryKey:["fetch-posts"]})
-      toast.error("unfriended successfully.")
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["following-Users"] });
+
+      queryClient.invalidateQueries({ queryKey: ["bookmarked-posts"] });
+      queryClient.invalidateQueries({ queryKey: ["fetch-posts"] });
+      toast.error("unfriended successfully.");
     },
-    onError:(err:any)=>{
+    onError: (err: any) => {
       toast.error(err?.response?.data?.message || "Failed to unfriend user");
-    }
-  })
-}
+    },
+  });
+};

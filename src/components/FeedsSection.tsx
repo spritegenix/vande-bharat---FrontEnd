@@ -29,6 +29,7 @@ interface FeedsSectionProps {
   fetchNextPage: () => void;
   isFetchingNextPage?: boolean;
   hasNextPage?: boolean;
+  slug?: string;
 }
 
 const FeedsSection: React.FC<FeedsSectionProps> = ({
@@ -39,6 +40,7 @@ const FeedsSection: React.FC<FeedsSectionProps> = ({
   fetchNextPage,
   hasNextPage,
   isFetchingNextPage,
+  slug,
 }) => {
   const [editingPostId, setEditingPostId] = useState<string | null>(null);
   const { mutate: updatePost } = useUpdatePost();
@@ -88,7 +90,7 @@ const FeedsSection: React.FC<FeedsSectionProps> = ({
           ) : (
             <Box className="m-2 my-6 pb-2 md:mx-auto">
               <div className="flex items-start justify-between gap-x-2 p-3 pb-0">
-                {!showOwnPostsOnly && <PostHeader post={post} />}
+                {<PostHeader post={post} />}
 
                 {user &&
                   !showOwnPostsOnly &&
@@ -121,6 +123,16 @@ const FeedsSection: React.FC<FeedsSectionProps> = ({
                       Unfollow
                     </Button>
                   ))}
+                {!user && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="text-xs"
+                    onClick={() => handleFollow(post?.userId?._id)}
+                  >
+                    Follow
+                  </Button>
+                )}
               </div>
 
               <div className="flex items-center justify-between">
@@ -129,7 +141,7 @@ const FeedsSection: React.FC<FeedsSectionProps> = ({
                     <div>{post.content}</div>
                   </Linkify>
                 </div>
-                {showOwnPostsOnly && (
+                {showOwnPostsOnly && user.slug === slug && (
                   <PostUpdateButton post={post} setEditingPostId={setEditingPostId} />
                 )}
               </div>

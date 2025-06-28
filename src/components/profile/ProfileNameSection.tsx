@@ -5,7 +5,12 @@ import { Camera, Pencil } from "lucide-react";
 import { Input } from "../ui/input";
 import ImageCropperModal from "../common/ImageCropperModal";
 import { useMutation } from "@tanstack/react-query";
-import { getPresignedUrl, updateUserProfile, uploadToS3 } from "@/queries/user/user.api";
+import {
+  getPresignedUrl,
+  updateUserProfile,
+  updateUserProfilePic,
+  uploadToS3,
+} from "@/queries/user/user.api";
 import { toast } from "sonner";
 import { useUserStore } from "@/stores/userStore";
 import { useParams } from "next/navigation";
@@ -49,7 +54,7 @@ export default function ProfileNameSection({
 
         await uploadToS3(uploadUrl, file);
 
-        await updateUserProfile(fileUrl);
+        await updateUserProfilePic(fileUrl);
 
         return fileUrl;
       } catch (err) {
@@ -129,10 +134,7 @@ export default function ProfileNameSection({
           </div>
         </div>
         <div className="md:m-5 md:mr-9">
-          {/* <Button className="bg-offwhite px-4 py-2 text-gray-900">
-            <Pencil />
-            Edit Profile
-          </Button> */}
+          <Button className="px-4 py-2 text-gray-900 dark:bg-offwhite">Follow</Button>
         </div>
       </div>
     </div>

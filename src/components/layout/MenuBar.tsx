@@ -26,6 +26,7 @@ import Image from "next/image";
 import { Button } from "../ui/button";
 import { useUser } from "@clerk/nextjs";
 import { useUserStore } from "@/stores/userStore";
+import { useFollowingUsers } from "@/queries/user/user.queries";
 
 interface MenuBarProps {
   className?: string;
@@ -41,12 +42,12 @@ interface MenuTabProps {
 
 export default function MenuBar({ className }: MenuBarProps) {
   const [showAllCommunities, setShowAllCommunities] = useState(false);
-
+  const { data } = useFollowingUsers();
   const user = useUserStore((state) => state.user);
   const userProfileSlug = user?.slug || user?.id;
   const [isCreatePageOpen, setIsCreatePageOpen] = useState(false);
   const [isCreateCommunityOpen, setIsCreateCommunityOpen] = useState(false);
-
+  const profiles = data?.pages.flatMap((page) => page.data) || [];
   return (
     <>
       <div className={`pb-10 ${className}`}>
@@ -68,37 +69,41 @@ export default function MenuBar({ className }: MenuBarProps) {
         </div>
         <hr className="my-4 w-full max-w-52 border-t" />
         {/* ---------------------------Following---------------------------  */}
-        <p className="mb-2 pl-3 text-sm font-semibold text-zinc-500">Following</p>
-        <div className="flex flex-col gap-y-3">
-          {/* {mockProfiles.slice(0, 6).map((item) => (
-            <Link
-              href={`/profile/${item.id}`}
-              key={item.id}
-              className="flex items-center gap-x-5 pl-3"
-            >
-              <Avatar>
-                <AvatarImage src={item.avatar} sizes="30" />
-                <AvatarFallback>
-                  <Image
-                    src="/images/profile/profileplaceholder.jpg"
-                    alt="fallback"
-                    height={30}
-                    width={30}
-                  />
-                </AvatarFallback>
-              </Avatar>
+        {profiles && profiles.length > 0 && (
+          <>
+            <p className="mb-2 pl-3 text-sm font-semibold text-zinc-500">Following</p>
+            <div className="flex flex-col gap-y-3">
+              {profiles?.slice(0, 6).map((profile) => (
+                <Link
+                  href={`/profile/${profile?.slug}`}
+                  key={profile?._id}
+                  className="flex items-center gap-x-5 pl-3"
+                >
+                  <Avatar>
+                    <AvatarImage src={profile?.avatar} sizes="30" />
+                    <AvatarFallback>
+                      <Image
+                        src="/images/profile/profileplaceholder.jpg"
+                        alt="fallback"
+                        height={30}
+                        width={30}
+                      />
+                    </AvatarFallback>
+                  </Avatar>
 
-              <p>{item.name}</p>
-            </Link>
-          ))} */}
-          <Link
-            href={`/profile/${userProfileSlug}?tab=following+profiles`}
-            className="ml-4 cursor-pointer text-sm font-semibold text-zinc-500"
-          >
-            See All
-          </Link>
-        </div>
-        <hr className="my-4 w-full max-w-52 border-t" />
+                  <p>{profile?.name}</p>
+                </Link>
+              ))}
+              <Link
+                href={`/profile/${userProfileSlug}?tab=following`}
+                className="ml-4 cursor-pointer text-sm font-semibold text-zinc-500"
+              >
+                See All
+              </Link>
+            </div>
+            <hr className="my-4 w-full max-w-52 border-t" />
+          </>
+        )}
         {/* --------------------------Communities----------------------------  */}
         <p className="mb-2 pl-5 text-sm font-semibold text-zinc-500">Communities</p>
         <Button variant={"outline"} asChild className="my-3 ml-4 border-gray-500">

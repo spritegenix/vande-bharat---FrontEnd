@@ -16,8 +16,9 @@ import { ImageChecker } from "@/lib/ImagesChecker";
 import { useInView } from "react-intersection-observer";
 import SkeletonCard from "../common/SkeletonCard";
 
-export default function FollowersProfileList() {
-  const { data, isFetchingNextPage, fetchNextPage, hasNextPage, isLoading } = useFollowerUsers();
+export default function FollowersProfileList({ slug }: { slug?: string }) {
+  const { data, isFetchingNextPage, fetchNextPage, hasNextPage, isLoading } =
+    useFollowerUsers(slug);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
 
   const { ref } = useInView({

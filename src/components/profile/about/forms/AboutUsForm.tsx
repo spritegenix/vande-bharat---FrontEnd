@@ -1,4 +1,5 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
@@ -15,83 +16,79 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
-import { useAboutStore } from "@/stores/AboutStore";
 import { Edit, Trash2 } from "lucide-react";
 import Linkify from "@/components/Linkify";
 import { extractHashtags } from "@/utils/HashTagExtractor";
+import { useUpdateProfile } from "@/queries/user/user.mutation";
+import { useUserStore } from "@/stores/userStore";
 
 const formSchema = z.object({
-  about: z.string().min(20, "Please add little more about you."),
+  about: z.string().min(20, "Please add a little more about you."),
 });
 
-export default function AboutUsForm() {
-  const { description, deletedDescription, addDescription } = useAboutStore();
+export default function AboutUsForm({
+  userData,
+  userId,
+}: {
+  userData: string | undefined;
+  userId: string | undefined;
+}) {
   const [isEditing, setIsEditing] = useState(false);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
   });
+
+  const { mutate: bioUpdate } = useUpdateProfile();
+  const { user } = useUserStore();
+
   useEffect(() => {
-    if (description) {
-      form.reset({ about: description });
-    } else {
-      form.reset({ about: "" });
-    }
-  }, [description, form]);
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    try {
-      const hashtags = extractHashtags(values.about);
-      addDescription(values.about);
-      const payload = {
-        description: values.about,
-        hashtags,
-      };
-      console.log(payload);
-      toast(
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-black">{JSON.stringify(values, null, 2)}</code>
-        </pre>,
-      );
-      form.reset();
-      setIsEditing(false);
-    } catch (error) {
-      console.error("Form submission error", error);
-      toast.error("Failed to submit the form. Please try again.");
-    }
-  }
+    form.reset({ about: userData || "" });
+  }, [userData, form]);
+
+  const onSubmit = (values: z.infer<typeof formSchema>) => {
+    const hashtags = extractHashtags(values.about);
+    const payload = { bio: values.about, hashtags };
+    bioUpdate(payload);
+    setIsEditing(false);
+  };
+
   const handleDelete = () => {
-    deletedDescription();
+    bioUpdate({ bio: "" });
     setIsEditing(true);
     toast.success("About section deleted.");
   };
+
+  const canEdit = user._id === userId;
+
   return (
-    <>
-      {!description || isEditing ? (
+    <div className="rounded-xl border border-muted p-4 shadow-sm">
+      {canEdit && isEditing ? (
         <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="mx-auto max-w-3xl space-y-8 py-10"
-          >
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <FormField
               control={form.control}
               name="about"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>About</FormLabel>
+                  <FormLabel className="text-sm font-medium">About</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="About"
-                      className="resize-none border-2 border-gray-500"
+                      placeholder="Write something about yourself..."
+                      className="resize-none border-muted"
+                      rows={5}
                       {...field}
                     />
                   </FormControl>
-                  <FormDescription>Describe about you (you can add #hashtags also)</FormDescription>
+                  <FormDescription className="text-xs text-muted-foreground">
+                    Add some description and #hashtags if you like.
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <div className="flex justify-start gap-2 lg:justify-end">
-              {description && (
-                <Button type="button" onClick={() => setIsEditing(false)} className="bg-gray-300">
+            <div className="flex justify-end gap-2">
+              {userData && (
+                <Button type="button" variant="outline" onClick={() => setIsEditing(false)}>
                   Cancel
                 </Button>
               )}
@@ -100,22 +97,37 @@ export default function AboutUsForm() {
           </form>
         </Form>
       ) : (
-        <div className="flex justify-between py-6 leading-tight">
-          <div>
-            <Linkify>
-              <p className="whitespace-pre-line text-sm text-gray-500">{description}</p>
-            </Linkify>
+        <div className="group relative">
+          <div className="mb-2 whitespace-pre-wrap text-sm text-muted-foreground">
+            {userData && userData.length > 0 ? (
+              <Linkify>
+                <p>{userData}</p>
+              </Linkify>
+            ) : (
+              <p className="text-muted-foreground">Nothing described yet.</p>
+            )}
           </div>
-          <div className="flex gap-3">
-            <div className="cursor-pointer text-gray-500" onClick={() => setIsEditing(true)}>
-              <Edit size={17} />
+
+          {canEdit && (
+            <div className="absolute right-0 top-0 flex gap-2 opacity-0 transition-opacity group-hover:opacity-100">
+              <button
+                onClick={() => setIsEditing(true)}
+                className="text-muted-foreground hover:text-primary"
+                title="Edit"
+              >
+                <Edit size={18} />
+              </button>
+              <button
+                onClick={handleDelete}
+                className="text-muted-foreground hover:text-destructive"
+                title="Delete"
+              >
+                <Trash2 size={18} />
+              </button>
             </div>
-            <div className="cursor-pointer text-gray-500" onClick={handleDelete}>
-              <Trash2 size={17} />
-            </div>
-          </div>
+          )}
         </div>
       )}
-    </>
+    </div>
   );
 }

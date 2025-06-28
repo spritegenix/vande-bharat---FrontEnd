@@ -33,9 +33,15 @@ export const fetchPosts = async({ pageParam = null }: { pageParam?: string | nul
   };
 };
 
-export const userPosts = async () => {
-  const response = await axios.get("/posts/my-posts", { withCredentials: true });
-  return response.data.data;
+export const userPosts = async ({ pageParam = null, slug }: { pageParam?: string | null; slug:string }) => {
+  const response = await axios.get(`/posts/my-posts/${slug}`, { withCredentials: true, params:{
+    cursor: pageParam,
+    limit: 3
+  } });
+  return {
+    posts: response.data.data,
+    nextCursor: response.data.nextCursor ?? undefined,
+  };
 };
 
 //bookmark posts

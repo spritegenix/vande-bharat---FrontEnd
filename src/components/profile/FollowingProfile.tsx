@@ -15,8 +15,8 @@ import { ImageChecker } from "@/lib/ImagesChecker";
 import { useUnfriend } from "@/queries/user/user.mutation";
 import SkeletonCard from "../common/SkeletonCard";
 
-export default function FollowingProfileList() {
-  const { data, isFetchingNextPage, fetchNextPage, isError, isLoading } = useFollowingUsers();
+export default function FollowingProfileList({ slug }: { slug?: string }) {
+  const { data, isFetchingNextPage, fetchNextPage, isError, isLoading } = useFollowingUsers(slug);
   const { mutate: unfriend, isPending } = useUnfriend();
 
   const handleUnfriend = (toUserId: string) => {
