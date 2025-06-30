@@ -50,7 +50,7 @@ export const useSuggestions = () =>
 
   export const useFollowingUsers = (slug?: string)=> useInfiniteQuery({
     queryKey:["following-Users"],
-    queryFn:({pageParam})=> followingUsers(pageParam, slug),
+    queryFn:({pageParam})=> followingUsers(slug!,pageParam),
     initialPageParam:"",
     getNextPageParam:(lastPage)=> lastPage?.nextCursor ?? null,
     staleTime: 1000 * 60 * 5,
@@ -59,7 +59,7 @@ export const useSuggestions = () =>
  
     export const useFollowerUsers = (slug?: string)=> useInfiniteQuery({
     queryKey:["follower-Users"],
-    queryFn:({pageParam})=> Usersfollowers(pageParam, slug),
+    queryFn:({pageParam})=> Usersfollowers(slug! ,pageParam),
     initialPageParam:"",
     getNextPageParam:(lastPage)=> lastPage?.nextCursor ?? null,
     staleTime: 1000 * 60 * 5,

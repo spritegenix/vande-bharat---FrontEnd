@@ -2,7 +2,6 @@
 import LoadingSpinner from "@/components/common/LoadingSpinner";
 import CoverImage from "@/components/profile/CoverImage";
 import ProfileCategory from "@/components/profile/ProfileCategory";
-import { fetchFollowingProfiles } from "@/queries/user/user.api";
 import { useCurrentUser, useUserById } from "@/queries/user/user.queries";
 import { useUserStore } from "@/stores/userStore";
 import { useParams } from "next/navigation";
@@ -16,10 +15,14 @@ export default function IndividualProfilePage() {
   const { data: user, isLoading, isError } = useUserById(usersSlug);
   if (isLoading) return <LoadingSpinner />;
   if (isError) return <p>Failed to load user.</p>;
-
   return (
     <div>
-      <CoverImage coverImage={user?.banner} profileImage={user?.avatar} name={user?.name} />
+      <CoverImage
+        coverImage={user?.banner}
+        profileImage={user?.avatar}
+        name={user?.name}
+        followStatus={user?.followStatus}
+      />
       <ProfileCategory slug={usersSlug} />
     </div>
   );

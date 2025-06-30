@@ -31,7 +31,6 @@ export default function ProfileTabs({ slug }: { slug: string }) {
     params.set("tab", value.toLowerCase());
     router.replace(`${pathname}?${params.toString()}`, { scroll: false });
   };
-
   return (
     <Tabs value={selectedTab} onValueChange={handleTabChange} className="mt-5 border-t-2">
       <TabsList className="flex justify-start bg-transparent md:gap-6">

@@ -123,19 +123,22 @@ export const allFollowRequests = async(pageParam = "")=>{
 // }
 
 export const Usersfollowers = async(slug: string,pageParam = "") => {
+  if (!slug) throw new Error("Slug is required for fetching followed users");
   const res = await axios.get(`users/followers/${slug}`, {params:{
     limit:3,
     cursor: pageParam,
   } , withCredentials:true})
+  
   return res.data
 }
 export const followingUsers = async (slug: string, pageParam = "") => {
-  const res = await axios.get(`/users/followed/${slug}`, {
+  if (!slug) throw new Error("Slug is required for fetching followed users");
+  console.log(slug)
+  const res = await axios.get(`users/following/${slug}`, {
     params: {  limit:3,
     cursor: pageParam},
     withCredentials: true,
   });
-
   return res.data;
 };
 export const unfriendUser = async(toUserId:string) => {

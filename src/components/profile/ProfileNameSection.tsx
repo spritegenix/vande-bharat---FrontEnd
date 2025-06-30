@@ -18,9 +18,11 @@ import { useParams } from "next/navigation";
 export default function ProfileNameSection({
   profileImage,
   name,
+  followStatus,
 }: {
   profileImage: string;
   name: string;
+  followStatus: "PENDING" | "ACCEPTED" | "REJECTED" | "CANCELLED" | null;
 }) {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [imageSrc, setImageSrc] = useState<string>(
@@ -134,7 +136,15 @@ export default function ProfileNameSection({
           </div>
         </div>
         <div className="md:m-5 md:mr-9">
-          <Button className="px-4 py-2 text-gray-900 dark:bg-offwhite">Follow</Button>
+          {followStatus !== "REJECTED" && (
+            <Button className="px-4 py-2 text-gray-900 dark:bg-offwhite">
+              {followStatus === "PENDING"
+                ? "Requested"
+                : followStatus === "ACCEPTED"
+                  ? "Following"
+                  : "Follow"}
+            </Button>
+          )}
         </div>
       </div>
     </div>
