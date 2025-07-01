@@ -1,67 +1,92 @@
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
-import { allFollowRequests, allSentRequests, fetchCurrentUser, fetchSuggestions, fetchUserById, followingUsers, Usersfollowers } from './user.api';
+import {
+  allFollowRequests,
+  allSentRequests,
+  fetchCurrentUser,
+  fetchSuggestions,
+  fetchUserById,
+  followingUsers,
+  Usersfollowers
+} from './user.api';
+import { useAuthAxios } from '@/lib/axios';
 
-export const useCurrentUser = (queryParams?: Record<string, any>) =>
-  useQuery({
-    queryKey: ['current-user', queryParams], 
-    queryFn: () => fetchCurrentUser(queryParams),
+export const useCurrentUser = (queryParams?: Record<string, any>) => {
+  const axios = useAuthAxios();
+  return useQuery({
+    queryKey: ['current-user', queryParams],
+    queryFn: () => fetchCurrentUser(axios, queryParams),
     staleTime: 1000 * 60 * 5,
     retry: 1,
+    refetchOnWindowFocus:false
   });
+};
 
-  export const useUserById = (slug?: string) =>
-  useQuery({
+export const useUserById = (slug?: string) => {
+  const axios = useAuthAxios();
+  return useQuery({
     queryKey: ['user-by-id', slug],
-    queryFn: () => fetchUserById(slug),
+    queryFn: () => fetchUserById(axios, slug),
     staleTime: 1000 * 60 * 5,
     retry: 1,
   });
+};
 
-export const useSuggestions = () =>
-  useInfiniteQuery({
-    queryKey: ["friend-suggestions"],
-    queryFn: ({ pageParam }) => fetchSuggestions(pageParam),
-    initialPageParam: "",
+export const useSuggestions = () => {
+  const axios = useAuthAxios();
+  return useInfiniteQuery({
+    queryKey: ['friend-suggestions'],
+    queryFn: ({ pageParam }) => fetchSuggestions(axios, pageParam),
+    initialPageParam: '',
     getNextPageParam: (lastPage) => lastPage?.nextCursor ?? null,
     staleTime: 1000 * 60 * 2,
     retry: 1,
   });
+};
 
-
-  export const useAllsentRequest = ()=> useInfiniteQuery({
-    queryKey:["allSent-requests"],
-    queryFn:({pageParam})=> allSentRequests(pageParam),
-    initialPageParam:"",
-    getNextPageParam:(lastpage) => lastpage?.nextCursor ?? null,
-    staleTime: 1000 * 60 * 5,
-    retry:1
-  })
-
-  export const useFollowRequests = () => 
-   useInfiniteQuery({
-    queryKey: ['recieved-requests'],
-    queryFn: ({pageParam}) => allFollowRequests(pageParam),
-    initialPageParam: "",
+export const useAllsentRequest = () => {
+  const axios = useAuthAxios();
+  return useInfiniteQuery({
+    queryKey: ['allSent-requests'],
+    queryFn: ({ pageParam }) => allSentRequests(axios, pageParam),
+    initialPageParam: '',
     getNextPageParam: (lastPage) => lastPage?.nextCursor ?? null,
     staleTime: 1000 * 60 * 5,
     retry: 1,
   });
+};
 
-
-  export const useFollowingUsers = (slug?: string)=> useInfiniteQuery({
-    queryKey:["following-Users"],
-    queryFn:({pageParam})=> followingUsers(slug!,pageParam),
-    initialPageParam:"",
-    getNextPageParam:(lastPage)=> lastPage?.nextCursor ?? null,
+export const useFollowRequests = () => {
+  const axios = useAuthAxios();
+  return useInfiniteQuery({
+    queryKey: ['recieved-requests'],
+    queryFn: ({ pageParam }) => allFollowRequests(axios, pageParam),
+    initialPageParam: '',
+    getNextPageParam: (lastPage) => lastPage?.nextCursor ?? null,
     staleTime: 1000 * 60 * 5,
     retry: 1,
-  })
- 
-    export const useFollowerUsers = (slug?: string)=> useInfiniteQuery({
-    queryKey:["follower-Users"],
-    queryFn:({pageParam})=> Usersfollowers(slug! ,pageParam),
-    initialPageParam:"",
-    getNextPageParam:(lastPage)=> lastPage?.nextCursor ?? null,
+  });
+};
+
+export const useFollowingUsers = (slug?: string) => {
+  const axios = useAuthAxios();
+  return useInfiniteQuery({
+    queryKey: ['following-Users', slug],
+    queryFn: ({ pageParam }) => followingUsers(axios, slug!, pageParam),
+    initialPageParam: '',
+    getNextPageParam: (lastPage) => lastPage?.nextCursor ?? null,
     staleTime: 1000 * 60 * 5,
     retry: 1,
-  })
+  });
+};
+
+export const useFollowerUsers = (slug?: string) => {
+  const axios = useAuthAxios();
+  return useInfiniteQuery({
+    queryKey: ['follower-Users', slug],
+    queryFn: ({ pageParam }) => Usersfollowers(axios, slug!, pageParam),
+    initialPageParam: '',
+    getNextPageParam: (lastPage) => lastPage?.nextCursor ?? null,
+    staleTime: 1000 * 60 * 5,
+    retry: 1,
+  });
+};

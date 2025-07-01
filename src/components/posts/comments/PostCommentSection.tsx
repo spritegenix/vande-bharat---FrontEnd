@@ -1,10 +1,11 @@
 "use client";
 import { useQuery } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
-import axios from "@/lib/axios";
+import { useAuthAxios } from "@/lib/axios";
 import { useCommentStore } from "@/stores/CommentStore";
 import CommentItem from "./commentToggle";
 import CreateComment from "./CreateComment";
+import { fetchComments } from "@/queries/posts/posts.api";
 
 interface PostCommentSectionProps {
   postId: string;
@@ -22,17 +23,13 @@ interface Comment {
   createdAt: string;
 }
 
-const fetchComments = async (postId: string) => {
-  const res = await axios.get(`/posts/${postId}/comments`);
-  return res.data.data || [];
-};
-
 export const PostCommentSection = ({ postId }: PostCommentSectionProps) => {
   const { open, commentId } = useCommentStore();
+  const axios = useAuthAxios();
   const isOpen = open === postId;
   const { data, isLoading, isError } = useQuery({
     queryKey: ["comments", commentId],
-    queryFn: () => fetchComments(commentId),
+    queryFn: () => fetchComments(axios, commentId),
     enabled: !!open, // only fetch when open
   });
   const comments = data?.comments || [];

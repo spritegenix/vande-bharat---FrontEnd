@@ -1,9 +1,24 @@
-// src/lib/axios.ts
+// src/lib/authAxios.ts
 import axios from 'axios';
+import { useAuth } from '@clerk/nextjs';
 
-const axiosInstance = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:4000/api/v1',
-  withCredentials: true,
-});
+export const useAuthAxios = () => {
+  const { getToken } = useAuth();
 
-export default axiosInstance;
+  const instance = axios.create({
+    baseURL: process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/+$/, ''),
+    withCredentials: true,
+  });
+
+  instance.interceptors.request.use(async (config) => {
+    const token = await getToken({ template: 'default' });
+
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+
+    return config;
+  }, (error) => Promise.reject(error));
+
+  return instance;
+};

@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import axios from "@/lib/axios";
+import  { useAuthAxios } from "@/lib/axios";
 import { CreatePostPayload } from "@/types/post";
 import { isAxiosError } from "axios";
 import { extractHashtags } from "@/utils/HashTagExtractor";
@@ -111,7 +111,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
 
 export const uploadMediaFiles = async (files: File[]): Promise<any[]> => {
   const uploaded: any[] = [];
-
+const axios = useAuthAxios()
   for (const file of files) {
     try {
       const { data: response } = await axios.post("/media/upload-url", {

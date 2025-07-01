@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
-import axios from "@/lib/axios";
+import { useAuthAxios } from "@/lib/axios";
+import { toggleLikeAPI } from "@/queries/posts/posts.api";
 import { useUserStore } from "@/stores/userStore";
 import { Post } from "@/types/post";
 import { useMutation } from "@tanstack/react-query";
@@ -21,12 +22,9 @@ export default function LikeButton({ post, posts }: { post: { _id: string }; pos
     setLiked(initialLiked);
     setLikeCounts(initialCounts);
   }, [posts]);
-
+  const axios = useAuthAxios();
   const { mutate: toggleLikeMutation } = useMutation({
-    mutationFn: (postId: string) =>
-      axios.post(`/posts/likes/toggle`, { postId }).then((res) => {
-        return res.data;
-      }),
+    mutationFn: (postId: string) => toggleLikeAPI(axios, postId),
 
     onMutate: async (postId) => {
       setLiked((prev) => ({ ...prev, [postId]: !prev[postId] }));
