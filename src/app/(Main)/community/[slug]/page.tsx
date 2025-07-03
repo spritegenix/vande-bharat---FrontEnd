@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { notFound } from "next/navigation";
 import Feed from "@/components/Feed";
 import { toast } from "sonner";
+import Fullpage from "@/components/community/Fullpage";
 
 // Simulated static data
 const mockCommunity = {
@@ -34,8 +35,9 @@ export default function IndividualCommunityPage() {
 
   return (
     <>
-      <div className="mx-auto max-w-5xl">
-        {/* Cover Photo Section */}
+      <Fullpage />
+      {/* <div className="mx-auto max-w-5xl">
+      
         <div className="relative h-60 w-full overflow-hidden rounded-b-lg md:h-72">
           <img
             src={mockCommunity.coverUrl}
@@ -64,14 +66,14 @@ export default function IndividualCommunityPage() {
           </div>
         </div>
 
-        {/* About Section */}
+        
         <div className="mt-6 px-4 sm:px-0">
           <Card className="p-5">
             <h2 className="mb-2 text-lg font-semibold">About this community</h2>
             <p className="text-sm text-muted-foreground">{mockCommunity.description}</p>
           </Card>
         </div>
-      </div>
+      </div> */}
       <Feed />
     </>
   );

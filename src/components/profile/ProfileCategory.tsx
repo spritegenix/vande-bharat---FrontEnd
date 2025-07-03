@@ -46,7 +46,7 @@ export default function ProfileTabs({ slug }: { slug: string }) {
       </TabsList>
 
       <TabsContent value="posts">
-        {user.slug === slug && <Feed user={user} />}
+        {user?.slug === slug && <Feed user={user} />}
         <FeedsSection
           isLoading={isLoading}
           isError={isError}
