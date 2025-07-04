@@ -1,4 +1,5 @@
 import { AxiosInstance } from "axios";
+import { i } from "framer-motion/m";
 import { toast } from "sonner";
 
 // ✔ Generic fetch
@@ -32,17 +33,29 @@ export const getPresignedUrl = async (axios: AxiosInstance, file: File, folder: 
 export const uploadToS3 = async (axios: AxiosInstance, uploadUrl: string, file: File | Blob) => {
   try {
     await axios.put(uploadUrl, file, {
-      headers: { "Content-Type": file.type },
-    });
+      headers: { "Content-Type": file.type },withCredentials: false, _skipAuth: true,
+    }as any);
+    
   } catch (error: any) {
     toast.error("Image upload failed. Please try again.");
+     console.log(error)
     throw new Error("Failed to upload file to S3");
+   
   }
 };
 
 export const updateUserCover = async (axios: AxiosInstance, imageUrl: string) => {
-  const res = await axios.patch("/users/me", { banner: imageUrl });
-  return res.data;
+  try {
+    if (!imageUrl) {
+      throw new Error("Image URL is required to update cover photo");
+    }
+    const res = await axios.patch("/users/me", { banner: imageUrl });
+    return res.data;
+  }catch (error: any) {
+    toast.error("Failed to update cover photo. Please try again.");
+    console.error("Error updating cover photo:", error);
+    throw error; // rethrow to handle it in the calling function
+  }
 };
 
 export const updateUserProfile = async (axios: AxiosInstance, payload: unknown) => {

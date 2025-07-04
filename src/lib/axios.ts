@@ -11,6 +11,7 @@ export const useAuthAxios = () => {
   });
 
   instance.interceptors.request.use(async (config) => {
+      if ((config as any)._skipAuth) return config;
     const token = await getToken({ template: 'default' });
 
     if (token) {
@@ -22,3 +23,7 @@ export const useAuthAxios = () => {
 
   return instance;
 };
+//for s3
+export const plainAxios = axios.create({
+  withCredentials: false,
+});

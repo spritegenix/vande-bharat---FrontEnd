@@ -88,6 +88,7 @@ export const fetchBookmarkedPosts = async (
  axios: AxiosInstance,
   pageParam: string | null = null
 ) => {
+  try {
   const response = await axios.get("/posts/bookmarks/my-bookmarks", {
     params: {
       isLiked: true,
@@ -95,12 +96,18 @@ export const fetchBookmarkedPosts = async (
       cursor: pageParam,
       limit: 3,
     },
-  });
-
+  })
+  
   return {
     posts: response.data.bookmarks,
     nextCursor: response.data.nextCursor ?? undefined,
-  };
+  }
+  }catch (error) {
+    console.error("Error fetching bookmarked posts:", error);
+    throw error; // Re-throw the error to handle it in the calling function
+  }
+
+
 };
 
 export const updateComment = async (

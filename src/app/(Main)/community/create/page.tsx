@@ -1,5 +1,6 @@
 "use client";
 
+import React, { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -16,58 +17,75 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import ImageCropperModal from "@/components/common/ImageCropperModal";
-import { SetStateAction, useRef, useState } from "react";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Switch } from "@/components/ui/switch";
+
+/* -------------------------------------------------------------------------- */
+/*                                    Zod                                    */
+/* -------------------------------------------------------------------------- */
 const MAX_IMAGE_SIZE = 500 * 1024; // 500KB
 const communityFormSchema = z.object({
   communityName: z.string().min(1, "Community Name is required"),
   category: z.string().min(1, "Category is required"),
   description: z.string().min(1, "Description is required"),
-  privacy: z.string().min(1, "Privacy setting is required"),
+  isPrivate: z.boolean().default(false).optional(),
   location: z.string().optional(),
-  image: z.any().refine((file) => !file || (file instanceof File && file.size <= MAX_IMAGE_SIZE), {
-    message: "Image must be under 500KB",
-  }),
+  image: z
+    .any()
+    .refine((file) => !file || (file instanceof File && file.size <= MAX_IMAGE_SIZE), {
+      message: "Image must be under 500KB",
+    })
+    .optional(),
   tags: z.string().optional(),
-  language: z.string().optional(),
   rules: z.array(z.string().min(1, "Rule cannot be empty")).optional(),
 });
 
 type CommunityFormValues = z.infer<typeof communityFormSchema>;
 
-export default function page() {
+/* -------------------------------------------------------------------------- */
+/*                                 Component                                  */
+/* -------------------------------------------------------------------------- */
+export default function CommunityPage() {
+  /* ------------------------------- Image state ------------------------------ */
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [croppedImage, setCroppedImage] = useState<Blob | null>(null);
   const [openCropper, setOpenCropper] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
+  /* ------------------------- React‑Hook‑Form setup -------------------------- */
   const form = useForm<CommunityFormValues>({
     resolver: zodResolver(communityFormSchema),
     defaultValues: {
       communityName: "",
       category: "",
       description: "",
-      privacy: "Public - Anyone can join",
+      isPrivate: false,
       location: "",
       tags: "",
-      language: "English",
       rules: [""],
     },
   });
 
   const {
-    register,
+    control,
     handleSubmit,
-    formState: { errors },
     setValue,
     watch,
+    formState: { errors },
   } = form;
 
-  const rules = watch("rules") || [];
+  const rules = watch("rules") ?? [];
 
-  const addRule = () => {
-    setValue("rules", [...rules, ""]);
-  };
+  const addRule = () => setValue("rules", [...rules, ""]);
 
   const removeRule = (index: number) => {
     const updated = [...rules];
@@ -81,223 +99,249 @@ export default function page() {
     setValue("rules", updated);
   };
 
+  /* -------------------------------------------------------------------------- */
+  /*                                   Submit                                   */
+  /* -------------------------------------------------------------------------- */
   const onSubmit = (data: CommunityFormValues) => {
-    console.log(data);
-    // API logic here
+    console.log("🎉 Submitted:", data);
+    // TODO: connect to API
+    form.reset();
   };
 
+  /* -------------------------------------------------------------------------- */
+  /*                                   Render                                   */
+  /* -------------------------------------------------------------------------- */
   return (
     <section className="mx-auto max-w-4xl px-4 py-10">
       <Tabs defaultValue="community" className="w-full">
         <TabsList className="mb-6">
           <TabsTrigger value="community">Create Community</TabsTrigger>
-          {/* <TabsTrigger value="event">Create Event</TabsTrigger> */}
         </TabsList>
 
         <TabsContent value="community">
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            <div>
-              <h3 className="mb-2 text-lg font-semibold">Basic Information</h3>
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <div>
-                  <Label>Community Name *</Label>
-                  <Input
-                    {...register("communityName")}
-                    placeholder="e.g., Ancient Architecture Society"
+          <Form {...form}>
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+              {/* ----------------------------- Basic Info ----------------------------- */}
+              <div>
+                <h3 className="mb-4 text-lg font-semibold">Basic Information</h3>
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                  {/* Community Name */}
+                  <FormField
+                    control={control}
+                    name="communityName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Community Name *</FormLabel>
+                        <FormControl>
+                          <Input placeholder="e.g., Ancient Architecture Society" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                  {errors.communityName && (
-                    <p className="text-sm text-red-500">{errors.communityName.message}</p>
-                  )}
+
+                  {/* Category */}
+                  <FormField
+                    control={control}
+                    name="category"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Category *</FormLabel>
+                        <FormControl>
+                          <Select value={field.value} onValueChange={field.onChange}>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select a category" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {[
+                                "Cultural Heritage",
+                                "Art and Literature",
+                                "Technology and Innovation",
+                                "Environmental Awareness",
+                                "Education and Learning",
+                                "Community Service",
+                              ].map((option) => (
+                                <SelectItem key={option} value={option}>
+                                  {option}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                 </div>
-                <div>
-                  <Label>Category *</Label>
-                  <Select onValueChange={(val) => setValue("category", val)} defaultValue="">
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Cultural Heritage">Cultural Heritage</SelectItem>
-                      <SelectItem value="Art and Literature">Art and Literature</SelectItem>
-                      <SelectItem value="Technology and Innovation">
-                        Technology and Innovation
-                      </SelectItem>
-                      <SelectItem value="Environmental Awareness">
-                        Environmental Awareness
-                      </SelectItem>
-                      <SelectItem value="Education and Learning">Education and Learning</SelectItem>
-                      <SelectItem value="Community Service">Community Service</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  {errors.category && (
-                    <p className="text-sm text-red-500">{errors.category.message}</p>
+
+                {/* Description */}
+                <FormField
+                  control={control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem className="mt-6">
+                      <FormLabel>Description *</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="Describe the purpose and goals of your community..."
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
                   )}
+                />
+
+                {/* Privacy + Location */}
+                <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2">
+                  {/* isPrivate */}
+                  <FormField
+                    control={control}
+                    name="isPrivate"
+                    render={({ field }) => (
+                      <FormItem className="flex items-center justify-between rounded-lg border p-4">
+                        <div className="space-y-0.5">
+                          <FormLabel className="text-base">Privacy Setting</FormLabel>
+                          <FormDescription>
+                            {field.value
+                              ? "Private - Approval required"
+                              : "Public - Anyone can join"}
+                          </FormDescription>
+                        </div>
+                        <FormControl>
+                          <Switch checked={field.value} onCheckedChange={field.onChange} />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* Location */}
+                  <FormField
+                    control={control}
+                    name="location"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Location</FormLabel>
+                        <FormControl>
+                          <Input placeholder="City, State" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                 </div>
               </div>
-              <div className="mt-4">
-                <Label>Description *</Label>
-                <Textarea
-                  {...register("description")}
-                  placeholder="Describe the purpose and goals of your community..."
+
+              {/* --------------------------- Community Images -------------------------- */}
+              <div>
+                <h3 className="mb-4 text-lg font-semibold">Community Images</h3>
+
+                <FormField
+                  control={control}
+                  name="image"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Cover Image</FormLabel>
+                      <FormControl>
+                        <Input
+                          ref={fileInputRef}
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            field.onChange(file);
+                            if (file) {
+                              setImageFile(file);
+                              const reader = new FileReader();
+                              reader.onloadend = () => {
+                                setImagePreview(reader.result as string);
+                                setOpenCropper(true);
+                              };
+                              reader.readAsDataURL(file);
+                            }
+                          }}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-                {errors.description && (
-                  <p className="text-sm text-red-500">{errors.description.message}</p>
+
+                {imagePreview && (
+                  <ImageCropperModal
+                    imageSrc={imagePreview}
+                    open={openCropper}
+                    onClose={() => {
+                      setOpenCropper(false);
+                      setImageFile(null);
+                      setImagePreview(null);
+                      setValue("image", null);
+                      if (fileInputRef.current) fileInputRef.current.value = "";
+                    }}
+                    onCropped={(blob) => setCroppedImage(blob)}
+                  />
+                )}
+                {croppedImage && (
+                  <img
+                    src={URL.createObjectURL(croppedImage)}
+                    alt="Cropped preview"
+                    className="mt-4 w-full rounded border"
+                  />
                 )}
               </div>
-              <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
-                <div>
-                  <Label>Privacy Setting *</Label>
-                  <Select
-                    onValueChange={(val) => setValue("privacy", val)}
-                    defaultValue="Public - Anyone can join"
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select Privacy" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Public - Anyone can join">
-                        Public - Anyone can join
-                      </SelectItem>
-                      <SelectItem value="Private - Approval required">
-                        Private - Approval required
-                      </SelectItem>
-                      {/* <SelectItem value="Secret - Invite only">Secret - Invite only</SelectItem> */}
-                    </SelectContent>
-                  </Select>
-                  {errors.privacy && (
-                    <p className="text-sm text-red-500">{errors.privacy.message}</p>
-                  )}
-                </div>
-                <div>
-                  <Label>Location</Label>
-                  <Input {...register("location" as const)} placeholder="City, State" />
+
+              {/* --------------------------- Community Rules --------------------------- */}
+              <div>
+                <h3 className="mb-4 text-lg font-semibold">Community Rules</h3>
+                <div className="space-y-3">
+                  {rules.map((rule, index) => (
+                    <div key={index} className="flex items-center gap-2">
+                      <Input
+                        value={rule}
+                        onChange={(e) => updateRule(index, e.target.value)}
+                        placeholder={`Rule ${index + 1}`}
+                      />
+                      <Button type="button" variant="ghost" onClick={() => removeRule(index)}>
+                        🗑️
+                      </Button>
+                    </div>
+                  ))}
+                  <Button type="button" variant="outline" onClick={addRule}>
+                    ➕ Add Another Rule
+                  </Button>
                 </div>
               </div>
-            </div>
 
-            <div>
-              <h3 className="mb-2 text-lg font-semibold">Community Images</h3>
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                {/* <div>
-                  <Label>Logo Image</Label>
-                  <Input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) {
-                        console.log("Logo selected:", file);
-                      }
-                    }}
+              {/* ------------------------- Tags and Language -------------------------- */}
+              <div>
+                <h3 className="mb-4 text-lg font-semibold">Tags and Language</h3>
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                  {/* Tags */}
+                  <FormField
+                    control={control}
+                    name="tags"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Tags</FormLabel>
+                        <FormControl>
+                          <Input placeholder="heritage, culture, history" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                </div> */}
-                <div>
-                  <Label>Cover Image</Label>
-                  <Input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) {
-                        setImageFile(file);
-                        setValue("image", file);
-                        const reader = new FileReader();
-                        reader.onloadend = () => {
-                          setImagePreview(reader.result as string);
-                          setOpenCropper(true);
-                        };
-                        reader.readAsDataURL(file);
-                      }
-                    }}
-                  />
-                  {imagePreview && (
-                    <ImageCropperModal
-                      imageSrc={imagePreview}
-                      open={openCropper}
-                      onClose={() => {
-                        setOpenCropper(false);
-                        setImageFile(null);
-                        setValue("image", null);
-                        if (fileInputRef.current) {
-                          fileInputRef.current.value = "";
-                        }
-                      }}
-                      onCropped={(blob: SetStateAction<Blob | null>) => setCroppedImage(blob)}
-                    />
-                  )}
-
-                  {croppedImage && (
-                    <img
-                      src={URL.createObjectURL(croppedImage)}
-                      alt="Cropped Preview"
-                      className="mt-2 w-full rounded border"
-                    />
-                  )}
                 </div>
               </div>
-            </div>
 
-            <div>
-              <h3 className="mb-2 text-lg font-semibold">Community Rules</h3>
-              <div className="space-y-3">
-                {rules.map((rule, index) => (
-                  <div key={index} className="flex items-center gap-2">
-                    <Input
-                      value={rule}
-                      onChange={(e) => updateRule(index, e.target.value)}
-                      placeholder={`Rule ${index + 1}`}
-                    />
-                    <Button type="button" variant="ghost" onClick={() => removeRule(index)}>
-                      🗑️
-                    </Button>
-                  </div>
-                ))}
-                <Button type="button" variant="outline" onClick={addRule}>
-                  ➕ Add Another Rule
-                </Button>
-              </div>
-            </div>
-
-            <div>
-              <h3 className="mb-2 text-lg font-semibold">Tags and Language</h3>
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <div>
-                  <Label>Tags</Label>
-                  <Input {...register("tags" as const)} placeholder="heritage, culture, history" />
-                </div>
-                <div>
-                  <Label>Language</Label>
-                  <Select onValueChange={(val) => setValue("language", val)} defaultValue="English">
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select language" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="English">English</SelectItem>
-                      <SelectItem value="Hindi">Hindi</SelectItem>
-                      <SelectItem value="Sanskrit">Sanskrit</SelectItem>
-                      <SelectItem value="Multiple Languages">Multiple Languages</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex justify-between border-t pt-4">
-              <Button variant="outline" type="button">
-                Save as Draft
-              </Button>
-              <div className="space-x-2">
+              {/* ----------------------------- Action Bar ----------------------------- */}
+              <div className="flex justify-between border-t pt-6">
                 <Button variant="outline" type="button">
                   Cancel
                 </Button>
                 <Button type="submit">Create Community</Button>
               </div>
-            </div>
-          </form>
-        </TabsContent>
-
-        <TabsContent value="event">
-          <div className="py-10 text-neutral-600">Event form coming soon...</div>
+            </form>
+          </Form>
         </TabsContent>
       </Tabs>
     </section>

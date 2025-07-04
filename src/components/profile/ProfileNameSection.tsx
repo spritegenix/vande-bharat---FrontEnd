@@ -14,6 +14,7 @@ import {
 import { toast } from "sonner";
 import { useUserStore } from "@/stores/userStore";
 import { useParams } from "next/navigation";
+import { useAuthAxios } from "@/lib/axios";
 
 export default function ProfileNameSection({
   profileImage,
@@ -43,20 +44,21 @@ export default function ProfileNameSection({
     };
     reader.readAsDataURL(file);
   };
+  const axios = useAuthAxios();
   const updateCoverMutation = useMutation({
     mutationFn: async (blob: Blob) => {
       try {
         const file = new File([blob], "profile.jpg", { type: blob.type });
 
-        const { uploadUrl, fileUrl } = await getPresignedUrl(file, "avatars");
+        const { uploadUrl, fileUrl } = await getPresignedUrl(axios, file, "avatars");
 
         if (!uploadUrl || !fileUrl) {
           throw new Error("2. Failed to get pre-signed URL from backend");
         }
 
-        await uploadToS3(uploadUrl, file);
+        await uploadToS3(axios, uploadUrl, file);
 
-        await updateUserProfilePic(fileUrl);
+        await updateUserProfilePic(axios, fileUrl);
 
         return fileUrl;
       } catch (err) {
