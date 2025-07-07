@@ -92,7 +92,8 @@ export default function CreateCommunityPage() {
     form.append("name", data.name);
     form.append("description", data.description);
     if (croppedImage) form.append("banner", croppedImage, imageFile?.name);
-    form.append("isPrivate", data.isPrivate);
+    form.append("isPrivate", String(data.isPrivate ?? false));
+
     createCommunityMutation.mutate(form);
   };
 

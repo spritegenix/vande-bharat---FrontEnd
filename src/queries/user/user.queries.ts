@@ -6,6 +6,7 @@ import {
   fetchSuggestions,
   fetchUserById,
   followingUsers,
+  myCommunities,
   Usersfollowers
 } from './user.api';
 import { useAuthAxios } from '@/lib/axios';
@@ -90,3 +91,16 @@ export const useFollowerUsers = (slug?: string) => {
     retry: 1,
   });
 };
+
+
+export const useMyCommunities = (slug?: string) => {
+  const axios = useAuthAxios();
+  return useInfiniteQuery({
+    queryKey: ['my-communities'],
+    queryFn:({pageParam})=> myCommunities(axios, pageParam, slug!),
+    initialPageParam:null,
+    getNextPageParam:(lastPage)=> lastPage?.nextCursor ?? null,
+    staleTime: 1000 * 60* 5,
+    retry: 1,
+  })
+}

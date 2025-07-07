@@ -122,3 +122,11 @@ export const unfriendUser = async (axios: AxiosInstance, toUserId: string) => {
   const res = await axios.patch(`/users/following/${toUserId}/unfriend`);
   return res.data;
 };
+
+
+export const myCommunities = async(axios: AxiosInstance, pageParam: string | null = null, slug:string) => {
+  const res = await axios.get(`/users/mycommunity/${slug}`, {
+    params: { cursor: pageParam, limit: 3 },
+  });
+  return res.data.data;
+}

@@ -10,6 +10,7 @@ import About from "./about/About";
 import { useFetchUserPosts } from "@/queries/posts/posts.queries";
 import { useUserStore } from "@/stores/userStore";
 import FollowersProfileList from "./FollowersProfile";
+import CommunityTab from "./Tabs/community/CommunityTab";
 
 const tabOptions = ["posts", "about", "Following", "Followers", "Communities"];
 
@@ -71,7 +72,7 @@ export default function ProfileTabs({ slug }: { slug: string }) {
       </TabsContent>
 
       <TabsContent value="communities">
-        <About slug={slug} />
+        <CommunityTab slug={slug} />
       </TabsContent>
     </Tabs>
   );
