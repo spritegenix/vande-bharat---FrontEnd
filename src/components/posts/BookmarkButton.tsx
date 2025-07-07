@@ -1,11 +1,12 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import axios from "@/lib/axios";
+import { useAuthAxios } from "@/lib/axios";
 import { Post } from "@/types/post";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "../ui/button";
 import { Bookmark } from "lucide-react";
 import { useUserStore } from "@/stores/userStore";
+import { toggleBookmarkAPI } from "@/queries/posts/posts.api";
 export default function BookmarkButton({ posts, post }: { posts?: Post[]; post: { _id: string } }) {
   const [bookmarked, setBookmarked] = useState<Record<string, boolean>>({});
   const { user } = useUserStore();
@@ -18,11 +19,9 @@ export default function BookmarkButton({ posts, post }: { posts?: Post[]; post: 
       setBookmarked(initialBookmarks);
     });
   }, [posts]);
+  const axios = useAuthAxios();
   const { mutate: toggleBookmarkMutation } = useMutation({
-    mutationFn: (postId: string) =>
-      axios.post("/posts/bookmarks/toggle", { postId }).then((res) => {
-        return res.data;
-      }),
+    mutationFn: (postId: string) => toggleBookmarkAPI(axios, postId),
     onMutate: async (postId: string) => {
       setBookmarked((prev) => ({ ...prev, [postId]: !prev[postId] }));
     },

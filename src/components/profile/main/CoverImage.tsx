@@ -11,6 +11,7 @@ import { getPresignedUrl, updateUserCover, uploadToS3 } from "@/queries/user/use
 import { toast } from "sonner";
 import { useUserStore } from "@/stores/userStore";
 import { useParams } from "next/navigation";
+import { useAuthAxios } from "@/lib/axios";
 export default function CoverImage({ coverImage }: { coverImage?: string }) {
   const [modelOpen, setModelOpen] = useState(false);
   const [imageSrc, setImageSrc] = useState<string>(
@@ -20,20 +21,21 @@ export default function CoverImage({ coverImage }: { coverImage?: string }) {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const { user } = useUserStore();
   const params = useParams();
+  const axios = useAuthAxios();
   const updateCoverMutation = useMutation({
     mutationFn: async (blob: Blob) => {
       try {
         const file = new File([blob], "cover.jpg", { type: blob.type });
 
-        const { uploadUrl, fileUrl } = await getPresignedUrl(file, "covers");
+        const { uploadUrl, fileUrl } = await getPresignedUrl(axios, file, "covers");
 
         if (!uploadUrl || !fileUrl) {
           throw new Error("2. Failed to get pre-signed URL from backend");
         }
 
-        await uploadToS3(uploadUrl, file);
+        await uploadToS3(axios, uploadUrl, file);
 
-        await updateUserCover(fileUrl);
+        await updateUserCover(axios, fileUrl);
 
         return fileUrl;
       } catch (err) {
