@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import  { useAuthAxios } from "@/lib/axios";
 import { CreatePostPayload } from "@/types/post";
-import { isAxiosError } from "axios";
+import { AxiosInstance, isAxiosError } from "axios";
 import { extractHashtags } from "@/utils/HashTagExtractor";
 import { queryClient } from "@/lib/react-query";
 import { getPresignedUrl, uploadToS3 } from "@/queries/user/user.api";
@@ -37,7 +37,7 @@ interface EditorStore {
   setUploading: (uploading: boolean) => void;
   clearEditorState: () => void;
 
-  submitPost: () => Promise<CreatePostPayload | undefined>;
+  submitPost: (axios:AxiosInstance) => Promise<CreatePostPayload | undefined>;
 
 }
 
@@ -62,18 +62,19 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
     }),
  
 
-  submitPost: async () => {
+  submitPost: async (axios:AxiosInstance) => {
+   
   const { draftText, draftFiles } = get();
   if (!draftText.trim() && draftFiles.length === 0) return;
 
   try {
-    set({ uploading: true });
 
+    set({ uploading: true });
     const extractedTags = extractHashtags(draftText);
     set({ tags: extractedTags });
 
   
- const attachments = await uploadMediaFiles(draftFiles)
+ const attachments = await uploadMediaFiles(axios, draftFiles)
 
     const payload: CreatePostPayload = {
       content: draftText.trim(),
@@ -109,25 +110,20 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
 
 
 
-export const uploadMediaFiles = async (files: File[]): Promise<any[]> => {
+export const uploadMediaFiles = async (axios: AxiosInstance ,files: File[]): Promise<any[]> => {
   const uploaded: any[] = [];
-const axios = useAuthAxios()
+
   for (const file of files) {
     try {
-      const { data: response } = await axios.post("/media/upload-url", {
-        fileName: file.name,
-        fileType: file.type,
-        folder: "posts",
-      });
+     const { uploadUrl, fileUrl }= await  getPresignedUrl(axios, file, "posts");
+   
 
-      const uploadUrl = response?.data?.uploadUrl;
-      const fileUrl = response?.data?.fileUrl;
+      // const uploadUrl = response?.data?.uploadUrl;
+      // const fileUrl = response?.data?.fileUrl;
 
       if (!uploadUrl || !fileUrl) throw new Error("Missing uploadUrl or fileUrl");
-
-      await axios.put(uploadUrl, file, {
-        headers: { "Content-Type": file.type },
-      });
+await uploadToS3(axios, uploadUrl, file);
+     
 
       const media: any = {
         url: fileUrl,

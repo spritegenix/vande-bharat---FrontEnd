@@ -14,8 +14,8 @@ export interface CreatePostPayload {
   content: string;
   attachments: Attachment[];
   tags?: string[];
-  pageId?: string | null;
-  communityId?: string | null;
+  pageSlug?: string | null;
+  communitySlug?: string | null | undefined;
   isHidden?: boolean;
 }
 
@@ -58,8 +58,8 @@ export interface Post {
   content: string;
   tags?: string[];
   userId: UserInfo
-  communityId?: CommunityInfo | null;
-  pageId?: string | null;
+  communitySlug?: CommunityInfo | null;
+  pageSlug?: string | null;
   attachments: Attachment[];
 
   createdAt: string;

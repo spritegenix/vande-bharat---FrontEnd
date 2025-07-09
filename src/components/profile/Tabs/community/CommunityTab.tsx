@@ -34,7 +34,7 @@ export default function CommunityTab({ slug }: { slug: string }) {
               />
               <div className="p-4">
                 <Link
-                  href={`/communities/${community.slug}`}
+                  href={`/community/${community.slug}`}
                   className="block text-xl font-semibold hover:underline"
                 >
                   {community.name}

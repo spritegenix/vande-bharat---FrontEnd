@@ -37,7 +37,7 @@ export const useUpdatePost = () => {
       newFiles: File[];
       existingAttachments: any[];
     }) => {
-      const uploaded = await uploadMediaFiles(newFiles);
+      const uploaded = await uploadMediaFiles(axios,newFiles);
       const finalAttachments = [...existingAttachments, ...uploaded];
       const payload = { content: newText, attachments: finalAttachments };
 
@@ -81,7 +81,7 @@ export const useCreatePost = () => {
         isLiked: false,
         isBookmarked: false,
         userId: { _id: "", slug: "", name: "", avatar: "" },
-        communityId: newPost.communityId
+        communitySlug: newPost?.communitySlug
           ? { slug: "", name: "", avatar: "" }
           : null,
         requestStatus: "",

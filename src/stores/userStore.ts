@@ -1,15 +1,20 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-
+interface UserInfo {
+  _id:string
+  slug: string;
+  name: string;
+  avatar: string;
+}
 interface UserState {
-  user: any;
+  user: UserInfo | null;
   setUser: (data: any) => void;
 }
 
 export const useUserStore = create<UserState>()(
   persist(
     (set) => ({
-      user: [],
+      user: null,
       setUser: (data) => set({ user: data }),
     }),
     {

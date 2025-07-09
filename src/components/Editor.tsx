@@ -14,6 +14,8 @@ import "./editor.css";
 import Image from "next/image";
 import { useEditorStore } from "@/stores/editorStore";
 import { useCreatePost } from "@/queries/posts/posts.mutation";
+import { CreatePostPayload } from "@/types/post";
+import { useAuthAxios } from "@/lib/axios";
 
 const editorConfig = {
   namespace: "FacebookStyleEditor",
@@ -27,7 +29,13 @@ const editorConfig = {
 const MAX_IMAGE_SIZE = 1 * 1024 * 1024;
 const MAX_VIDEO_SIZE = 10 * 1024 * 1024;
 
-export default function EditorWithImage() {
+export default function EditorWithImage({
+  communitySlug,
+  pageSlug,
+}: {
+  communitySlug?: string;
+  pageSlug?: string;
+}) {
   const {
     draftFiles,
     setDraftText,
@@ -39,7 +47,7 @@ export default function EditorWithImage() {
   } = useEditorStore();
   const [shouldClearEditor, setShouldClearEditor] = React.useState(false);
   const { mutateAsync: createPost } = useCreatePost();
-
+  const axios = useAuthAxios();
   const handleTextChange = (editorState: EditorState) => {
     editorState.read(() => {
       const text = $getRoot().getTextContent();
@@ -66,7 +74,18 @@ export default function EditorWithImage() {
   };
 
   const handlePost = async () => {
-    const payload = await submitPost();
+    const data = await submitPost(axios);
+    if (!data || !data.content) return;
+
+    const payload: CreatePostPayload = {
+      content: data.content,
+      attachments: data.attachments ?? [],
+      tags: data.tags,
+      pageSlug: pageSlug ?? null,
+      communitySlug: communitySlug ?? null,
+      isHidden: data.isHidden ?? false,
+    };
+
     if (payload) {
       await createPost(payload); // ← Await this!
       setShouldClearEditor(true); // ← or clearEditorState();
