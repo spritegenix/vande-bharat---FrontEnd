@@ -29,9 +29,8 @@ type Props = {
 
 export default function SinglePostModal({ isOpen, onClose, postId }: Props) {
   const [post, setPost] = useState<Post | null>(null);
-
+  const axios = useAuthAxios();
   useEffect(() => {
-    const axios = useAuthAxios();
     if (postId && isOpen) {
       getPostById(axios, postId).then((data) => {
         setPost(data);
