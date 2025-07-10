@@ -13,12 +13,14 @@ import EventsTab from "./home/EventsTab";
 import AboutTab from "./home/AboutTab";
 import AboutTabEditor from "./home/AboutTab";
 import CommunityBanner from "./home/CommunityBanner";
+import { useFetchCommunityPosts } from "@/queries/community/community.queries";
 export default function Fullpage({ communitySlug }: { communitySlug: string }) {
   const { user } = useUserStore();
 
   const tabOptions = ["Feed", "Discussion", "Members", "Events", "About"];
   const { data, isLoading, isError, isFetchingNextPage, fetchNextPage, hasNextPage } =
-    useFetchUserPosts(communitySlug);
+    useFetchCommunityPosts(communitySlug);
+  // const allCommunityPosts = data?.pages.flatMap((page) => page.posts) ?? [];
   return (
     <main id="main-content" className="bg-neutral-50">
       <div className="mx-auto max-w-6xl">
@@ -97,7 +99,7 @@ export default function Fullpage({ communitySlug }: { communitySlug: string }) {
                   />
                 </div>
                 <div id="community-sidebar" className="col-span-4">
-                  <div className="sticky top-24 space-y-6">
+                  <div className="space-y-6">
                     {/* Community Stats */}
                     <Card>
                       <CardHeader>

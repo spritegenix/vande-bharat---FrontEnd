@@ -70,8 +70,10 @@ export const useCreatePost = () => {
 
   return useMutation({
     mutationFn: (payload: CreatePostPayload) => createPostAPI(axios, payload),
+
     onMutate: async (newPost) => {
-      const previousData = queryClient.getQueryData<InfiniteData<AllPosts>>(["fetch-posts"]);
+      const previousFetchPosts = queryClient.getQueryData<InfiniteData<AllPosts>>(["fetch-posts"]);
+      const previousCommunityPosts = queryClient.getQueryData<InfiniteData<AllPosts>>(["community-posts"]);
 
       const optimisticPost: Post = {
         ...newPost,
@@ -87,30 +89,56 @@ export const useCreatePost = () => {
         requestStatus: "",
       };
 
+      // Update ["fetch-posts"]
       queryClient.setQueryData<InfiniteData<AllPosts>>(["fetch-posts"], (old) => {
         if (!old) return old;
         return {
           ...old,
           pages: [
-            { ...old.pages[0], posts: [optimisticPost, ...old.pages?.[0]?.posts ?? []] },
+            {
+              ...old.pages[0],
+              posts: [optimisticPost, ...(old.pages?.[0]?.posts ?? [])],
+            },
             ...old.pages.slice(1),
           ],
         };
       });
 
-      return { previousData };
+      // Update ["community-posts"]
+      queryClient.setQueryData<InfiniteData<AllPosts>>(["community-posts"], (old) => {
+        if (!old) return old;
+        return {
+          ...old,
+          pages: [
+            {
+              ...old.pages[0],
+              posts: [optimisticPost, ...(old.pages?.[0]?.posts ?? [])],
+            },
+            ...old.pages.slice(1),
+          ],
+        };
+      });
+
+      return { previousFetchPosts, previousCommunityPosts };
     },
+
     onError: (_err, _newPost, context) => {
-      if (context?.previousData) {
-        queryClient.setQueryData(["fetch-posts"], context.previousData);
+      if (context?.previousFetchPosts) {
+        queryClient.setQueryData(["fetch-posts"], context.previousFetchPosts);
+      }
+      if (context?.previousCommunityPosts) {
+        queryClient.setQueryData(["community-posts"], context.previousCommunityPosts);
       }
     },
+
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["user-posts"] });
+      queryClient.invalidateQueries({ queryKey: ["community-posts"] }); // ✅ Invalidate community posts
       clearEditorState();
     },
   });
 };
+
 
 export const useDeletePost = () => {
   const queryClient = useQueryClient();
