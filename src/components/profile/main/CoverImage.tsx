@@ -78,7 +78,7 @@ export default function CoverImage({ coverImage }: { coverImage?: string }) {
         <div className="absolute bottom-0 right-0 z-20 m-5">
           <Button
             type="button"
-            className="bg-offwhite text-gray-900"
+            className="bg-offwhite text-gray-800 dark:bg-muted dark:text-offwhite"
             onClick={() => {
               if (fileInputRef.current) {
                 fileInputRef.current.value = "";

@@ -1,3 +1,5 @@
+//Earlier Code (Old code)
+
 // "use client";
 // import LoadingSpinner from "@/components/common/LoadingSpinner";
 // import CoverImage from "@/components/profile/CoverImage";
@@ -28,17 +30,12 @@
 //   );
 // }
 
-
-import ProfileTabs from "@/components/profile/ProfileCategory";
-import ProfileHeader from "./sections/profileHeader";
-
+import ProfileHeader from "./v2/sections/profile/ProfileHeader";
 
 export default function ProfilePage() {
   return (
     <>
       <ProfileHeader></ProfileHeader>
-   
-
     </>
   );
 }
