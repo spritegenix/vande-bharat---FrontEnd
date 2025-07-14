@@ -7,14 +7,9 @@ const aboutCards = [
     id: "card-1",
     title: "Personal Info",
     content:
-      "Dr. Priya Sharma is a cultural historian specializing in temple architecture with 15+ years of experience.",
+      "Dr. Priya Sharma is a cultural historian specializing in temple architecture with 15+ years of experience,Focused on South Indian temple architecture and traditional building techniques.",
   },
-  {
-    id: "card-2",
-    title: "Research Focus",
-    content:
-      "Focused on South Indian temple architecture and traditional building techniques.",
-  },
+  
   // You can dynamically add more
 ];
 
