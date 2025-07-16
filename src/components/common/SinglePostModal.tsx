@@ -19,6 +19,7 @@ import CommentButton from "../posts/comments/CommentButton";
 import ShareMenu from "../posts/ShareMenu";
 import BookmarkButton from "../posts/BookmarkButton";
 import { PostCommentSection } from "../posts/comments/PostCommentSection";
+import { useAuthAxios } from "@/lib/axios";
 
 type Props = {
   isOpen: boolean;
@@ -28,10 +29,10 @@ type Props = {
 
 export default function SinglePostModal({ isOpen, onClose, postId }: Props) {
   const [post, setPost] = useState<Post | null>(null);
-
+  const axios = useAuthAxios();
   useEffect(() => {
     if (postId && isOpen) {
-      getPostById(postId).then((data) => {
+      getPostById(axios, postId).then((data) => {
         setPost(data);
       });
     }

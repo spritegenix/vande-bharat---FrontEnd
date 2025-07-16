@@ -7,17 +7,17 @@ import { useState } from "react";
 import { nanoid } from "nanoid"; // for temporary ID
 import { createComment } from "@/queries/posts/posts.api";
 import { useUserStore } from "@/stores/userStore";
+import { useAuthAxios } from "@/lib/axios";
 
 export default function CreateComment() {
   const [comment, setComment] = useState("");
   const queryClient = useQueryClient();
   const { commentId: postId } = useCommentStore(); // active postId
   const { user } = useUserStore();
-
+  const axios = useAuthAxios();
   const { mutate, isPending } = useMutation({
-    mutationFn: createComment,
+    mutationFn: (data: { postId: string; content: string }) => createComment(axios, data),
 
-    // ✅ Optimistic Update
     onMutate: async ({ postId, content }) => {
       await queryClient.cancelQueries({ queryKey: ["comments", postId] });
 
@@ -41,14 +41,12 @@ export default function CreateComment() {
       return { previousData };
     },
 
-    // ❌ Rollback on error
-    onError: (err, _newComment, ctx) => {
+    onError: (_err, _vars, ctx) => {
       if (ctx?.previousData) {
         queryClient.setQueryData(["comments", postId], ctx.previousData);
       }
     },
 
-    // ✅ Refetch real data
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["comments", postId] });
     },

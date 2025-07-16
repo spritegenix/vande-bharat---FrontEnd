@@ -18,10 +18,11 @@ import { Button } from "@/components/ui/button";
 import { SetStateAction, useRef, useState } from "react";
 import ImageCropperModal from "../common/ImageCropperModal";
 import getCroppedImg from "@/lib/cropImage";
-import axios from "@/lib/axios";
+
 import { uploadToS3 } from "@/queries/user/user.api";
 import { useCreateCommunityPosts } from "@/queries/community/community.mutation";
 import { communityPost } from "@/types/community";
+import { useAuthAxios } from "@/lib/axios";
 const MAX_IMAGE_SIZE = 500 * 1024; // 500KB
 export default function GeneratedForm() {
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -29,7 +30,7 @@ export default function GeneratedForm() {
   const [croppedImage, setCroppedImage] = useState<Blob | null>(null);
   const [openCropper, setOpenCropper] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-
+  const axios = useAuthAxios();
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<null | {
     x: number;
     y: number;
@@ -73,7 +74,7 @@ export default function GeneratedForm() {
         folder: "covers",
       });
 
-      await uploadToS3(uploadRes.data.data.uploadUrl, file);
+      await uploadToS3(axios, uploadRes.data.data.uploadUrl, file);
 
       forms.append("image", uploadRes.data.data.fileUrl); // URL of uploaded image
     }

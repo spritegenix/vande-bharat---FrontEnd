@@ -141,7 +141,7 @@ const FeedsSection: React.FC<FeedsSectionProps> = ({
                     <div>{post.content}</div>
                   </Linkify>
                 </div>
-                {showOwnPostsOnly && user.slug === slug && (
+                {showOwnPostsOnly && user?.slug === slug && (
                   <PostUpdateButton post={post} setEditingPostId={setEditingPostId} />
                 )}
               </div>

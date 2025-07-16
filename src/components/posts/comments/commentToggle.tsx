@@ -6,11 +6,12 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { formatPublishedDate } from "@/utils/dateSorter";
-import axios from "@/lib/axios";
+
 import { useDeleteComment, useUpdateComment } from "@/queries/posts/posts.mutation";
 import { useUserStore } from "@/stores/userStore";
 import { CustomTextarea } from "@/components/CustomTextArea";
 import { ConfirmDeleteDialog } from "@/components/common/ConfirmDeleteModal";
+import { useAuthAxios } from "@/lib/axios";
 
 interface UserInfo {
   _id: string;
@@ -30,6 +31,7 @@ export default function CommentItem({ c }: { c: Comment }) {
   const { mutate: updateCommentMutate, isPending } = useUpdateComment();
   const { mutate: deleteCommentMutate, isPending: isDeleting } = useDeleteComment();
   const { user } = useUserStore();
+  const axios = useAuthAxios();
   const handleEdit = () => {
     //axios post
     updateCommentMutate({

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { notFound } from "next/navigation";
+import { notFound, useParams } from "next/navigation";
 import Feed from "@/components/Feed";
 import { toast } from "sonner";
 import Fullpage from "@/components/community/Fullpage";
@@ -21,7 +21,7 @@ const mockCommunity = {
 
 export default function IndividualCommunityPage() {
   const [joined, setJoined] = useState(false);
-
+  const params = useParams();
   const handleToggle = () => {
     setJoined((prev) => !prev);
     if (joined) {
@@ -32,10 +32,10 @@ export default function IndividualCommunityPage() {
   };
 
   if (!mockCommunity) return notFound();
-
+  const communitySlug = String(params.slug);
   return (
     <>
-      <Fullpage />
+      <Fullpage communitySlug={communitySlug} />
       {/* <div className="mx-auto max-w-5xl">
       
         <div className="relative h-60 w-full overflow-hidden rounded-b-lg md:h-72">
@@ -74,7 +74,6 @@ export default function IndividualCommunityPage() {
           </Card>
         </div>
       </div> */}
-      <Feed />
     </>
   );
 }
