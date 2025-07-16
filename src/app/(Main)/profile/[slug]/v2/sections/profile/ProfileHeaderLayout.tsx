@@ -29,6 +29,7 @@ export default function ProfileHeaderLayout({ user, posts, isPostLoading, curren
               {/* Avatar upload */}
               <ProfileAvatarEditor
                 user={user}
+                currentUser={currentUser} // ✅ Pass current user here
                 inputRef={inputRef}
                 imageSrc={imageSrc}
                 setImageSrc={setImageSrc}
@@ -58,12 +59,24 @@ export default function ProfileHeaderLayout({ user, posts, isPostLoading, curren
               {/* Tabs */}
               <div className="mt-6 w-full max-w-4xl px-4">
                 <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-6">
-                  <TabsTrigger value="feed" className="dark:text-offwhite">Feed</TabsTrigger>
-                  <TabsTrigger value="about" className="dark:text-offwhite">About</TabsTrigger>
-                  <TabsTrigger value="research" className="dark:text-offwhite">Research</TabsTrigger>
-                  <TabsTrigger value="following" className="dark:text-offwhite">Following</TabsTrigger>
-                  <TabsTrigger value="followers" className="dark:text-offwhite">Followers</TabsTrigger>
-                  <TabsTrigger value="communities" className="dark:text-offwhite">Communities</TabsTrigger>
+                  <TabsTrigger value="feed" className="dark:text-offwhite">
+                    Feed
+                  </TabsTrigger>
+                  <TabsTrigger value="about" className="dark:text-offwhite">
+                    About
+                  </TabsTrigger>
+                  <TabsTrigger value="research" className="dark:text-offwhite">
+                    Research
+                  </TabsTrigger>
+                  <TabsTrigger value="following" className="dark:text-offwhite">
+                    Following
+                  </TabsTrigger>
+                  <TabsTrigger value="followers" className="dark:text-offwhite">
+                    Followers
+                  </TabsTrigger>
+                  <TabsTrigger value="communities" className="dark:text-offwhite">
+                    Communities
+                  </TabsTrigger>
                 </TabsList>
               </div>
             </div>

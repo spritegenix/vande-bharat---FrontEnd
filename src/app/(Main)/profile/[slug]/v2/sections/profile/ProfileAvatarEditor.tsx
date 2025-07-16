@@ -1,5 +1,6 @@
 "use client";
 
+import { useParams } from "next/navigation";
 import { Camera } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
@@ -7,12 +8,16 @@ import { Button } from "@/components/ui/button";
 
 export default function ProfileAvatarEditor({
   user,
+  currentUser,
   inputRef,
   imageSrc,
   setImageSrc,
   croppedImage,
   setOpenModal,
 }: any) {
+  const { slug } = useParams();
+  const isOwner = currentUser?.slug === slug; // ✅ Using slug logic like CoverImage
+
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -31,22 +36,26 @@ export default function ProfileAvatarEditor({
         <AvatarFallback>{user?.name?.slice(0, 2).toUpperCase()}</AvatarFallback>
       </Avatar>
 
-      <Button
-        type="button"
-        variant="ghost"
-        className="absolute bottom-0 right-0 h-8 w-8 rounded-full border border-gray-300 bg-white p-1 dark:border-border dark:bg-muted"
-        onClick={() => inputRef.current?.click()}
-      >
-        <Camera className="h-4 w-4 text-gray-600 dark:text-gray-300" />
-      </Button>
+      {isOwner && (
+        <>
+          <Button
+            type="button"
+            variant="ghost"
+            className="absolute bottom-0 right-0 h-8 w-8 rounded-full border border-gray-300 bg-white p-1 dark:border-border dark:bg-muted"
+            onClick={() => inputRef.current?.click()}
+          >
+            <Camera className="h-4 w-4 text-gray-600 dark:text-gray-300" />
+          </Button>
 
-      <Input
-        ref={inputRef}
-        type="file"
-        accept="image/*"
-        onChange={handleImageChange}
-        className="hidden"
-      />
+          <Input
+            ref={inputRef}
+            type="file"
+            accept="image/*"
+            onChange={handleImageChange}
+            className="hidden"
+          />
+        </>
+      )}
     </div>
   );
 }
