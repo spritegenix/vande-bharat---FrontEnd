@@ -29,7 +29,7 @@ export default function ProfileHeaderLayout({ user, posts, isPostLoading, curren
               {/* Avatar upload */}
               <ProfileAvatarEditor
                 user={user}
-                currentUser={currentUser} // ✅ Pass current user here
+                currentUser={currentUser}
                 inputRef={inputRef}
                 imageSrc={imageSrc}
                 setImageSrc={setImageSrc}
