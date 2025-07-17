@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import Feed from "../Feed";
 import FeedsSection from "../FeedsSection";
@@ -14,6 +14,7 @@ import AboutTab from "./home/AboutTab";
 import AboutTabEditor from "./home/AboutTab";
 import CommunityBanner from "./home/CommunityBanner";
 import { useFetchCommunityPosts } from "@/queries/community/community.queries";
+import { useSearchParams, usePathname, useRouter } from "next/navigation";
 export default function Fullpage({ communitySlug }: { communitySlug: string }) {
   const { user } = useUserStore();
 
@@ -21,6 +22,19 @@ export default function Fullpage({ communitySlug }: { communitySlug: string }) {
   const { data, isLoading, isError, isFetchingNextPage, fetchNextPage, hasNextPage } =
     useFetchCommunityPosts(communitySlug);
   // const allCommunityPosts = data?.pages.flatMap((page) => page.posts) ?? [];
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const router = useRouter();
+  const queryTab = searchParams.get("tab")?.toLowerCase() || "feed";
+  const [selectedTab, setSelectedTab] = useState(queryTab);
+  useEffect(() => {
+    setSelectedTab(queryTab);
+  }, [queryTab]);
+  const handleTabChange = (value: string) => {
+    const params = new URLSearchParams(searchParams);
+    params.set("tab", value.toLowerCase());
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+  };
   return (
     <main id="main-content" className="bg-neutral-50">
       <div className="mx-auto max-w-6xl">
@@ -33,7 +47,7 @@ export default function Fullpage({ communitySlug }: { communitySlug: string }) {
           id="community-tabs"
           className="sticky top-12 z-40 border-b border-neutral-200 bg-white py-4 dark:border-neutral-700 dark:bg-neutral-900"
         >
-          <Tabs defaultValue="feed">
+          <Tabs value={selectedTab} onValueChange={handleTabChange}>
             <TabsList className="flex justify-start bg-transparent md:gap-6">
               {tabOptions.map((tab) => (
                 <TabsTrigger

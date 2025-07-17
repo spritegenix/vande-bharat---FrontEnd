@@ -1,35 +1,68 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+"use client";
 
-const discussions = [
-  {
-    name: "Dr. Rajesh Gupta",
-    seed: "456",
-    badge: "Expert",
-    time: "2h ago",
-    title: "Preservation techniques for ancient stone carvings",
-    content:
-      "What are the most effective modern preservation methods for protecting ancient stone carvings from environmental damage? Looking for insights from conservationists and archaeologists.",
-    replies: 23,
-    likes: 45,
-    views: 234,
-  },
-  {
-    name: "Priya Sharma",
-    seed: "789",
-    time: "4h ago",
-    title: "Differences between North and South Indian temple architecture",
-    content:
-      "Can someone explain the key architectural differences between Nagara and Dravidian styles? Working on my research paper and would appreciate expert insights.",
-    replies: 15,
-    likes: 28,
-    views: 156,
-  },
-];
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Textarea } from "@/components/ui/textarea";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { motion, AnimatePresence } from "framer-motion";
+import { useState } from "react";
+import { DiscussionCard } from "./DiscussionCard";
+import { useCreateDiscussion } from "@/queries/community/community.mutation";
+import { useParams } from "next/navigation";
+import { useUserStore } from "@/stores/userStore";
+import Image from "next/image";
+import { useFetchDiscussions, useFetchReplies } from "@/queries/community/community.queries";
+import { Discussion } from "../Discussion/Discussion";
+import { ReplyCard } from "../Discussion/RepliesCard";
+const formSchema = z.object({
+  title: z.string().min(3, "Title must be at least 3 characters"),
+  content: z.string().min(5, "Content must be at least 5 characters"),
+});
 
 export function DiscussionTab() {
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      title: "",
+      content: "",
+    },
+  });
+  const params = useParams();
+  const communityParams = String(params.slug);
+  const [openReplies, setOpenReplies] = useState<{ [key: number]: boolean }>({});
+  const [selectedSlug, setSelectedSlug] = useState<string | null>(null);
+  const { mutate: createDiscussion } = useCreateDiscussion(communityParams);
+  const toggleReplyVisibility = (id: number) => {
+    setOpenReplies((prev) => ({ ...prev, [id]: !prev[id] }));
+  };
+  const { user } = useUserStore();
+  const onSubmit = (values: z.infer<typeof formSchema>) => {
+    createDiscussion(values);
+    form.reset();
+  };
+  const { data, hasNextPage, isFetchingNextPage, fetchNextPage, isLoading, isError } =
+    useFetchDiscussions(communityParams);
+  const [repliesSlug, setRepliesSlug] = useState("");
+  const discussions = data?.pages.flatMap((page) => page.data) ?? [];
+
+  const handleRepliesClick = (slug: string) => {
+    setRepliesSlug(slug);
+  };
+
+  const { data: replies } = useFetchReplies(repliesSlug);
+
   return (
     <Card className="bg-background">
       <CardHeader className="border-b border-border">
@@ -39,47 +72,74 @@ export function DiscussionTab() {
         </p>
       </CardHeader>
 
-      <CardContent className="border-b border-border">
-        <div className="mb-4 flex items-center space-x-3">
-          <Avatar className="h-10 w-10">
-            <AvatarImage src="https://api.dicebear.com/7.x/notionists/svg?seed=123" alt="You" />
-            <AvatarFallback>U</AvatarFallback>
+      <CardContent className="space-y-6 p-6">
+        <div className="flex items-start gap-4">
+          <Avatar className="h-10 w-10 shrink-0">
+            <AvatarImage src={user?.avatar} />
+            <AvatarFallback>
+              <Image
+                src="/images/profile/profileplaceholder.jpg"
+                alt="image"
+                height={50}
+                width={50}
+              />
+            </AvatarFallback>
           </Avatar>
-          <Input className="flex-1" placeholder="Start a new discussion..." />
-          <Button>Post</Button>
+
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-4">
+              <FormField
+                control={form.control}
+                name="title"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Title</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Post title" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="content"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Content</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Write your thoughts..."
+                        rows={4}
+                        className="resize-none"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div className="flex justify-end">
+                <Button type="submit" disabled={form.formState.isSubmitting}>
+                  Post
+                </Button>
+              </div>
+            </form>
+          </Form>
         </div>
       </CardContent>
 
       <CardContent className="divide-y divide-border">
-        {discussions.map((d, i) => (
-          <div key={i} className="py-6">
-            <div className="flex items-start space-x-3">
-              <Avatar className="h-12 w-12">
-                <AvatarImage
-                  src={`https://api.dicebear.com/7.x/notionists/svg?seed=${d.seed}`}
-                  alt={d.name}
-                />
-                <AvatarFallback>{d.name[0]}</AvatarFallback>
-              </Avatar>
-              <div className="flex-1">
-                <div className="mb-2 flex items-center space-x-2">
-                  <h4 className="font-medium text-foreground">{d.name}</h4>
-                  {d.badge && (
-                    <span className="rounded bg-muted px-2 py-1 text-xs text-muted-foreground">
-                      {d.badge}
-                    </span>
-                  )}
-                  <span className="text-sm text-muted-foreground">• {d.time}</span>
-                </div>
-                <h3 className="mb-2 text-lg font-semibold text-foreground">{d.title}</h3>
-                <p className="mb-3 text-muted-foreground">{d.content}</p>
-                <div className="flex items-center space-x-4 text-sm text-muted-foreground">
-                  <span>💬 {d.replies} replies</span>
-                  <span>👍 {d.likes} likes</span>
-                  <span>👁️ {d.views} views</span>
-                </div>
-              </div>
-            </div>
+        {discussions.map((discussion) => (
+          <div key={discussion._id} className="space-y-4 py-6">
+            <Discussion
+              key={discussion._id}
+              discussion={discussion}
+              onRepliesClick={(slug) => setSelectedSlug(slug === selectedSlug ? null : slug)}
+            />
+            {selectedSlug === discussion.slug && <ReplyCard discussionSlug={discussion.slug} />}
           </div>
         ))}
       </CardContent>
