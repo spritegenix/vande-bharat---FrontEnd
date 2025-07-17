@@ -23,7 +23,7 @@ export function Discussion({ discussion, onRepliesClick }: Props) {
       <h2 className="text-lg font-semibold text-foreground">{discussion.title}</h2>
       <p className="mt-1 text-sm text-muted-foreground">{discussion.content}</p>
 
-      {discussion.commentCount > 0 && (
+      {discussion.commentCount > 0 ? (
         <Button
           variant="ghost"
           size="sm"
@@ -31,6 +31,15 @@ export function Discussion({ discussion, onRepliesClick }: Props) {
           className="mt-2 text-xs text-muted-foreground"
         >
           View {discussion.commentCount} {discussion.commentCount === 1 ? "Reply" : "Replies"}
+        </Button>
+      ) : (
+        <Button
+          variant="ghost"
+          onClick={() => onRepliesClick(discussion.slug)}
+          size="sm"
+          className="mt-2 text-xs text-muted-foreground"
+        >
+          Reply
         </Button>
       )}
     </div>
