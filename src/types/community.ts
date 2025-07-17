@@ -4,3 +4,8 @@ export interface communityPost {
     image:string,
     isPrivate:boolean
 }
+
+export interface CommunityDiscussionType {
+    title:string,
+    content:string
+}

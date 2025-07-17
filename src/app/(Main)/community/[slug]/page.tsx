@@ -8,17 +8,6 @@ import Feed from "@/components/Feed";
 import { toast } from "sonner";
 import Fullpage from "@/components/community/Fullpage";
 
-// Simulated static data
-const mockCommunity = {
-  id: "1",
-  name: "Tech Minds",
-  description:
-    "Tech Minds is a community where developers, designers, and innovators come together to share ideas, collaborate on projects, and grow their skills. Join us to be a part of the future.",
-  coverUrl:
-    "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&w=1600&q=80",
-  membersCount: 2543,
-};
-
 export default function IndividualCommunityPage() {
   const [joined, setJoined] = useState(false);
   const params = useParams();
@@ -31,7 +20,6 @@ export default function IndividualCommunityPage() {
     // TODO: Connect to API
   };
 
-  if (!mockCommunity) return notFound();
   const communitySlug = String(params.slug);
   return (
     <>

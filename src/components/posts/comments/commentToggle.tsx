@@ -64,7 +64,7 @@ export default function CommentItem({ c }: { c: Comment }) {
           <Link href={`/profile/${c.userId.slug}`} className="font-medium text-primary">
             {c.userId.name}
           </Link>
-          {c.userId._id === user._id && (
+          {c.userId._id === user?._id && (
             <div className="flex gap-2">
               <Button
                 size="icon"
