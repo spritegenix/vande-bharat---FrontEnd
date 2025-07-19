@@ -24,9 +24,9 @@ export default function ProfileTabsContent({ posts, isPostLoading }: any) {
         <AboutSection />
       </TabsContent>
 
-      <TabsContent value="research">
+      {/* <TabsContent value="research">
         <ResearchPublications />
-      </TabsContent>
+      </TabsContent> */}
 
       <TabsContent value="following">
         <FollowingSection />

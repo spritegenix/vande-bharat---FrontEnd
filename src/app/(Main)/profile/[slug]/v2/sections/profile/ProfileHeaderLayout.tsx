@@ -47,7 +47,7 @@ export default function ProfileHeaderLayout({ user, posts, isPostLoading, curren
               </p>
 
               {/* Stats */}
-              <TabStatsGrid user={user} />
+              <TabStatsGrid user={user} post={{ postCount: posts.length }} />
 
               {/* Follow/Edit buttons */}
               <ProfileFollowButton
@@ -58,23 +58,25 @@ export default function ProfileHeaderLayout({ user, posts, isPostLoading, curren
 
               {/* Tabs */}
               <div className="mt-6 w-full max-w-4xl px-4">
-                <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-6">
-                  <TabsTrigger value="feed" className="dark:text-offwhite">
+                {/* The grid classes are replaced with flex */}
+                <TabsList className="flex w-full">
+                  {/* Each trigger gets 'flex-1' to evenly distribute space */}
+                  <TabsTrigger value="feed" className="flex-1 dark:text-offwhite">
                     Feed
                   </TabsTrigger>
-                  <TabsTrigger value="about" className="dark:text-offwhite">
+                  <TabsTrigger value="about" className="flex-1 dark:text-offwhite">
                     About
                   </TabsTrigger>
-                  <TabsTrigger value="research" className="dark:text-offwhite">
+                  {/* <TabsTrigger value="following" className="flex-1 dark:text-offwhite">
                     Research
-                  </TabsTrigger>
-                  <TabsTrigger value="following" className="dark:text-offwhite">
+                  </TabsTrigger> */}
+                  <TabsTrigger value="following" className="flex-1 dark:text-offwhite">
                     Following
                   </TabsTrigger>
-                  <TabsTrigger value="followers" className="dark:text-offwhite">
+                  <TabsTrigger value="followers" className="flex-1 dark:text-offwhite">
                     Followers
                   </TabsTrigger>
-                  <TabsTrigger value="communities" className="dark:text-offwhite">
+                  <TabsTrigger value="communities" className="flex-1 dark:text-offwhite">
                     Communities
                   </TabsTrigger>
                 </TabsList>

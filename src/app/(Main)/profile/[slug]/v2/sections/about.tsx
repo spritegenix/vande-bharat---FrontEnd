@@ -10,21 +10,21 @@ const aboutCards = [
       "Dr. Priya Sharma is a cultural historian specializing in temple architecture with 15+ years of experience,Focused on South Indian temple architecture and traditional building techniques.",
   },
   
-  // You can dynamically add more
+  
 ];
 
 export default function AboutSection() {
   return (
-    <Box>
+    <Box className="dark:bg-card">
       <div
-        className={`flex w-full flex-wrap justify-center gap-5 px-3 py-3 ${
+        className={`flex w-full flex-wrap justify-center gap-5  ${
           aboutCards.length === 1 ? "items-center" : "md:justify-between"
         }`}
       >
         {aboutCards.map((card) => (
           <Card
             key={card.id}
-            className="w-full max-w-xl flex-1 rounded-lg border border-gray-300 bg-gray-100 dark:border-border dark:bg-card"
+            className="w-full max-w-full flex-1 rounded-lg  bg-gray-100  dark:bg-card"
           >
             <CardContent className="space-y-4 p-4">
               <h3 className="text-lg font-semibold text-black dark:text-foreground">

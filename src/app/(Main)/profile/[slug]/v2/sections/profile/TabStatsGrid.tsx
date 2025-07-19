@@ -1,11 +1,24 @@
 "use client";
 
-export default function TabStatsGrid({ user }: any) {
+interface TabStatsGridProps {
+  user: {
+    communityCount?: number;
+    followerCount?: number;
+    followingCount?: number;
+  };
+  post: {
+    postCount?: number;
+  };
+}
+
+export default function TabStatsGrid({ user, post }: TabStatsGridProps) {
+  console.log("DEBUG - User in TabStatsGrid:", user); // ✅ DEBUG LINE
+
   const stats = [
-    { label: "Posts", value: user?.postsCount || "0" },
-    { label: "Followers", value: user?.followersCount || "0" },
-    { label: "Following", value: user?.followingCount || "0" },
-    { label: "Communities", value: user?.communitiesCount || "0" },
+    { label: "Communities", value: user?.communityCount ?? 0 },
+    { label: "Followers", value: user?.followerCount ?? 0 },
+    { label: "Following", value: user?.followingCount ?? 0 },
+    { label: "Posts", value: post?.postCount ?? 0 },
   ];
 
   return (

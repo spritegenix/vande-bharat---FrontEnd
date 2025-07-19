@@ -10,6 +10,8 @@ import CommentButton from "@/components/posts/comments/CommentButton";
 import { PostCommentSection } from "@/components/posts/comments/PostCommentSection";
 import PostUpdateButton from "@/components/posts/dropdown/PostUpdateButton";
 import { Post } from "@/types/post";
+import { Separator } from "@/components/ui/separator";
+import { ConfirmDeleteDialog } from "@/components/common/ConfirmDeleteModal";
 
 interface PostCardProps {
   post: Post;
@@ -20,9 +22,9 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
   const [editingPostId, setEditingPostId] = useState<string | null>(null);
 
   return (
-    <Box className="p-2">
-      <Card className="rounded-lg border border-gray-300 bg-gray-200 dark:border-border dark:bg-card">
-        <CardContent className="space-y-4 p-5">
+    <Box className="dark:bg-card border dark:border">
+      <Card className="rounded-lg dark:bg-card">
+        <CardContent className="space-y-5 p-5">
           {/* Header */}
           <div className="flex justify-between">
             <div className="flex items-center gap-3">
@@ -41,27 +43,23 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
                 </p>
               </div>
             </div>
-
-            {currentUserId === post.userId._id && (
-              <PostUpdateButton post={post} setEditingPostId={setEditingPostId} />
-            )}
           </div>
 
           {/* Content */}
-          <p className="text-sm text-gray-900 dark:text-muted-foreground">
-            {post.content}
-          </p>
+          <p className="text-sm text-gray-900 dark:text-muted-foreground">{post.content}</p>
 
           {/* Optional Image */}
           {post.attachments?.[0]?.type === "IMAGE" && (
-            <div className="h-40 w-full overflow-hidden rounded-lg bg-gray-300 dark:bg-muted">
+            <div className="w-full">
               <img
                 src={post.attachments[0].url}
                 alt="Post image"
-                className="h-full w-full object-cover"
+                className="h-auto w-full rounded-lg"
               />
             </div>
           )}
+
+          <Separator />
 
           {/* Interaction */}
           <div className="flex flex-wrap gap-4 text-sm text-gray-600 dark:text-muted-foreground">
