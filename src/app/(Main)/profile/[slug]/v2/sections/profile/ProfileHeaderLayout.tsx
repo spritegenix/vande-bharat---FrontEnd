@@ -3,6 +3,7 @@
 import { useState, useRef } from "react";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button"; // Make sure to import Button
 import CoverImage from "@/components/profile/main/CoverImage";
 import ImageCropperModal from "@/components/common/ImageCropperModal";
 import EditProfileModal from "../../modals/editModal";
@@ -10,13 +11,27 @@ import ProfileAvatarEditor from "./ProfileAvatarEditor";
 import ProfileFollowButton from "./ProfileFollowButton";
 import TabStatsGrid from "./TabStatsGrid";
 import ProfileTabsContent from "./ProfileTabsContent";
+import { useFetchUserPosts } from "@/queries/posts/posts.queries"; // 1. Import the hook
 
-export default function ProfileHeaderLayout({ user, posts, isPostLoading, currentUser }: any) {
+// Remove posts and isPostLoading from props, as we'll fetch them here
+export default function ProfileHeaderLayout({ user, currentUser }: any) {
   const [croppedImage, setCroppedImage] = useState<string | null>(null);
   const [imageSrc, setImageSrc] = useState<string>(user?.avatar || "/profile.jpg");
   const [openModal, setOpenModal] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement | null>(null);
+
+  // 2. Call the hook to fetch user-specific posts
+  const {
+    data,
+    isLoading: isPostLoading, // Rename isLoading to avoid conflicts
+    isFetching: isFetchingPosts,
+    hasNextPage,
+    fetchNextPage,
+  } = useFetchUserPosts(user?.slug);
+
+  // 3. Flatten the pages array into a single posts array
+  const posts = data?.pages.flatMap(page => page.posts) ?? [];
 
   return (
     <>
@@ -46,7 +61,7 @@ export default function ProfileHeaderLayout({ user, posts, isPostLoading, curren
                 {user?.location || "India"}
               </p>
 
-              {/* Stats */}
+              {/* Stats - Now it gets the correct post count */}
               <TabStatsGrid user={user} post={{ postCount: posts.length }} />
 
               {/* Follow/Edit buttons */}
@@ -58,18 +73,13 @@ export default function ProfileHeaderLayout({ user, posts, isPostLoading, curren
 
               {/* Tabs */}
               <div className="mt-6 w-full max-w-4xl px-4">
-                {/* The grid classes are replaced with flex */}
                 <TabsList className="flex w-full">
-                  {/* Each trigger gets 'flex-1' to evenly distribute space */}
                   <TabsTrigger value="feed" className="flex-1 dark:text-offwhite">
                     Feed
                   </TabsTrigger>
                   <TabsTrigger value="about" className="flex-1 dark:text-offwhite">
                     About
                   </TabsTrigger>
-                  {/* <TabsTrigger value="following" className="flex-1 dark:text-offwhite">
-                    Research
-                  </TabsTrigger> */}
                   <TabsTrigger value="following" className="flex-1 dark:text-offwhite">
                     Following
                   </TabsTrigger>
@@ -84,7 +94,17 @@ export default function ProfileHeaderLayout({ user, posts, isPostLoading, curren
             </div>
           </Card>
 
+          {/* 4. Pass the fetched posts and loading state down */}
           <ProfileTabsContent posts={posts} isPostLoading={isPostLoading} />
+
+          {/* 5. Add a "Load More" button for infinite scrolling */}
+          {hasNextPage && (
+            <div className="mt-6 text-center">
+              <Button onClick={() => fetchNextPage()} disabled={isFetchingPosts}>
+                {isFetchingPosts ? "Loading more..." : "Load More"}
+              </Button>
+            </div>
+          )}
         </Tabs>
       </div>
 

@@ -12,7 +12,6 @@ interface TabStatsGridProps {
 }
 
 export default function TabStatsGrid({ user, post }: TabStatsGridProps) {
-  console.log("DEBUG - User in TabStatsGrid:", user); // ✅ DEBUG LINE
 
   const stats = [
     { label: "Communities", value: user?.communityCount ?? 0 },

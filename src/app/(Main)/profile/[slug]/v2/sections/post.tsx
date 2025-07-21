@@ -1,17 +1,17 @@
 "use client";
 
 import React, { useState } from "react";
+import LikeButton from "@/components/posts/like/LikeButton";
+import BookmarkButton from "@/components/posts/BookmarkButton";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Heart } from "lucide-react";
 import Box from "@/components/elements/Box";
 import ShareMenu from "@/components/posts/ShareMenu";
 import CommentButton from "@/components/posts/comments/CommentButton";
 import { PostCommentSection } from "@/components/posts/comments/PostCommentSection";
-import PostUpdateButton from "@/components/posts/dropdown/PostUpdateButton";
-import { Post } from "@/types/post";
 import { Separator } from "@/components/ui/separator";
-import { ConfirmDeleteDialog } from "@/components/common/ConfirmDeleteModal";
+import { Post } from "@/types/post";
+import PostAttachment from "@/components/posts/PostAttachment"; 
 
 interface PostCardProps {
   post: Post;
@@ -48,27 +48,20 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
           {/* Content */}
           <p className="text-sm text-gray-900 dark:text-muted-foreground">{post.content}</p>
 
-          {/* Optional Image */}
-          {post.attachments?.[0]?.type === "IMAGE" && (
-            <div className="w-full">
-              <img
-                src={post.attachments[0].url}
-                alt="Post image"
-                className="h-auto w-full rounded-lg"
-              />
-            </div>
-          )}
+          {/* ✅ Attachment support (Images/Videos modal-ready) */}
+          <PostAttachment post={post} />
 
           <Separator />
 
-          {/* Interaction */}
+          {/* Interaction Buttons */}
           <div className="flex flex-wrap gap-4 text-sm text-gray-600 dark:text-muted-foreground">
-            <div className="flex items-center gap-1">
-              <Heart className="h-4 w-4" />
-              {post.likeCount || 0} likes
-            </div>
+            <LikeButton post={{ _id: post._id }} posts={[post]} />
             <CommentButton postId={post._id} />
             <ShareMenu postUrl={`https://yourapp.com/posts/${post._id}`} />
+            <BookmarkButton
+              post={{ _id: post._id}}
+              posts={[post]}
+            />
           </div>
 
           {/* Comments */}
