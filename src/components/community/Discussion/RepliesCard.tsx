@@ -21,8 +21,8 @@ export function ReplyCard({ discussionSlug }: Props) {
   const { data: replies, isFetching, refetch, isFetched } = useFetchReplies(discussionSlug);
 
   const toggleReplies = async () => {
+    await refetch();
     if (!showReplies && !isFetched) {
-      await refetch();
     }
     setShowReplies((prev) => !prev);
   };

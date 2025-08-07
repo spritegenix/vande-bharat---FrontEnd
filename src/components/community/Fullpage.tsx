@@ -13,12 +13,21 @@ import EventsTab from "./home/EventsTab";
 import AboutTab from "./home/AboutTab";
 import AboutTabEditor from "./home/AboutTab";
 import CommunityBanner from "./home/CommunityBanner";
-import { useFetchCommunityPosts } from "@/queries/community/community.queries";
-import { useSearchParams, usePathname, useRouter } from "next/navigation";
+import {
+  useFetchCommunityabout,
+  useFetchCommunityPosts,
+} from "@/queries/community/community.queries";
+import { useSearchParams, usePathname, useRouter, useParams } from "next/navigation";
 export default function Fullpage({ communitySlug }: { communitySlug: string }) {
   const { user } = useUserStore();
+  const slug = useParams();
+  const {
+    data: aboutContent,
+    isLoading: aboutLoading,
+    isFetching,
+  } = useFetchCommunityabout(slug.slug as string);
 
-  const tabOptions = ["Feed", "Discussion", "Members", "Events", "About"];
+  const tabOptions = ["Feed", "Discussion", "Members", "About"];
   const { data, isLoading, isError, isFetchingNextPage, fetchNextPage, hasNextPage } =
     useFetchCommunityPosts(communitySlug);
   // const allCommunityPosts = data?.pages.flatMap((page) => page.posts) ?? [];
@@ -39,7 +48,7 @@ export default function Fullpage({ communitySlug }: { communitySlug: string }) {
     <main id="main-content" className="bg-neutral-50">
       <div className="mx-auto max-w-6xl">
         {/* <!-- Community Banner --> */}
-        <CommunityBanner />
+        <CommunityBanner aboutContent={aboutContent} />
         {/* 
     <!-- Navigation Tabs --> */}
 
@@ -216,20 +225,14 @@ export default function Fullpage({ communitySlug }: { communitySlug: string }) {
             <TabsContent value="members">
               <MembersTab />
             </TabsContent>
-            <TabsContent value="events">
+            {/* <TabsContent value="events">
               <EventsTab />
-            </TabsContent>
+            </TabsContent> */}
             <TabsContent value="about">
               <AboutTabEditor
-                aboutContent={{
-                  vision: "To preserve architectural heritage through education.",
-                  mission: "Empower communities via awareness and collaboration.",
-                  objectives: "• Organize events\n• Conduct tours\n• Publish research",
-                }}
-                onSubmit={(data) => {
-                  // e.g. call mutation
-                  console.log("Submitted:", data);
-                }}
+                aboutContent={aboutContent}
+                isLoading={aboutLoading}
+                isFetching={isFetching}
               />
             </TabsContent>
           </Tabs>

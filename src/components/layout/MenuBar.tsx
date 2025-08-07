@@ -44,7 +44,7 @@ export default function MenuBar({ className }: MenuBarProps) {
   const [showAllCommunities, setShowAllCommunities] = useState(false);
   const { data } = useFollowingUsers();
   const user = useUserStore((state) => state.user);
-  const userProfileSlug = user?.slug || user?.id;
+  const userProfileSlug = user?.slug || user?._id;
   const [isCreatePageOpen, setIsCreatePageOpen] = useState(false);
   const [isCreateCommunityOpen, setIsCreateCommunityOpen] = useState(false);
   const profiles = data?.pages.flatMap((page) => page.data) || [];
@@ -66,10 +66,11 @@ export default function MenuBar({ className }: MenuBarProps) {
           <MenuTab icon={<Bookmark />} label="Bookmarks" href="/bookmarks" />
           <MenuTab icon={<Users />} label="Requests" href="/profile/requests" />
           <MenuTab icon={<UserPlus />} label="Add Saathis" href="/profile" />
+          <MenuTab icon={<Folder />} label="Communities" href="/community" />
         </div>
         <hr className="my-4 w-full max-w-52 border-t" />
         {/* ---------------------------Following---------------------------  */}
-        {profiles && profiles.length > 0 && (
+        {/* {profiles && profiles.length > 0 && (
           <>
             <p className="mb-2 pl-3 text-sm font-semibold text-zinc-500">Following</p>
             <div className="flex flex-col gap-y-3">
@@ -103,7 +104,7 @@ export default function MenuBar({ className }: MenuBarProps) {
             </div>
             <hr className="my-4 w-full max-w-52 border-t" />
           </>
-        )}
+        )} */}
         {/* --------------------------Communities----------------------------  */}
         <p className="mb-2 pl-5 text-sm font-semibold text-zinc-500">Communities</p>
         <Button variant={"outline"} asChild className="my-3 ml-4 border-gray-500">
@@ -113,7 +114,7 @@ export default function MenuBar({ className }: MenuBarProps) {
           </Link>
         </Button>
 
-        <MotionAccordion
+        {/* <MotionAccordion
           className="space-y-1"
           title="Your Communities"
           titleClassName="text-left px-4"
@@ -160,7 +161,7 @@ export default function MenuBar({ className }: MenuBarProps) {
           >
             See All
           </Link>
-        </div>
+        </div> */}
       </div>
       {/* Create Page Modal  */}
       {isCreatePageOpen && (

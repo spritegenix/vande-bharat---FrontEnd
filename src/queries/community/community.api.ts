@@ -1,8 +1,9 @@
-import { CommunityDiscussionType, communityPost } from "@/types/community";
+import { CommunityFormValues } from "@/app/(Main)/community/create/page";
+import { CommunityDiscussionType, communityPost, updateCommunityInfoType } from "@/types/community";
 import axios, { AxiosInstance } from "axios";
 
 //POST
-export const createCommuntiy = async (payload: communityPost, axios: AxiosInstance) => {
+export const createCommuntiy = async (payload: CommunityFormValues, axios: AxiosInstance) => {
   const response = await axios.post("/communities/create-community", payload, {
     withCredentials: true,
   });
@@ -38,7 +39,7 @@ export const getDiscussions = async(axios: AxiosInstance, {communitySlug, pagePa
     const response = await axios.get(`/communities/${communitySlug}/discussions`, {
         params:{
             cursor:pageParam,
-            limit:3
+            limit:10
         }
     });
     return response.data.data
@@ -46,5 +47,32 @@ export const getDiscussions = async(axios: AxiosInstance, {communitySlug, pagePa
 
 export const getReplies = async(axios: AxiosInstance, {discussionSlug}: {discussionSlug: string}) => {
     const response = await axios.get(`/communities/discussions/${discussionSlug}/replies`);
+    return response.data.data
+}
+
+export const fetchCommunityMembers = async(axios: AxiosInstance, {communitySlug, pageParam}: {communitySlug: string, pageParam: string | null}) => {
+    const response = await axios.get(`/communities/${communitySlug}/members`, {
+        params:{
+            cursor:pageParam,
+            limit:10
+        }
+    });
+   
+    return response.data
+}
+
+
+export const updateCommunityInfo = async(axios: AxiosInstance, {communitySlug, payload}: {communitySlug: string, payload: updateCommunityInfoType}) => {
+    const response = await axios.patch(`/communities/${communitySlug}/update`, payload);
+    return response.data
+}
+
+export const getCommunityInfo = async(axios: AxiosInstance, communitySlug: string) => {
+    const response = await axios.get(`/communities/${communitySlug}/single`, {
+      params:{
+        fields:"description,tags,banner,category,location,rules"
+      }
+    });
+    
     return response.data.data
 }

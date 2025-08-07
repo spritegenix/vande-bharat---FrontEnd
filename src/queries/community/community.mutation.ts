@@ -1,14 +1,15 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createCommuntiy, createDiscussion } from "./community.api";
-import { CommunityDiscussionType, communityPost } from "@/types/community";
+import { createCommuntiy, createDiscussion, updateCommunityInfo } from "./community.api";
+import { CommunityDiscussionType, communityPost, updateCommunityInfoType } from "@/types/community";
 import { toast } from "sonner";
 import { useAuthAxios } from "@/lib/axios";
+import { CommunityFormValues } from "@/app/(Main)/community/create/page";
 
-export const useCreateCommunityPosts = () => {
+export const useCreateCommunity = () => {
   const axios = useAuthAxios();
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (payload: communityPost) => createCommuntiy(payload, axios),
+    mutationFn: (payload: CommunityFormValues) => createCommuntiy(payload, axios),
     onSuccess: () => {
       toast.success("Community post created successfully!");
       queryClient.invalidateQueries({ queryKey: ["community-discussions"] });
@@ -34,3 +35,19 @@ export const useCreateDiscussion = (communitySlug: string) => {
     },
   });
 };
+
+
+export const useUpdateCommunity = (communitySlug:string)=> {
+  const axios = useAuthAxios()
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (payload: updateCommunityInfoType) => updateCommunityInfo(axios,{communitySlug,payload}),
+    onSuccess: () => {
+      toast.success("Community post created successfully!");
+       queryClient.invalidateQueries({ queryKey: ["community-about"] });
+    },
+    onError: (error: any) => {
+      toast.error("Failed to create post: " + (error?.response?.data?.message || error.message));
+    },
+  })
+}

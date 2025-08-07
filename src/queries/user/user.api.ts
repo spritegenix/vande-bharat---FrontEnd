@@ -32,10 +32,15 @@ export const getPresignedUrl = async (axios: AxiosInstance, file: File, folder: 
 
 export const uploadToS3 = async (axios: AxiosInstance, uploadUrl: string, file: File | Blob) => {
   try {
-    await axios.put(uploadUrl, file, {
+      const response =  await axios.put(uploadUrl, file, {
       headers: { "Content-Type": file.type },withCredentials: false, _skipAuth: true,
     }as any);
-    
+     if (response.status === 200 || response.status === 204) {
+      // Upload succeeded
+      return true;
+    } else {
+      throw new Error("Unexpected status: " + response.status);
+    }
   } catch (error: any) {
     toast.error("Image upload failed. Please try again.");
      console.log(error)

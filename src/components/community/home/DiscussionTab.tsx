@@ -58,10 +58,12 @@ export function DiscussionTab() {
   const discussions = data?.pages.flatMap((page) => page.data) ?? [];
 
   const handleRepliesClick = (slug: string) => {
+    setSelectedSlug(slug);
     setRepliesSlug(slug);
   };
-
-  const { data: replies } = useFetchReplies(repliesSlug);
+  const { data: replies } = useFetchReplies(repliesSlug, {
+    enabled: !!repliesSlug,
+  });
 
   return (
     <Card className="bg-background">
@@ -137,7 +139,7 @@ export function DiscussionTab() {
             <Discussion
               key={discussion._id}
               discussion={discussion}
-              onRepliesClick={(slug) => setSelectedSlug(slug === selectedSlug ? null : slug)}
+              onRepliesClick={handleRepliesClick}
             />
             {selectedSlug === discussion.slug && <ReplyCard discussionSlug={discussion.slug} />}
           </div>

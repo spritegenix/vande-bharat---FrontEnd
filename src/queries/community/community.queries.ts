@@ -1,8 +1,8 @@
 //community/
 
 import { useAuthAxios } from "@/lib/axios";
-import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
-import { fetchCommunityPosts, getDiscussions, getReplies } from "./community.api";
+import { useInfiniteQuery, useQuery, UseQueryOptions } from "@tanstack/react-query";
+import { fetchCommunityMembers, fetchCommunityPosts, getCommunityInfo, getDiscussions, getReplies } from "./community.api";
 
 export const useFetchCommunityPosts = (slug:string) => {
   const axios = useAuthAxios();
@@ -28,14 +28,46 @@ export const useFetchDiscussions = (communitySlug:string)=> {
     staleTime: 1000 * 60 * 5
   })
 }
-export const useFetchReplies = (discussionSlug:string)=>{
-  const axios = useAuthAxios()
+interface RepliesQueryOptions extends Partial<UseQueryOptions<any, Error>> {
+  enabled?: boolean;
+}
+
+export const useFetchReplies = (
+  discussionSlug: string,
+  options?: RepliesQueryOptions
+) => {
+  const axios = useAuthAxios();
+
   return useQuery({
-    queryKey:["community-replies"],
-    queryFn:()=> getReplies(axios,{discussionSlug}),
-    enabled:false,
-    refetchOnWindowFocus:false,
+    queryKey: ["community-replies", discussionSlug],
+    queryFn: () => getReplies(axios, { discussionSlug }),
+    enabled: options?.enabled ?? false,
+    refetchOnWindowFocus: false,
     retry: 1,
-    staleTime: 1000 * 60 * 5
+    staleTime: 1000 * 60 * 5,
+    ...options,
+  });
+};
+
+export const useFetchCommunityMembers = (communitySlug:string) => {
+  const axios = useAuthAxios();
+  return useInfiniteQuery({
+    queryKey: ['community-members', communitySlug],
+    queryFn: ({pageParam= null}) => fetchCommunityMembers(axios, {communitySlug, pageParam}),
+    initialPageParam: null,
+    getNextPageParam: (lastPage) => lastPage?.nextCursor ?? null,
+    staleTime: 1000 * 60 * 5,
+    retry: 1,
+  })
+}
+
+
+export const useFetchCommunityabout = (communitySlug:string) => {
+  const axios = useAuthAxios();
+  return useQuery({
+    queryKey: ['community-about', communitySlug],
+    queryFn: () => getCommunityInfo(axios, communitySlug),
+    staleTime: 1000 * 60 * 5,
+    retry: 1,
   })
 }

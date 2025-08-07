@@ -1,6 +1,11 @@
+import { aboutContentType } from "@/types/community";
 import React from "react";
-
-export default function CommunityBanner() {
+function dates(date: string) {
+  let createdAtDate = new Date(date);
+  const formatted = createdAtDate.toLocaleString("default", { month: "long", year: "numeric" });
+  return formatted;
+}
+export default function CommunityBanner({ aboutContent }: { aboutContent: aboutContentType }) {
   return (
     <div
       id="community-banner"
@@ -9,9 +14,9 @@ export default function CommunityBanner() {
       {/* Cover Image */}
       <div className="relative h-40 w-full bg-neutral-200 dark:bg-neutral-800 sm:h-52 md:h-64">
         <img
-          src="/images/profile/coverplaceholder.jpg"
+          src={aboutContent.banner ? aboutContent.banner : "/images/profile/coverplaceholder.jpg"}
           alt="Community Cover"
-          className="h-full w-full object-cover"
+          className="aspect-video h-full w-full object-cover"
         />
         <div className="absolute bottom-3 right-3">
           <button className="rounded bg-white bg-opacity-80 px-3 py-1 text-sm text-neutral-700 hover:bg-opacity-100 dark:bg-black/50 dark:text-white dark:hover:bg-black/70">
@@ -27,15 +32,15 @@ export default function CommunityBanner() {
             {/* Info */}
             <div className="pb-2">
               <h1 className="mb-1 text-xl font-semibold text-neutral-900 dark:text-white sm:text-2xl">
-                Ancient Architecture Society
+                {aboutContent.name}
               </h1>
               <p className="mb-2 max-w-md text-sm text-neutral-600 dark:text-neutral-400 sm:text-base">
-                Preserving and celebrating India's architectural heritage
+                {aboutContent.description}
               </p>
               <div className="flex flex-wrap items-center gap-x-4 text-sm text-neutral-500 dark:text-neutral-400">
                 <span>👥 12.5k members</span>
-                <span>👁️ Public</span>
-                <span>📅 Created March 2020</span>
+                <span>👁️ {aboutContent.isprivate ? "Private" : "Public"}</span>
+                <span>📅 Created {aboutContent.createdAt && dates(aboutContent?.createdAt)}</span>
               </div>
             </div>
           </div>

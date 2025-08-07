@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -8,7 +8,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -20,38 +19,41 @@ import ImageCropperModal from "@/components/common/ImageCropperModal";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
+  FormDescription,
 } from "@/components/ui/form";
 import { Switch } from "@/components/ui/switch";
+import { getPresignedUrl, uploadToS3 } from "@/queries/user/user.api";
+import { useAuthAxios } from "@/lib/axios";
+import { useCreateCommunity } from "@/queries/community/community.mutation";
 
 /* -------------------------------------------------------------------------- */
-/*                                    Zod                                    */
+/*                                    Zod                                    */
 /* -------------------------------------------------------------------------- */
 const MAX_IMAGE_SIZE = 500 * 1024; // 500KB
 const communityFormSchema = z.object({
-  communityName: z.string().min(1, "Community Name is required"),
+  name: z.string().min(1, "Community Name is required"),
   category: z.string().min(1, "Category is required"),
   description: z.string().min(1, "Description is required"),
   isPrivate: z.boolean().default(false).optional(),
   location: z.string().optional(),
-  image: z
+  banner: z
     .any()
     .refine((file) => !file || (file instanceof File && file.size <= MAX_IMAGE_SIZE), {
       message: "Image must be under 500KB",
     })
     .optional(),
-  tags: z.string().optional(),
-  rules: z.array(z.string().min(1, "Rule cannot be empty")).optional(),
+  tags: z.array(z.string().min(1, "Tag cannot be empty")),
+  rules: z.array(z.string().min(1, "Rule cannot be empty")),
 });
 
-type CommunityFormValues = z.infer<typeof communityFormSchema>;
+export type CommunityFormValues = z.infer<typeof communityFormSchema>;
 
 /* -------------------------------------------------------------------------- */
-/*                                 Component                                  */
+/*                                 Component                                  */
 /* -------------------------------------------------------------------------- */
 export default function CommunityPage() {
   /* ------------------------------- Image state ------------------------------ */
@@ -59,18 +61,22 @@ export default function CommunityPage() {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [croppedImage, setCroppedImage] = useState<Blob | null>(null);
   const [openCropper, setOpenCropper] = useState(false);
+
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const axios = useAuthAxios();
+  const { mutate } = useCreateCommunity();
 
   /* ------------------------- React‑Hook‑Form setup -------------------------- */
   const form = useForm<CommunityFormValues>({
     resolver: zodResolver(communityFormSchema),
     defaultValues: {
-      communityName: "",
+      name: "",
+      banner: null,
       category: "",
       description: "",
       isPrivate: false,
       location: "",
-      tags: "",
+      tags: [""],
       rules: [""],
     },
   });
@@ -85,6 +91,21 @@ export default function CommunityPage() {
 
   const rules = watch("rules") ?? [];
 
+  /* ---------------------- Tags input as comma-separated --------------------- */
+  const tagsArray = watch("tags") ?? [];
+  const [tagsInput, setTagsInput] = useState(tagsArray.join(", "));
+
+  function handleTagsChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const input = e.target.value;
+    setTagsInput(input);
+    const tags = input
+      .split(",")
+      .map((tag) => tag.trim())
+      .filter((tag) => tag.length > 0);
+    setValue("tags", tags, { shouldValidate: true, shouldDirty: true });
+  }
+
+  /* ------------------------- Rules add/update/remove ------------------------ */
   const addRule = () => setValue("rules", [...rules, ""]);
 
   const removeRule = (index: number) => {
@@ -99,18 +120,26 @@ export default function CommunityPage() {
     setValue("rules", updated);
   };
 
-  /* -------------------------------------------------------------------------- */
-  /*                                   Submit                                   */
-  /* -------------------------------------------------------------------------- */
-  const onSubmit = (data: CommunityFormValues) => {
-    console.log("🎉 Submitted:", data);
-    // TODO: connect to API
-    form.reset();
+  /* ---------------------------- Form Submission ----------------------------- */
+  const onSubmit = async (data: CommunityFormValues) => {
+    let bannerUrl = "";
+    if (croppedImage) {
+      const finalFile = new File([croppedImage], "cover.jpg", { type: croppedImage.type });
+      const { uploadUrl, fileUrl } = await getPresignedUrl(axios, finalFile, "covers");
+      await uploadToS3(axios, uploadUrl, finalFile);
+      bannerUrl = fileUrl;
+    }
+
+    // Create payload with banner URL override
+    const payloadToSend = {
+      ...data,
+      banner: bannerUrl,
+    };
+
+    mutate(payloadToSend);
   };
 
-  /* -------------------------------------------------------------------------- */
-  /*                                   Render                                   */
-  /* -------------------------------------------------------------------------- */
+  /* ------------------------------- Render ----------------------------------- */
   return (
     <section className="mx-auto max-w-4xl px-4 py-10">
       <Tabs defaultValue="community" className="w-full">
@@ -121,14 +150,14 @@ export default function CommunityPage() {
         <TabsContent value="community">
           <Form {...form}>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-              {/* ----------------------------- Basic Info ----------------------------- */}
+              {/* Basic Information */}
               <div>
                 <h3 className="mb-4 text-lg font-semibold">Basic Information</h3>
                 <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                   {/* Community Name */}
                   <FormField
                     control={control}
-                    name="communityName"
+                    name="name"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Community Name *</FormLabel>
@@ -232,13 +261,13 @@ export default function CommunityPage() {
                 </div>
               </div>
 
-              {/* --------------------------- Community Images -------------------------- */}
+              {/* Community Images */}
               <div>
                 <h3 className="mb-4 text-lg font-semibold">Community Images</h3>
 
                 <FormField
                   control={control}
-                  name="image"
+                  name="banner"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Cover Image</FormLabel>
@@ -273,12 +302,15 @@ export default function CommunityPage() {
                     open={openCropper}
                     onClose={() => {
                       setOpenCropper(false);
-                      setImageFile(null);
-                      setImagePreview(null);
-                      setValue("image", null);
+                      // Optionally reset image states if you want:
+                      // setImageFile(null);
+                      // setImagePreview(null);
+                      // setValue("banner", null);
                       if (fileInputRef.current) fileInputRef.current.value = "";
                     }}
-                    onCropped={(blob) => setCroppedImage(blob)}
+                    onCropped={(blob) => {
+                      setCroppedImage(blob);
+                    }}
                   />
                 )}
                 {croppedImage && (
@@ -290,7 +322,7 @@ export default function CommunityPage() {
                 )}
               </div>
 
-              {/* --------------------------- Community Rules --------------------------- */}
+              {/* Community Rules */}
               <div>
                 <h3 className="mb-4 text-lg font-semibold">Community Rules</h3>
                 <div className="space-y-3">
@@ -306,34 +338,46 @@ export default function CommunityPage() {
                       </Button>
                     </div>
                   ))}
-                  <Button type="button" variant="outline" onClick={addRule}>
-                    ➕ Add Another Rule
-                  </Button>
+
+                  {rules.length < 4 && (
+                    <Button type="button" variant="outline" onClick={addRule}>
+                      ➕ Add Another Rule
+                    </Button>
+                  )}
                 </div>
               </div>
 
-              {/* ------------------------- Tags and Language -------------------------- */}
-              <div>
-                <h3 className="mb-4 text-lg font-semibold">Tags and Language</h3>
-                <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                  {/* Tags */}
-                  <FormField
-                    control={control}
-                    name="tags"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Tags</FormLabel>
-                        <FormControl>
-                          <Input placeholder="heritage, culture, history" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              </div>
+              {/* Tags input as comma-separated */}
+              <FormField
+                control={control}
+                name="tags"
+                render={() => (
+                  <FormItem>
+                    <FormLabel>Tags (comma separated)</FormLabel>
+                    <FormControl>
+                      <Input
+                        value={tagsInput}
+                        onChange={handleTagsChange}
+                        placeholder="heritage, culture, history"
+                      />
+                    </FormControl>
+                    <FormMessage>
+                      {errors.tags && (
+                        <>
+                          {Array.isArray(errors.tags)
+                            ? errors.tags.map((e, i) => <div key={i}>{e?.message || null}</div>)
+                            : errors.tags.message}
+                        </>
+                      )}
+                    </FormMessage>
+                    <FormDescription>
+                      Separate tags with commas. At least one tag required.
+                    </FormDescription>
+                  </FormItem>
+                )}
+              />
 
-              {/* ----------------------------- Action Bar ----------------------------- */}
+              {/* Action Bar */}
               <div className="flex justify-between border-t pt-6">
                 <Button variant="outline" type="button">
                   Cancel

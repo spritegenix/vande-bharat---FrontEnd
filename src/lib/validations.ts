@@ -12,12 +12,14 @@ export const loginSchema = z.object({
 
 
 
-  // lib/validators/aboutSchema.ts
-
-export const aboutSchema = z.object({
-  vision: z.string().min(10, 'Vision must be at least 10 characters'),
-  mission: z.string().min(10, 'Mission must be at least 10 characters'),
-  objectives: z.string().min(10, 'Objectives must be at least 10 characters'),
+export const aboutItemSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  description: z.string().min(1, "Description is required"),
+  rules: z.array(z.string().min(1, "Rule cannot be empty")),
+  category: z.string().min(1),
+  location: z.string().min(1),
 });
 
-export type AboutSchema = z.infer<typeof aboutSchema>;
+
+export type AboutItem = z.infer<typeof aboutItemSchema>; 
+
