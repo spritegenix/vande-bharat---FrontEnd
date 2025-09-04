@@ -18,7 +18,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
-import { DiscussionCard } from "./DiscussionCard";
+// import { DiscussionCard } from "./DiscussionCard";
 import { useCreateDiscussion } from "@/queries/community/community.mutation";
 import { useParams } from "next/navigation";
 import { useUserStore } from "@/stores/userStore";

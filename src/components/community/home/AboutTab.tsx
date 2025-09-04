@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useForm, useFieldArray } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { aboutItemSchema, AboutItem } from "@/lib/validations";
 
@@ -28,9 +28,7 @@ import { AboutTabProps, admin } from "@/types/community";
 
 export default function AboutTabEditor({ aboutContent, isLoading, isFetching }: AboutTabProps) {
   const slug = useParams();
-
   const { mutate } = useUpdateCommunity(slug.slug as string);
-
   const [isEditing, setIsEditing] = useState(false);
   const user = useUserStore((state) => state.user);
 
@@ -52,17 +50,12 @@ export default function AboutTabEditor({ aboutContent, isLoading, isFetching }: 
   const { control, formState, reset } = form;
   const { errors, isSubmitting } = formState;
 
-  // UseFieldArray for rules
-  const { fields, append, remove, replace } = useFieldArray({
-    control,
-    name: "rules",
-  });
   const handleFormSubmit = (values: AboutItem) => {
     mutate(values);
     setIsEditing(false);
   };
 
-  // Reset form and field array when data loads
+  // Reset form when data loads
   useEffect(() => {
     if (aboutContent) {
       if (
@@ -73,23 +66,20 @@ export default function AboutTabEditor({ aboutContent, isLoading, isFetching }: 
         aboutContent.rules = [""];
       }
       reset(aboutContent);
-      replace(aboutContent.rules);
       setIsEditing(false);
     } else {
       // If no aboutContent, start editing to create new info
       setIsEditing(true);
     }
-  }, [aboutContent, reset, replace]);
+  }, [aboutContent, reset]);
 
   const handleCancel = () => {
     if (aboutContent) {
       reset(aboutContent);
-      replace(aboutContent.rules || [""]);
       setIsEditing(false);
     } else {
-      // No data to reset to, clear form and rules
+      // No data to reset to, clear form
       reset(defaultFormValues);
-      replace([""]);
       setIsEditing(false);
     }
   };
@@ -107,7 +97,6 @@ export default function AboutTabEditor({ aboutContent, isLoading, isFetching }: 
     <Card className="rounded-lg border bg-background shadow-sm">
       <CardHeader className="flex items-center justify-between">
         <CardTitle className="mb-1 text-2xl text-foreground">About This Community</CardTitle>
-        {}
         {user &&
           (user._id === aboutContent?.owner._id ||
             aboutContent?.admins.some((admin: admin) => admin._id === user._id)) &&
@@ -195,52 +184,74 @@ export default function AboutTabEditor({ aboutContent, isLoading, isFetching }: 
                 )}
               />
 
-              {/* Rules Array */}
-              <div>
-                <label className="mb-1 block font-semibold">Rules</label>
-                {fields.map((field, index) => (
-                  <div key={field.id} className="mb-2 flex items-center space-x-2">
-                    <FormField
-                      control={control}
-                      name={`rules.${index}`}
-                      render={({ field }) => (
-                        <FormItem className="flex-grow">
-                          <FormControl>
+              {/* Rules Array using Controller */}
+              <Controller
+                control={control}
+                name="rules"
+                render={({ field, fieldState }) => {
+                  const rules = field.value || [""];
+
+                  const updateRules = (newRules: string[]) => {
+                    field.onChange(newRules);
+                  };
+
+                  const addRule = () => {
+                    if (rules.length < 4) {
+                      updateRules([...rules, ""]);
+                    }
+                  };
+
+                  const removeRule = (index: number) => {
+                    if (rules.length > 1) {
+                      updateRules(rules.filter((_, i) => i !== index));
+                    }
+                  };
+
+                  const updateRule = (index: number, value: string) => {
+                    const newRules = [...rules];
+                    newRules[index] = value;
+                    updateRules(newRules);
+                  };
+
+                  return (
+                    <div>
+                      <label className="mb-1 block font-semibold">Rules</label>
+                      {rules.map((rule: string, index: number) => (
+                        <div key={index} className="mb-2 flex items-center space-x-2">
+                          <div className="flex-grow">
                             <Input
-                              {...field}
+                              value={rule}
+                              onChange={(e) => updateRule(index, e.target.value)}
                               placeholder={`Rule ${index + 1}`}
-                              aria-invalid={!!errors.rules?.[index]}
+                              aria-invalid={!!fieldState.error}
                             />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
+                          </div>
+                          {rules.length > 1 && (
+                            <Button
+                              type="button"
+                              variant="destructive"
+                              size="icon"
+                              onClick={() => removeRule(index)}
+                              aria-label={`Remove Rule ${index + 1}`}
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          )}
+                        </div>
+                      ))}
+                      {rules.length < 4 && (
+                        <Button type="button" variant="outline" onClick={addRule} className="mb-4">
+                          <Plus className="mr-1 h-4 w-4" />
+                          Add Rule
+                        </Button>
                       )}
-                    />
-                    {fields.length > 1 && (
-                      <Button
-                        type="button"
-                        variant="destructive"
-                        size="icon"
-                        onClick={() => remove(index)}
-                        aria-label={`Remove Rule ${index + 1}`}
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    )}
-                  </div>
-                ))}
-                {fields.length < 4 && (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => append("")}
-                    className="mb-4"
-                  >
-                    <Plus className="mr-1 h-4 w-4" />
-                    Add Rule
-                  </Button>
-                )}
-              </div>
+                      {fieldState.error && (
+                        <p className="mt-1 text-sm text-red-500">{fieldState.error.message}</p>
+                      )}
+                    </div>
+                  );
+                }}
+              />
 
               {/* Buttons */}
               <div className="flex gap-2">

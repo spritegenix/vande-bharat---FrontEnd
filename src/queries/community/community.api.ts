@@ -73,6 +73,10 @@ export const getCommunityInfo = async(axios: AxiosInstance, communitySlug: strin
         fields:"description,tags,banner,category,location,rules"
       }
     });
-    
     return response.data.data
 }
+
+export const joinCommunity = async(axios: AxiosInstance, communitySlug: string) => {
+    const response = await axios.patch(`/communities/${communitySlug}/single/join`);
+    return response.data
+} 

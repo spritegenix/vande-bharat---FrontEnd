@@ -47,6 +47,9 @@ export type aboutContentType = {
   admins: admin[];
   isprivate?: boolean;
   createdAt?: string;
+  totalMemberCount?: number;  
+  isMember?: boolean;
+
 };
 
 export interface AboutTabProps {

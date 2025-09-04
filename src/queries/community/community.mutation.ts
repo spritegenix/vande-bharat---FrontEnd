@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createCommuntiy, createDiscussion, updateCommunityInfo } from "./community.api";
+import { createCommuntiy, createDiscussion, joinCommunity, updateCommunityInfo } from "./community.api";
 import { CommunityDiscussionType, communityPost, updateCommunityInfoType } from "@/types/community";
 import { toast } from "sonner";
 import { useAuthAxios } from "@/lib/axios";
@@ -48,6 +48,22 @@ export const useUpdateCommunity = (communitySlug:string)=> {
     },
     onError: (error: any) => {
       toast.error("Failed to create post: " + (error?.response?.data?.message || error.message));
+    },
+  })
+}
+
+
+export const useJoinCommunity = (communitySlug:string) => {
+  const axios = useAuthAxios()
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: () => joinCommunity(axios,communitySlug),
+    onSuccess: () => {
+      toast.success("Joined Community successfully!");
+       queryClient.invalidateQueries({ queryKey: ["community-about"] });
+    },
+    onError: (error: any) => {
+      toast.error("Failed to join Community: " + (error?.response?.data?.message || error.message));
     },
   })
 }

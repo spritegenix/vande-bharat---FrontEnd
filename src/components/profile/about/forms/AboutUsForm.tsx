@@ -58,7 +58,7 @@ export default function AboutUsForm({
     toast.success("About section deleted.");
   };
 
-  const canEdit = user._id === userId;
+  const canEdit = user?._id === userId;
 
   return (
     <div className="rounded-xl border border-muted p-4 shadow-sm">
