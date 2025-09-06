@@ -86,6 +86,7 @@ export default function CommunityPage() {
     handleSubmit,
     setValue,
     watch,
+    reset,
     formState: { errors },
   } = form;
 
@@ -137,6 +138,10 @@ export default function CommunityPage() {
     };
 
     mutate(payloadToSend);
+    reset();
+    setImageFile(null);
+    setImagePreview(null);
+    setCroppedImage(null);
   };
 
   /* ------------------------------- Render ----------------------------------- */

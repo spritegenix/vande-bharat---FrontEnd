@@ -1,27 +1,42 @@
 "use client";
 
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import ImageCropperModal from "@/components/common/ImageCropperModal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Camera } from "lucide-react";
 import Image from "next/image";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { getPresignedUrl, updateUserCover, uploadToS3 } from "@/queries/user/user.api";
 import { toast } from "sonner";
-import { useUserStore } from "@/stores/userStore";
-import { useParams } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useAuthAxios } from "@/lib/axios";
-export default function CoverImage({ coverImage }: { coverImage?: string }) {
+import { updateCommunityInfo } from "@/queries/community/community.api";
+export default function CoverImage({
+  coverImage,
+  entityType,
+  canEdit,
+}: {
+  coverImage?: string;
+  entityType: string;
+  canEdit: boolean;
+}) {
   const [modelOpen, setModelOpen] = useState(false);
   const [imageSrc, setImageSrc] = useState<string>(
     coverImage || "/images/profile/coverplaceholder.jpg",
   );
   const [croppedImage, setCroppedImage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const { user } = useUserStore();
-  const params = useParams();
+  useEffect(() => {
+    if (coverImage) {
+      setImageSrc(coverImage);
+    }
+  }, [coverImage]);
   const axios = useAuthAxios();
+  const slug = usePathname();
+  const communitySlug = slug.startsWith("/community/") && slug.split("/community/")[1];
+
+  const queryClient = useQueryClient();
   const updateCoverMutation = useMutation({
     mutationFn: async (blob: Blob) => {
       try {
@@ -35,8 +50,16 @@ export default function CoverImage({ coverImage }: { coverImage?: string }) {
 
         await uploadToS3(axios, uploadUrl, file);
 
-        await updateUserCover(axios, fileUrl);
-
+        // Use community update instead of user update
+        if (entityType === "community" && communitySlug) {
+          // Use your existing hook's mutation function directly
+          await updateCommunityInfo(axios, {
+            communitySlug,
+            payload: { banner: fileUrl },
+          });
+        } else {
+          await updateUserCover(axios, fileUrl);
+        }
         return fileUrl;
       } catch (err) {
         console.error("❌ Mutation failed:", err);
@@ -45,6 +68,11 @@ export default function CoverImage({ coverImage }: { coverImage?: string }) {
     },
     onSuccess: (fileUrl) => {
       toast.success("Cover photo updated!");
+      if (entityType === "community") {
+        queryClient.invalidateQueries({ queryKey: ["community-by-slug"] });
+      } else {
+        queryClient.invalidateQueries({ queryKey: ["user-by-id"] });
+      }
     },
     onError: (err: any) => {
       toast.error("Failed to update cover photo.");
@@ -63,7 +91,6 @@ export default function CoverImage({ coverImage }: { coverImage?: string }) {
     };
     reader.readAsDataURL(file);
   };
-  const slug = params.slug as string;
 
   return (
     <div className="relative h-[150px] w-full md:h-[350px] lg:h-[400px]">
@@ -74,7 +101,7 @@ export default function CoverImage({ coverImage }: { coverImage?: string }) {
         className="object-cover object-center"
         priority
       />
-      {user?.slug && slug && user.slug === slug && (
+      {canEdit && (
         <div className="absolute bottom-0 right-0 z-20 m-5">
           <Button
             type="button"

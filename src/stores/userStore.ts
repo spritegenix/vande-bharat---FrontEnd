@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-interface UserInfo {
+export interface UserInfo {
   _id:string
   slug: string;
   name: string;

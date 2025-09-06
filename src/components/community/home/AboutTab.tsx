@@ -215,7 +215,7 @@ export default function AboutTabEditor({ aboutContent, isLoading, isFetching }: 
 
                   return (
                     <div>
-                      <label className="mb-1 block font-semibold">Rules</label>
+                      <label className="mb-1 block font-semibold">Community Guidelines</label>
                       {rules.map((rule: string, index: number) => (
                         <div key={index} className="mb-2 flex items-center space-x-2">
                           <div className="flex-grow">
@@ -286,7 +286,7 @@ export default function AboutTabEditor({ aboutContent, isLoading, isFetching }: 
               </p>
               {aboutContent.rules && aboutContent.rules.length > 0 && (
                 <>
-                  <h4 className="mt-2 font-semibold">Rules:</h4>
+                  <h4 className="mt-2 font-semibold">Community Guidelines:</h4>
                   <ul className="list-inside list-disc space-y-1 text-muted-foreground">
                     {aboutContent.rules.map((rule: string, i: React.Key) => (
                       <li key={i}>{rule}</li>

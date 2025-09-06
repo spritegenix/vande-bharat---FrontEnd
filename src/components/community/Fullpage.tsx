@@ -7,7 +7,7 @@ import { useUserStore } from "@/stores/userStore";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "../ui/button";
-import { MembersTab } from "./home/Card";
+import { MembersTab } from "./home/MemberCard";
 import { DiscussionTab } from "./home/DiscussionTab";
 import EventsTab from "./home/EventsTab";
 import AboutTab from "./home/AboutTab";
@@ -27,10 +27,9 @@ export default function Fullpage({ communitySlug }: { communitySlug: string }) {
     isFetching,
   } = useFetchCommunityabout(slug.slug as string);
 
-  const tabOptions = ["Feed", "Discussion", "Members", "About"];
+  const tabOptions = ["Feed", "Members", "About"];
   const { data, isLoading, isError, isFetchingNextPage, fetchNextPage, hasNextPage } =
     useFetchCommunityPosts(communitySlug);
-  // const allCommunityPosts = data?.pages.flatMap((page) => page.posts) ?? [];
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const router = useRouter();
@@ -108,7 +107,7 @@ export default function Fullpage({ communitySlug }: { communitySlug: string }) {
               </TabsList> */}
             <TabsContent value="feed">
               <div className="grid grid-cols-12 gap-6">
-                <div className="col-span-8">
+                <div className="col-span-12">
                   <Feed user={user} communitySlug={communitySlug} />
                   <FeedsSection
                     isLoading={isLoading}
@@ -121,9 +120,9 @@ export default function Fullpage({ communitySlug }: { communitySlug: string }) {
                     slug={communitySlug}
                   />
                 </div>
-                <div id="community-sidebar" className="col-span-4">
+                {/* <div id="community-sidebar" className="col-span-4">
                   <div className="space-y-6">
-                    {/* Community Stats */}
+                    {/* Community Stats 
                     <Card>
                       <CardHeader>
                         <CardTitle className="text-lg">Community Stats</CardTitle>
@@ -148,7 +147,7 @@ export default function Fullpage({ communitySlug }: { communitySlug: string }) {
                       </CardContent>
                     </Card>
 
-                    {/* Community Guidelines */}
+                    {/* Community Guidelines \
                     <Card>
                       <CardHeader>
                         <CardTitle className="text-lg">Community Guidelines</CardTitle>
@@ -161,7 +160,7 @@ export default function Fullpage({ communitySlug }: { communitySlug: string }) {
                       </CardContent>
                     </Card>
 
-                    {/* New Members */}
+                    {/* New Members \
                     <Card>
                       <CardHeader>
                         <CardTitle className="text-lg">New Members</CardTitle>
@@ -189,7 +188,7 @@ export default function Fullpage({ communitySlug }: { communitySlug: string }) {
                       </CardContent>
                     </Card>
 
-                    {/* Upcoming Events */}
+                    {/* Upcoming Events \
                     <Card>
                       <CardHeader>
                         <CardTitle className="text-lg">Upcoming Events</CardTitle>
@@ -216,14 +215,14 @@ export default function Fullpage({ communitySlug }: { communitySlug: string }) {
                       </CardContent>
                     </Card>
                   </div>
-                </div>
+                </div> */}
               </div>
             </TabsContent>
-            <TabsContent value="discussion">
+            {/* <TabsContent value="discussion">
               <DiscussionTab />
-            </TabsContent>
+            </TabsContent> */}
             <TabsContent value="members">
-              <MembersTab />
+              <MembersTab aboutContent={aboutContent} />
             </TabsContent>
             {/* <TabsContent value="events">
               <EventsTab />

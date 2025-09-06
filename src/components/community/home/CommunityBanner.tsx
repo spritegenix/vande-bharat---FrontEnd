@@ -1,6 +1,22 @@
+"use client";
 import ShareMenu from "@/components/posts/ShareMenu";
-import { useJoinCommunity } from "@/queries/community/community.mutation";
+import CoverImage from "@/components/profile/main/CoverImage";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  useDeleteCommunity,
+  useJoinCommunity,
+  useLeaveCommunity,
+} from "@/queries/community/community.mutation";
+import { useUserStore } from "@/stores/userStore";
 import { aboutContentType } from "@/types/community";
+import { useRouter } from "next/navigation";
 import React from "react";
 function dates(date: string) {
   let createdAtDate = new Date(date);
@@ -9,15 +25,40 @@ function dates(date: string) {
 }
 
 export default function CommunityBanner({ aboutContent }: { aboutContent: aboutContentType }) {
+  const router = useRouter();
   const { mutate: joinCommunity } = useJoinCommunity(aboutContent?.slug as string);
+  const {
+    mutate: leaveCommunity,
+    error,
+    isSuccess,
+  } = useLeaveCommunity(aboutContent?.slug as string);
+  const { mutate: removeCommunity } = useDeleteCommunity(aboutContent?.slug as string);
   const handleJoin = () => joinCommunity();
+
+  const handleLeave = () => {
+    leaveCommunity();
+  };
+  const handleDelete = () => {
+    removeCommunity();
+    router.push("/community");
+  };
+  const { user } = useUserStore();
   return (
     <div
       id="community-banner"
       className="overflow-hidden border border-neutral-200 bg-white dark:border-neutral-700 dark:bg-neutral-900"
     >
+      <CoverImage
+        coverImage={aboutContent?.banner}
+        canEdit={
+          aboutContent?.owner._id === user?._id ||
+          aboutContent?.admins.some((admin) => admin._id === user?._id)
+        }
+        entityType="community"
+      />
+
       {/* Cover Image */}
-      <div className="relative h-40 w-full bg-neutral-200 dark:bg-neutral-800 sm:h-52 md:h-64">
+      {/* <div className="relative h-40 w-full bg-neutral-200 dark:bg-neutral-800 sm:h-52 md:h-64">
         <img
           src={aboutContent?.banner ? aboutContent.banner : "/images/profile/coverplaceholder.jpg"}
           alt="Community Cover"
@@ -28,7 +69,7 @@ export default function CommunityBanner({ aboutContent }: { aboutContent: aboutC
             📷 Edit Cover
           </button>
         </div>
-      </div>
+      </div> */}
 
       {/* Main content */}
       <div className="px-4 pb-6 sm:px-6">
@@ -51,7 +92,7 @@ export default function CommunityBanner({ aboutContent }: { aboutContent: aboutC
           </div>
 
           {/* Actions */}
-          <div className="flex flex-wrap gap-2 sm:flex-nowrap sm:gap-0 sm:space-x-3">
+          <div className="flex flex-wrap items-center gap-2 sm:flex-nowrap sm:gap-0 sm:space-x-3">
             {!aboutContent?.isMember && (
               <button
                 onClick={handleJoin}
@@ -65,9 +106,23 @@ export default function CommunityBanner({ aboutContent }: { aboutContent: aboutC
               className="w-full rounded-lg border border-neutral-300 px-4 py-3 hover:bg-neutral-50 dark:border-neutral-600 dark:bg-transparent dark:text-white dark:hover:bg-neutral-800 sm:w-auto"
             />
 
-            <button className="w-full rounded-lg border border-neutral-300 px-3 py-2 hover:bg-neutral-50 dark:border-neutral-600 dark:bg-transparent dark:text-white dark:hover:bg-neutral-800 sm:w-auto">
-              ⋯
-            </button>
+            {aboutContent?.isMember && (
+              <DropdownMenu>
+                <DropdownMenuTrigger className="w-full rounded-lg border border-neutral-300 px-3 py-1 hover:bg-neutral-50 dark:border-neutral-600 dark:bg-transparent dark:text-white dark:hover:bg-neutral-800 sm:w-auto">
+                  ⋯
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  {user?._id !== aboutContent?.owner?._id && (
+                    <DropdownMenuItem onClick={handleLeave}>Leave</DropdownMenuItem>
+                  )}
+                  {user?._id === aboutContent?.owner?._id && (
+                    <DropdownMenuItem onClick={handleDelete} className="text-red-500">
+                      Delete
+                    </DropdownMenuItem>
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
           </div>
         </div>
       </div>

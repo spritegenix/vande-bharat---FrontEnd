@@ -15,12 +15,24 @@ import Link from "next/link";
 import { useInView } from "react-intersection-observer";
 import { useEffect } from "react";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
+import { aboutContentType } from "@/types/community";
+import { useUserStore } from "@/stores/userStore";
+import { canManageContent } from "@/utils/permission";
+import { useRemoveMember, useToggleAdmin } from "@/queries/community/community.mutation";
 
-export function MembersTab() {
+export function MembersTab({ aboutContent }: { aboutContent: aboutContentType }) {
   const slug = useParams().slug as string;
   const { data, isFetchingNextPage, fetchNextPage, hasNextPage } = useFetchCommunityMembers(slug);
+  const { mutate: removeMember } = useRemoveMember(slug);
+  const { mutate: toggleAdmin } = useToggleAdmin(slug);
   const [ref, inView] = useInView({ threshold: 0.1 });
-
+  const { user } = useUserStore();
   useEffect(() => {
     if (inView && hasNextPage && !isFetchingNextPage) {
       fetchNextPage();
@@ -28,6 +40,12 @@ export function MembersTab() {
   }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
   const members = data?.pages.flatMap((page) => page.data) || [];
   const totalMembers = data?.pages?.[0]?.count ?? 0;
+  const handleToggle = (id: string) => {
+    toggleAdmin(id);
+  };
+  const handleremove = (id: string) => {
+    removeMember(id);
+  };
   return (
     <Card className="bg-background">
       <CardHeader className="border-b border-border">
@@ -59,18 +77,48 @@ export function MembersTab() {
             members?.map((member) => (
               <Card key={member._id} className="border border-border">
                 <CardContent className="p-4">
-                  <div className="mb-3 flex items-center space-x-3">
-                    <Avatar className="h-12 w-12">
-                      <AvatarImage src={member.avatar} alt={member.name} />
-                      <AvatarFallback>{member.name[0]}</AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1">
-                      <h4 className="font-medium text-foreground">{member.name}</h4>
-                      <p className="text-sm text-muted-foreground">{member.role}</p>
-                      {/* <span className="mt-1 inline-block rounded bg-muted px-2 py-1 text-xs text-muted-foreground">
+                  <div className="flex justify-between">
+                    <div className="mb-3 flex items-center space-x-3">
+                      <Avatar className="h-12 w-12">
+                        <AvatarImage src={member.avatar} alt={member.name} />
+                        <AvatarFallback>{member.name[0]}</AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1">
+                        <h4 className="font-medium text-foreground">{member.name}</h4>
+                        <p className="text-sm text-muted-foreground">{member.role}</p>
+                        {/* <span className="mt-1 inline-block rounded bg-muted px-2 py-1 text-xs text-muted-foreground">
                         {member.type}
                       </span> */}
+                      </div>
                     </div>
+                    {user &&
+                      member.role !== "owner" &&
+                      canManageContent({ user, content: aboutContent }) && (
+                        <DropdownMenu>
+                          <DropdownMenuTrigger className="h-fit w-fit rounded-lg border border-neutral-300 px-1 hover:bg-neutral-50 dark:border-neutral-600 dark:bg-transparent dark:text-white dark:hover:bg-neutral-800 sm:w-auto">
+                            ⋯
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => handleremove(member?._id)}>
+                              Remove
+                            </DropdownMenuItem>
+                            {aboutContent?.owner._id === user._id && (
+                              <>
+                                {member.role !== "admin" && (
+                                  <DropdownMenuItem onClick={() => handleToggle(member?._id)}>
+                                    Make Admin
+                                  </DropdownMenuItem>
+                                )}
+                                {member.role === "admin" && (
+                                  <DropdownMenuItem onClick={() => handleToggle(member?._id)}>
+                                    Remove Admin
+                                  </DropdownMenuItem>
+                                )}
+                              </>
+                            )}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      )}
                   </div>
 
                   {/* <div className="mb-4 flex items-center justify-between text-sm text-muted-foreground">
@@ -79,7 +127,7 @@ export function MembersTab() {
                   </div> */}
 
                   <Button asChild className="w-full" variant="default">
-                    <Link href={`/profile/${member.slug}`}>View Profile</Link>
+                    <Link href={`/profile/${member?.slug}`}>View Profile</Link>
                   </Button>
                 </CardContent>
               </Card>

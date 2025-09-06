@@ -80,3 +80,26 @@ export const joinCommunity = async(axios: AxiosInstance, communitySlug: string) 
     const response = await axios.patch(`/communities/${communitySlug}/single/join`);
     return response.data
 } 
+
+export const leaveCommunity = async(axios: AxiosInstance, communitySlug: string) => {
+    const response = await axios.patch(`/communities/${communitySlug}/leave`);
+    return response.data
+}
+
+export const deleteCommunity = async(axios: AxiosInstance, communitySlug: string) => {
+    const response = await axios.patch(`/communities/${communitySlug}/delete`);
+    return response.data
+}
+
+export const toggleAdmin = async(axios: AxiosInstance, {communitySlug, memberId}: {communitySlug: string, memberId: string}) => {
+    const response = await axios.patch(`/communities/${communitySlug}/toggle-member-promotion`, {
+      memberId
+    });
+    return response.data
+}
+export const removeMember = async(axios: AxiosInstance, {communitySlug, memberId}: {communitySlug: string, memberId: string}) => {
+    const response = await axios.patch(`/communities/${communitySlug}/member/remove`, {
+      memberId
+    });
+    return response.data
+  }
