@@ -1,32 +1,29 @@
 export interface communityPost {
-    name:string,
-    description:string,
-    banner:string,
-    isPrivate:boolean
-     tags?:string[],
-    rules?:string[],
-    location?:string,
-    category?:string,
+  name: string;
+  description: string;
+  banner: string;
+  isPrivate: boolean;
+  tags?: string[];
+  rules?: string[];
+  location?: string;
+  category?: string;
 }
 
 export interface CommunityDiscussionType {
-    title:string,
-    content:string
+  title: string;
+  content: string;
 }
-
 
 export interface updateCommunityInfoType {
-    name?:string,
-    description?:string,
-    isPrivate?:boolean,
-    tags?:string[],
-    rules?:string[],
-    location?:string,
-    category?:string,
-    banner?:string,
+  name?: string;
+  description?: string;
+  isPrivate?: boolean;
+  tags?: string[];
+  rules?: string[];
+  location?: string;
+  category?: string;
+  banner?: string;
 }
-
-
 
 export type admin = {
   _id: string;
@@ -44,12 +41,12 @@ export type aboutContentType = {
   category: string;
   location: string;
   owner: admin;
-  admins: admin[];
-  isprivate?: boolean;
+  admins: String[];
+  isPrivate?: boolean;
   createdAt?: string;
-  totalMemberCount?: number;  
+  totalMemberCount?: number;
   isMember?: boolean;
-
+  requestStatus?: string | null;
 };
 
 export interface AboutTabProps {

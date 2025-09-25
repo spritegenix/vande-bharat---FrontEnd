@@ -18,6 +18,7 @@ import {
   useFetchCommunityPosts,
 } from "@/queries/community/community.queries";
 import { useSearchParams, usePathname, useRouter, useParams } from "next/navigation";
+import RecievedRequest from "./Request/RecievedRequest";
 export default function Fullpage({ communitySlug }: { communitySlug: string }) {
   const { user } = useUserStore();
   const slug = useParams();
@@ -27,7 +28,7 @@ export default function Fullpage({ communitySlug }: { communitySlug: string }) {
     isFetching,
   } = useFetchCommunityabout(slug.slug as string);
 
-  const tabOptions = ["Feed", "Members", "About"];
+  const tabOptions = ["Feed", "Members", "About", "Requests"];
   const { data, isLoading, isError, isFetchingNextPage, fetchNextPage, hasNextPage } =
     useFetchCommunityPosts(communitySlug);
   const searchParams = useSearchParams();
@@ -57,7 +58,11 @@ export default function Fullpage({ communitySlug }: { communitySlug: string }) {
         >
           <Tabs value={selectedTab} onValueChange={handleTabChange}>
             <TabsList className="flex justify-start bg-transparent md:gap-6">
-              {tabOptions.map((tab) => (
+              {(user?._id === aboutContent?.owner?._id ||
+              aboutContent?.admins.some((admin: string) => admin === user?._id)
+                ? tabOptions
+                : tabOptions.slice(0, 3)
+              ).map((tab) => (
                 <TabsTrigger
                   key={tab}
                   value={tab.toLowerCase()}
@@ -224,6 +229,7 @@ export default function Fullpage({ communitySlug }: { communitySlug: string }) {
             <TabsContent value="members">
               <MembersTab aboutContent={aboutContent} />
             </TabsContent>
+
             {/* <TabsContent value="events">
               <EventsTab />
             </TabsContent> */}
@@ -233,6 +239,9 @@ export default function Fullpage({ communitySlug }: { communitySlug: string }) {
                 isLoading={aboutLoading}
                 isFetching={isFetching}
               />
+            </TabsContent>
+            <TabsContent value="requests">
+              <RecievedRequest communitySlug={communitySlug} />
             </TabsContent>
           </Tabs>
         </div>

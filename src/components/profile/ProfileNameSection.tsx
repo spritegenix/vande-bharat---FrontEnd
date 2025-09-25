@@ -15,15 +15,18 @@ import { toast } from "sonner";
 import { useUserStore } from "@/stores/userStore";
 import { useParams } from "next/navigation";
 import { useAuthAxios } from "@/lib/axios";
+import { useSendRequest } from "@/queries/user/user.mutation";
 
 export default function ProfileNameSection({
   profileImage,
   name,
   followStatus,
+  canEdit,
 }: {
   profileImage: string;
   name: string;
   followStatus: "PENDING" | "ACCEPTED" | "REJECTED" | "CANCELLED" | null;
+  canEdit: boolean;
 }) {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [imageSrc, setImageSrc] = useState<string>(
@@ -74,7 +77,10 @@ export default function ProfileNameSection({
       console.error("onError:", err?.message || err);
     },
   });
-
+  const { mutate } = useSendRequest();
+  const handleFollow = (id: string) => {
+    mutate({ toUserId: id });
+  };
   return (
     <div className="absolute bottom-6 w-full md:-bottom-4 lg:-bottom-0">
       <div className="relative flex w-full flex-col items-center justify-between md:flex-row md:items-end">
@@ -137,17 +143,23 @@ export default function ProfileNameSection({
             </h2>
           </div>
         </div>
-        <div className="md:m-5 md:mr-9">
-          {followStatus !== "REJECTED" && (
-            <Button className="px-4 py-2 text-gray-900 dark:bg-offwhite">
-              {followStatus === "PENDING"
-                ? "Requested"
-                : followStatus === "ACCEPTED"
-                  ? "Following"
-                  : "Follow"}
-            </Button>
-          )}
-        </div>
+
+        {!canEdit && (
+          <div className="md:m-5 md:mr-9">
+            {followStatus !== "REJECTED" && (
+              <Button
+                className="px-4 py-2 text-gray-900 dark:bg-offwhite"
+                onClick={() => user && handleFollow(user._id)}
+              >
+                {followStatus === "PENDING"
+                  ? "Requested"
+                  : followStatus === "ACCEPTED"
+                    ? "Following"
+                    : "Follow"}
+              </Button>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

@@ -35,14 +35,14 @@ export const useSendRequest = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ toUserId }: { toUserId: string }) =>
-      sendFollowRequest(axios, toUserId),
+    mutationFn: ({ toUserId }: { toUserId: string }) => sendFollowRequest(axios, toUserId),
     onSuccess: () => {
       toast.success("Friend request sent");
       queryClient.invalidateQueries({ queryKey: ["fetch-posts"] });
       queryClient.invalidateQueries({ queryKey: ["friend-suggestions"] });
       queryClient.invalidateQueries({ queryKey: ["bookmarked-posts"] });
       queryClient.invalidateQueries({ queryKey: ["allSent-requests"] });
+      queryClient.invalidateQueries({ queryKey: ["user-by-id"] });
     },
     onError: (err: any) => {
       toast.error(err?.response?.data?.message || "Failed to send request");
@@ -54,8 +54,7 @@ export const useCancelRequest = () => {
   const axios = useAuthAxios();
 
   return useMutation({
-    mutationFn: ({ toUserId }: { toUserId: string }) =>
-      cancelRequest(axios, toUserId),
+    mutationFn: ({ toUserId }: { toUserId: string }) => cancelRequest(axios, toUserId),
   });
 };
 
@@ -64,8 +63,7 @@ export const useRemoveSuggestion = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ toUserId }: { toUserId: string }) =>
-      removeSuggestion(axios, toUserId),
+    mutationFn: ({ toUserId }: { toUserId: string }) => removeSuggestion(axios, toUserId),
     onSuccess: () => {
       toast.error(`Removed from suggestions.`);
       queryClient.invalidateQueries({ queryKey: ["friend-suggestions"] });
@@ -81,8 +79,7 @@ export const useAcceptRequest = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ toUserId }: { toUserId: string }) =>
-      acceptFollowRequest(axios, toUserId),
+    mutationFn: ({ toUserId }: { toUserId: string }) => acceptFollowRequest(axios, toUserId),
     onSuccess: () => {
       toast.success("Request accepted successfully");
       queryClient.invalidateQueries({ queryKey: ["recieved-requests"] });
@@ -98,8 +95,7 @@ export const useRejectRecievedRequest = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ fromUserId }: { fromUserId: string }) =>
-      removeSuggestion(axios, fromUserId),
+    mutationFn: ({ fromUserId }: { fromUserId: string }) => removeSuggestion(axios, fromUserId),
     onSuccess: () => {
       toast.error(`Removed from requests.`);
       queryClient.invalidateQueries({ queryKey: ["recieved-requests"] });
@@ -115,8 +111,7 @@ export const useUnfriend = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ toUserId }: { toUserId: string }) =>
-      unfriendUser(axios, toUserId),
+    mutationFn: ({ toUserId }: { toUserId: string }) => unfriendUser(axios, toUserId),
     onSuccess: () => {
       toast.error("Unfriended successfully.");
       queryClient.invalidateQueries({ queryKey: ["following-Users"] });
@@ -128,5 +123,3 @@ export const useUnfriend = () => {
     },
   });
 };
-
-

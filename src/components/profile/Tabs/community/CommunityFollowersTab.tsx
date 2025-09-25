@@ -5,13 +5,13 @@ import { Loader } from "lucide-react";
 import SkeletonCard from "@/components/common/SkeletonCard";
 import { useInView } from "react-intersection-observer";
 
-export default function CommunityTab({ slug }: { slug: string }) {
+export default function CommunityFollowersTab({ slug }: { slug: string }) {
   const { data, isFetchingNextPage, fetchNextPage, hasNextPage, isLoading } =
-    useMyCommunities(slug);
+    useFollowingCommunities(slug);
 
   const { ref } = useInView({
     threshold: 0,
-    rootMargin: "100px", // Trigger 100px before element comes into view
+    rootMargin: "100px",
     onChange: (inView) => {
       if (inView && hasNextPage && !isFetchingNextPage) {
         fetchNextPage();
@@ -19,7 +19,7 @@ export default function CommunityTab({ slug }: { slug: string }) {
     },
   });
 
-  const myCommunities = data?.pages.flatMap((page) => page.communities) ?? [];
+  const myCommunities = data?.pages.flatMap((page) => page.followingCommunity) ?? [];
 
   return (
     <div className="p-4">
@@ -29,7 +29,7 @@ export default function CommunityTab({ slug }: { slug: string }) {
         </div>
       ) : myCommunities.length === 0 ? (
         <div className="text-center text-gray-600 dark:text-gray-400">
-          "You have not created any communities yet."
+          "You have not joined any communities yet."
         </div>
       ) : (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">

@@ -32,10 +32,12 @@ export const getPresignedUrl = async (axios: AxiosInstance, file: File, folder: 
 
 export const uploadToS3 = async (axios: AxiosInstance, uploadUrl: string, file: File | Blob) => {
   try {
-      const response =  await axios.put(uploadUrl, file, {
-      headers: { "Content-Type": file.type },withCredentials: false, _skipAuth: true,
-    }as any);
-     if (response.status === 200 || response.status === 204) {
+    const response = await axios.put(uploadUrl, file, {
+      headers: { "Content-Type": file.type },
+      withCredentials: false,
+      _skipAuth: true,
+    } as any);
+    if (response.status === 200 || response.status === 204) {
       // Upload succeeded
       return true;
     } else {
@@ -43,9 +45,8 @@ export const uploadToS3 = async (axios: AxiosInstance, uploadUrl: string, file: 
     }
   } catch (error: any) {
     toast.error("Image upload failed. Please try again.");
-     console.log(error)
+    console.log(error);
     throw new Error("Failed to upload file to S3");
-   
   }
 };
 
@@ -56,7 +57,7 @@ export const updateUserCover = async (axios: AxiosInstance, imageUrl: string) =>
     }
     const res = await axios.patch("/users/me", { banner: imageUrl });
     return res.data;
-  }catch (error: any) {
+  } catch (error: any) {
     toast.error("Failed to update cover photo. Please try again.");
     console.error("Error updating cover photo:", error);
     throw error; // rethrow to handle it in the calling function
@@ -128,10 +129,25 @@ export const unfriendUser = async (axios: AxiosInstance, toUserId: string) => {
   return res.data;
 };
 
-
-export const myCommunities = async(axios: AxiosInstance, pageParam: string | null = null, slug:string) => {
+export const myCommunities = async (
+  axios: AxiosInstance,
+  pageParam: string | null = null,
+  slug: string,
+) => {
   const res = await axios.get(`/users/mycommunity/${slug}`, {
     params: { cursor: pageParam, limit: 3 },
   });
   return res.data.data;
-}
+};
+
+export const followingCommunities = async (
+  axios: AxiosInstance,
+  pageParam: string | null = null,
+  slug: string,
+) => {
+  const res = await axios.get(`/users/following-community/${slug}`, {
+    params: { cursor: pageParam, limit: 4 },
+  });
+  console.log("res", res.data);
+  return res.data.data;
+};

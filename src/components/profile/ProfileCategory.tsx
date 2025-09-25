@@ -11,8 +11,16 @@ import { useFetchUserPosts } from "@/queries/posts/posts.queries";
 import { useUserStore } from "@/stores/userStore";
 import FollowersProfileList from "./FollowersProfile";
 import CommunityTab from "./Tabs/community/CommunityTab";
+import CommunityFollowersTab from "./Tabs/community/CommunityFollowersTab";
 
-const tabOptions = ["posts", "about", "Following", "Followers", "Communities"];
+const tabOptions = [
+  "Posts",
+  "About",
+  "Following",
+  "Followers",
+  "Following Communities",
+  "Communities",
+];
 
 export default function ProfileTabs({ slug }: { slug: string }) {
   const searchParams = useSearchParams();
@@ -34,7 +42,7 @@ export default function ProfileTabs({ slug }: { slug: string }) {
   };
   return (
     <Tabs value={selectedTab} onValueChange={handleTabChange} className="mt-5 border-t-2">
-      <TabsList className="flex justify-start bg-transparent md:gap-6">
+      <TabsList className="flex justify-start bg-transparent max-[600px]:overflow-y-hidden max-[600px]:overflow-x-scroll md:gap-6">
         {tabOptions.map((tab) => (
           <TabsTrigger
             key={tab}
@@ -69,6 +77,10 @@ export default function ProfileTabs({ slug }: { slug: string }) {
       </TabsContent>
       <TabsContent value="followers">
         <FollowersProfileList slug={slug} />
+      </TabsContent>
+
+      <TabsContent value="following communities">
+        <CommunityFollowersTab slug={slug} />
       </TabsContent>
 
       <TabsContent value="communities">

@@ -23,7 +23,6 @@ export default function RequestsPage() {
         </TabsList>
 
         <TabsContent value="received">
-          {/* Replace with your actual received requests component */}
           <RecievedRequest />
         </TabsContent>
 

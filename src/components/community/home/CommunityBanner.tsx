@@ -12,6 +12,7 @@ import {
 import {
   useDeleteCommunity,
   useJoinCommunity,
+  useJoinPrivateCommunity,
   useLeaveCommunity,
 } from "@/queries/community/community.mutation";
 import { useUserStore } from "@/stores/userStore";
@@ -26,6 +27,7 @@ function dates(date: string) {
 
 export default function CommunityBanner({ aboutContent }: { aboutContent: aboutContentType }) {
   const router = useRouter();
+
   const { mutate: joinCommunity } = useJoinCommunity(aboutContent?.slug as string);
   const {
     mutate: leaveCommunity,
@@ -33,7 +35,10 @@ export default function CommunityBanner({ aboutContent }: { aboutContent: aboutC
     isSuccess,
   } = useLeaveCommunity(aboutContent?.slug as string);
   const { mutate: removeCommunity } = useDeleteCommunity(aboutContent?.slug as string);
-  const handleJoin = () => joinCommunity();
+  const { mutate: joinPrivateCommunity } = useJoinPrivateCommunity(aboutContent?.slug as string);
+  const handleJoin = () => {
+    aboutContent?.isPrivate ? joinPrivateCommunity() : joinCommunity();
+  };
 
   const handleLeave = () => {
     leaveCommunity();
@@ -52,7 +57,7 @@ export default function CommunityBanner({ aboutContent }: { aboutContent: aboutC
         coverImage={aboutContent?.banner}
         canEdit={
           aboutContent?.owner._id === user?._id ||
-          aboutContent?.admins.some((admin) => admin._id === user?._id)
+          aboutContent?.admins.some((admin) => admin === user?._id)
         }
         entityType="community"
       />
@@ -85,7 +90,7 @@ export default function CommunityBanner({ aboutContent }: { aboutContent: aboutC
               </p>
               <div className="flex flex-wrap items-center gap-x-4 text-sm text-neutral-500 dark:text-neutral-400">
                 <span>👥 {aboutContent?.totalMemberCount} members</span>
-                <span>👁️ {aboutContent?.isprivate ? "Private" : "Public"}</span>
+                <span>👁️ {aboutContent?.isPrivate ? "Private" : "Public"}</span>
                 <span>📅 Created {aboutContent?.createdAt && dates(aboutContent?.createdAt)}</span>
               </div>
             </div>
@@ -96,9 +101,16 @@ export default function CommunityBanner({ aboutContent }: { aboutContent: aboutC
             {!aboutContent?.isMember && (
               <button
                 onClick={handleJoin}
+                disabled={aboutContent?.requestStatus === "PENDING"}
                 className="w-full rounded-lg bg-neutral-900 px-6 py-2 text-white hover:bg-neutral-800 dark:bg-white dark:text-black dark:hover:bg-neutral-200 sm:w-auto"
               >
-                ➕ Join Community
+                {aboutContent?.requestStatus === null && aboutContent?.isPrivate
+                  ? "➕ Send Request to Join"
+                  : aboutContent?.requestStatus === "PENDING"
+                    ? "Request Sent"
+                    : aboutContent?.requestStatus === "REJECTED"
+                      ? "➕ Join Community"
+                      : "➕ Join Community"}
               </button>
             )}
             <ShareMenu

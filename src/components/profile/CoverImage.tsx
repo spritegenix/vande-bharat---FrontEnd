@@ -32,6 +32,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
       <ProfileNameSection
         profileImage={profileImage || "/images/profile/profileplaceholder.jpg"}
         name={name}
+        canEdit={user?.slug === slug}
         followStatus={followStatus}
       />
     </div>
