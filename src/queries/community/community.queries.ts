@@ -3,6 +3,7 @@
 import { useAuthAxios } from "@/lib/axios";
 import { useInfiniteQuery, useQuery, UseQueryOptions } from "@tanstack/react-query";
 import {
+  communitySuggestions,
   fetchCommunityMembers,
   fetchCommunityPosts,
   getCommunityInfo,
@@ -81,6 +82,19 @@ export const useFetchJoinRequests = (communitySlug: string) => {
   return useInfiniteQuery({
     queryKey: ["community-join-requests", communitySlug],
     queryFn: () => getJoinRequests(axios, communitySlug),
+    initialPageParam: null,
+    getNextPageParam: (lastPage) => lastPage?.nextCursor ?? null,
+    staleTime: 1000 * 60 * 5,
+    refetchOnWindowFocus: false,
+    retry: 1,
+  });
+};
+
+export const useCommunitySuggestions = () => {
+  const axios = useAuthAxios();
+  return useInfiniteQuery({
+    queryKey: ["community-suggestions"],
+    queryFn: ({ pageParam = null }) => communitySuggestions(axios, pageParam),
     initialPageParam: null,
     getNextPageParam: (lastPage) => lastPage?.nextCursor ?? null,
     staleTime: 1000 * 60 * 5,

@@ -147,3 +147,13 @@ export const respondToJoinRequest = async (
   });
   return response.data;
 };
+
+export const communitySuggestions = async (axios: AxiosInstance, pageParam: string | null) => {
+  const response = await axios.get("/communities/suggested-communities", {
+    params: {
+      cursor: pageParam,
+      limit: 5,
+    },
+  });
+  return response.data.data;
+};

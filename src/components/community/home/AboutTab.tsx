@@ -25,6 +25,7 @@ import { useParams } from "next/navigation";
 import { useUpdateCommunity } from "@/queries/community/community.mutation";
 import { useUserStore } from "@/stores/userStore";
 import { AboutTabProps, admin } from "@/types/community";
+import { canManageContent } from "@/utils/permission";
 
 export default function AboutTabEditor({ aboutContent, isLoading, isFetching }: AboutTabProps) {
   const slug = useParams();
@@ -97,14 +98,11 @@ export default function AboutTabEditor({ aboutContent, isLoading, isFetching }: 
     <Card className="rounded-lg border bg-background shadow-sm">
       <CardHeader className="flex items-center justify-between">
         <CardTitle className="mb-1 text-2xl text-foreground">About This Community</CardTitle>
-        {user &&
-          (user._id === aboutContent?.owner._id ||
-            aboutContent?.admins.some((admin: admin) => admin._id === user._id)) &&
-          !isEditing && (
-            <Button variant="outline" onClick={() => setIsEditing(true)}>
-              Edit
-            </Button>
-          )}
+        {user && canManageContent({ user, content: aboutContent }) && !isEditing && (
+          <Button variant="outline" onClick={() => setIsEditing(true)}>
+            Edit
+          </Button>
+        )}
       </CardHeader>
 
       <Separator />

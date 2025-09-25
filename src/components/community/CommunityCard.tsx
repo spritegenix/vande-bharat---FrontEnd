@@ -8,6 +8,7 @@ import { useState } from "react";
 interface CommunityCardProps {
   id: string;
   name: string;
+  slug: string;
   description: string;
   imageUrl?: string;
   membersCount: number;
@@ -17,6 +18,7 @@ interface CommunityCardProps {
 export default function CommunityCard({
   id,
   name,
+  slug,
   description,
   imageUrl,
   membersCount,
@@ -40,11 +42,11 @@ export default function CommunityCard({
         </div>
 
         <div className="flex w-full flex-col p-2">
-          <Link href={`/community/${id}`} className="text-lg font-semibold hover:underline">
+          <Link href={`/community/${slug}`} className="text-lg font-semibold hover:underline">
             {name}
           </Link>
           <p className="line-clamp-2 text-sm text-muted-foreground">{description}</p>
-          <p className="mt-1 text-xs text-zinc-500">{membersCount.toLocaleString()} members</p>
+          <p className="mt-1 text-xs text-zinc-500">{membersCount} members</p>
         </div>
       </div>
       <div className="w-full p-5">
