@@ -14,6 +14,9 @@ import {
   Users,
   Plus,
   UserPlus,
+  GitPullRequest,
+  UserRoundPlus,
+  Inbox,
 } from "lucide-react";
 import Modal from "../elements/Modal";
 import CreatePageForm from "./CreatePageForm";
@@ -64,9 +67,9 @@ export default function MenuBar({ className }: MenuBarProps) {
             />
           )}
           <MenuTab icon={<Bookmark />} label="Bookmarks" href="/bookmarks" />
-          <MenuTab icon={<Users />} label="Requests" href="/profile/requests" />
-          <MenuTab icon={<UserPlus />} label="Add Saathis" href="/profile" />
-          <MenuTab icon={<Folder />} label="Communities" href="/community" />
+          <MenuTab icon={<Inbox />} label="Requests" href="/profile/requests" />
+          <MenuTab icon={<UserRoundPlus />} label="Add Saathis" href="/profile" />
+          <MenuTab icon={<Users />} label="Communities" href="/community" />
         </div>
         <hr className="my-4 w-full max-w-52 border-t" />
         {/* ---------------------------Following---------------------------  */}
@@ -110,7 +113,7 @@ export default function MenuBar({ className }: MenuBarProps) {
         <Button variant={"outline"} asChild className="my-3 ml-4 border-gray-500">
           <Link href={`/community/create`} className="flex items-center gap-3">
             <Plus size={28} />
-            <p className="">Create New Page</p>
+            <p className="">Create Community</p>
           </Link>
         </Button>
 

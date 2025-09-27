@@ -14,7 +14,7 @@ interface WrapperProps {
 
 export default function Wrapper({
   containerClassName = "",
-  bgColor = "bg-transparent",
+  bgColor = "bg-background",
   isTop = false,
   isTop2 = false,
   children,

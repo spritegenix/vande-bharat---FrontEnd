@@ -36,7 +36,7 @@ export default function BookmarksPage() {
   if (isError) return <p className="text-center text-red-500">Failed to load bookmarks.</p>;
   if (!allBookmarks.length)
     return <p className="mt-10 text-center text-gray-500">No bookmarks found.</p>;
-  console.log(data);
+
   return (
     <>
       {allBookmarks.map(({ _id, postId }) => (

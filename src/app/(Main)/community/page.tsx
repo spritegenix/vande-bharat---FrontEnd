@@ -12,7 +12,11 @@ export default function CommunityListPage() {
       <h1 className="mb-4 text-2xl font-bold">Communities You Might Like</h1>
 
       {isLoading ? (
-        Array.from({ length: 8 }).map((_, index) => <SkeletonCard key={index} />)
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+          {Array.from({ length: 3 }).map((_, index) => (
+            <SkeletonCard key={index} />
+          ))}
+        </div>
       ) : (
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           {suggestions.map((community, i) => (
@@ -24,6 +28,7 @@ export default function CommunityListPage() {
               description={community.description}
               imageUrl={community.banner}
               membersCount={community.followingCount}
+              isPrivate={community.isPrivate}
             />
           ))}
         </div>

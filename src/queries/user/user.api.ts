@@ -148,6 +148,6 @@ export const followingCommunities = async (
   const res = await axios.get(`/users/following-community/${slug}`, {
     params: { cursor: pageParam, limit: 4 },
   });
-  console.log("res", res.data);
+
   return res.data.data;
 };

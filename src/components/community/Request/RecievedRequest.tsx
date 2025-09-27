@@ -9,7 +9,6 @@ export default function RecievedRequest({ communitySlug }: { communitySlug: stri
     useFetchJoinRequests(communitySlug);
   const { mutate } = useRespondtoJoinRequest(communitySlug);
   const handleAccept = (id: string) => {
-    console.log(id);
     mutate({ fromUserId: id, action: "ACCEPTED" });
   };
 

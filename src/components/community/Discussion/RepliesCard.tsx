@@ -26,9 +26,7 @@ export function ReplyCard({ discussionSlug }: Props) {
     }
     setShowReplies((prev) => !prev);
   };
-  const handleSave = () => {
-    console.log("hello");
-  };
+  const handleSave = () => {};
   return (
     <div className="mt-4 border-t pt-4">
       {/* Always show text area */}

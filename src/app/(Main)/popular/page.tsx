@@ -50,7 +50,6 @@ export default function page() {
   };
   const showOwnPostsOnly = false;
   const allPosts = popularPosts?.pages.flatMap((page) => page.posts);
-  console.log("popularPOst", allPosts);
   if (isLoading) return <LoadingSpinner />;
   if (isError) return <p>Fetching Bookmark failed</p>;
   return (

@@ -35,7 +35,9 @@ export default function CommunityBanner({ aboutContent }: { aboutContent: aboutC
     isSuccess,
   } = useLeaveCommunity(aboutContent?.slug as string);
   const { mutate: removeCommunity } = useDeleteCommunity(aboutContent?.slug as string);
-  const { mutate: joinPrivateCommunity } = useJoinPrivateCommunity(aboutContent?.slug as string);
+  const { mutate: joinPrivateCommunity } = useJoinPrivateCommunity({
+    slug: String(aboutContent?.slug),
+  });
   const handleJoin = () => {
     aboutContent?.isPrivate ? joinPrivateCommunity() : joinCommunity();
   };
@@ -102,7 +104,7 @@ export default function CommunityBanner({ aboutContent }: { aboutContent: aboutC
               <button
                 onClick={handleJoin}
                 disabled={aboutContent?.requestStatus === "PENDING"}
-                className="w-full rounded-lg bg-neutral-900 px-6 py-2 text-white hover:bg-neutral-800 dark:bg-white dark:text-black dark:hover:bg-neutral-200 sm:w-auto"
+                className="w-full rounded-lg border border-neutral-300 px-3 py-2 hover:bg-neutral-50 dark:border-neutral-600 dark:bg-transparent dark:text-white dark:hover:bg-neutral-800 sm:w-auto"
               >
                 {aboutContent?.requestStatus === null && aboutContent?.isPrivate
                   ? "➕ Send Request to Join"
@@ -115,7 +117,7 @@ export default function CommunityBanner({ aboutContent }: { aboutContent: aboutC
             )}
             <ShareMenu
               postUrl={`${aboutContent?.slug}`}
-              className="w-full rounded-lg border border-neutral-300 px-4 py-3 hover:bg-neutral-50 dark:border-neutral-600 dark:bg-transparent dark:text-white dark:hover:bg-neutral-800 sm:w-auto"
+              className="w-full rounded-lg border border-neutral-300 px-4 py-4 hover:bg-neutral-50 dark:border-neutral-600 dark:bg-transparent dark:text-white dark:hover:bg-neutral-800 sm:w-auto"
             />
 
             {aboutContent?.isMember && (

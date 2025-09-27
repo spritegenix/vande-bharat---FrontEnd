@@ -51,28 +51,39 @@ export default function Fullpage({ communitySlug }: { communitySlug: string }) {
         <CommunityBanner aboutContent={aboutContent} />
         {/* 
     <!-- Navigation Tabs --> */}
-
-        <div
-          id="community-tabs"
-          className="sticky top-12 z-40 border-b border-neutral-200 bg-white py-4 dark:border-neutral-700 dark:bg-neutral-900"
-        >
-          <Tabs value={selectedTab} onValueChange={handleTabChange}>
-            <TabsList className="flex justify-start bg-transparent md:gap-6">
-              {(user?._id === aboutContent?.owner?._id ||
-              aboutContent?.admins.some((admin: string) => admin === user?._id)
-                ? tabOptions
-                : tabOptions.slice(0, 3)
-              ).map((tab) => (
-                <TabsTrigger
-                  key={tab}
-                  value={tab.toLowerCase()}
-                  className="px-2 py-1 transition data-[state=active]:rounded-none data-[state=active]:border-b-2 data-[state=active]:border-blue-500 data-[state=active]:text-blue-600 data-[state=active]:shadow-none"
-                >
-                  {tab}
-                </TabsTrigger>
-              ))}
-            </TabsList>
-            {/* <TabsList className="w-full justify-start space-x-4 border-none bg-transparent p-0">
+        {aboutContent?.isPrivate && !aboutContent?.isMember ? (
+          <div className="flex items-center justify-center p-8 shadow-md dark:border-neutral-700 dark:bg-neutral-900">
+            <div className="text-center">
+              <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
+                Private Community
+              </h2>
+              <p className="mt-2 text-gray-600 dark:text-white">
+                You must be a member to see the content of this community.
+              </p>
+            </div>
+          </div>
+        ) : (
+          <div
+            id="community-tabs"
+            className="sticky top-12 z-40 border-b border-neutral-200 bg-white py-4 dark:border-neutral-700 dark:bg-neutral-900"
+          >
+            <Tabs value={selectedTab} onValueChange={handleTabChange}>
+              <TabsList className="flex justify-start bg-transparent md:gap-6">
+                {(user?._id === aboutContent?.owner?._id ||
+                aboutContent?.admins.some((admin: string) => admin === user?._id)
+                  ? tabOptions
+                  : tabOptions.slice(0, 3)
+                ).map((tab) => (
+                  <TabsTrigger
+                    key={tab}
+                    value={tab.toLowerCase()}
+                    className="px-2 py-1 transition data-[state=active]:rounded-none data-[state=active]:border-b-2 data-[state=active]:border-blue-500 data-[state=active]:text-blue-600 data-[state=active]:shadow-none"
+                  >
+                    {tab}
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+              {/* <TabsList className="w-full justify-start space-x-4 border-none bg-transparent p-0">
                 <TabsTrigger
                   value="feed"
                   className="border-b-2 border-transparent px-1 text-sm text-neutral-500 hover:text-neutral-700 data-[state=active]:border-b-2 data-[state=active]:border-neutral-900 data-[state=active]:text-neutral-900 dark:text-neutral-400 dark:hover:text-white dark:data-[state=active]:border-white dark:data-[state=active]:text-white"
@@ -110,22 +121,22 @@ export default function Fullpage({ communitySlug }: { communitySlug: string }) {
                   About
                 </TabsTrigger>
               </TabsList> */}
-            <TabsContent value="feed">
-              <div className="grid grid-cols-12 gap-6">
-                <div className="col-span-12">
-                  <Feed user={user} communitySlug={communitySlug} />
-                  <FeedsSection
-                    isLoading={isLoading}
-                    isError={isError}
-                    fetchNextPage={fetchNextPage}
-                    hasNextPage={hasNextPage}
-                    isFetchingNextPage={isFetchingNextPage}
-                    posts={data?.pages.flatMap((page) => page.posts) || []}
-                    showOwnPostsOnly={true}
-                    slug={communitySlug}
-                  />
-                </div>
-                {/* <div id="community-sidebar" className="col-span-4">
+              <TabsContent value="feed">
+                <div className="grid grid-cols-12 gap-6">
+                  <div className="col-span-12">
+                    <Feed user={user} communitySlug={communitySlug} />
+                    <FeedsSection
+                      isLoading={isLoading}
+                      isError={isError}
+                      fetchNextPage={fetchNextPage}
+                      hasNextPage={hasNextPage}
+                      isFetchingNextPage={isFetchingNextPage}
+                      posts={data?.pages.flatMap((page) => page.posts) || []}
+                      showOwnPostsOnly={true}
+                      slug={communitySlug}
+                    />
+                  </div>
+                  {/* <div id="community-sidebar" className="col-span-4">
                   <div className="space-y-6">
                     {/* Community Stats 
                     <Card>
@@ -221,30 +232,31 @@ export default function Fullpage({ communitySlug }: { communitySlug: string }) {
                     </Card>
                   </div>
                 </div> */}
-              </div>
-            </TabsContent>
-            {/* <TabsContent value="discussion">
+                </div>
+              </TabsContent>
+              {/* <TabsContent value="discussion">
               <DiscussionTab />
             </TabsContent> */}
-            <TabsContent value="members">
-              <MembersTab aboutContent={aboutContent} />
-            </TabsContent>
+              <TabsContent value="members">
+                <MembersTab aboutContent={aboutContent} />
+              </TabsContent>
 
-            {/* <TabsContent value="events">
+              {/* <TabsContent value="events">
               <EventsTab />
             </TabsContent> */}
-            <TabsContent value="about">
-              <AboutTabEditor
-                aboutContent={aboutContent}
-                isLoading={aboutLoading}
-                isFetching={isFetching}
-              />
-            </TabsContent>
-            <TabsContent value="requests">
-              <RecievedRequest communitySlug={communitySlug} />
-            </TabsContent>
-          </Tabs>
-        </div>
+              <TabsContent value="about">
+                <AboutTabEditor
+                  aboutContent={aboutContent}
+                  isLoading={aboutLoading}
+                  isFetching={isFetching}
+                />
+              </TabsContent>
+              <TabsContent value="requests">
+                <RecievedRequest communitySlug={communitySlug} />
+              </TabsContent>
+            </Tabs>
+          </div>
+        )}
       </div>
     </main>
   );

@@ -72,6 +72,7 @@ export const useJoinCommunity = (communitySlug: string) => {
       toast.success("Joined Community successfully!");
       queryClient.invalidateQueries({ queryKey: ["community-about"] });
       queryClient.invalidateQueries({ queryKey: ["community-members"] });
+      queryClient.invalidateQueries({ queryKey: ["community-suggestions"] });
     },
     onError: (error: any) => {
       toast.error("Failed to join Community: " + (error?.response?.data?.message || error.message));
@@ -145,14 +146,24 @@ export const useRemoveMember = (communitySlug: string) => {
   });
 };
 
-export const useJoinPrivateCommunity = (communitySlug: string) => {
+export const useJoinPrivateCommunity = ({
+  onSuccess,
+  slug,
+}: {
+  onSuccess?: (data: any) => void;
+  slug: string;
+}) => {
   const axios = useAuthAxios();
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: () => joinPrivateCommunity(axios, { communitySlug }),
-    onSuccess: () => {
+    mutationFn: () => joinPrivateCommunity(axios, { communitySlug: slug }),
+    onSuccess: (data) => {
       toast.success("Joined Community Request Sent!");
       queryClient.invalidateQueries({ queryKey: ["community-about"] });
+      queryClient.invalidateQueries({ queryKey: ["community-suggestions"] });
+      if (onSuccess) {
+        onSuccess(data);
+      }
     },
     onError: (error: any) => {
       toast.error(
