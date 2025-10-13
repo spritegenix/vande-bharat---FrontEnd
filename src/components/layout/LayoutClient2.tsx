@@ -33,7 +33,7 @@ export default function LayoutClient2({ children }: any) {
       <Wrapper as="main" isTop className="mx-auto grid grid-cols-12">
         {/* Desktop View */}
         <nav className="col-span-2 hidden h-full border-r lg:block">
-          <div className="fixed bottom-0 top-0 w-[inherit] overflow-y-auto pt-10">
+          <div className="fixed bottom-0 top-0 overflow-y-auto pt-10 lg:w-60">
             <MenuBarMarketplace className="pt-4" />
           </div>
         </nav>

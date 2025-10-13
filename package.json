@@ -2,6 +2,7 @@
   "name": "vande-bharat-frontend",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -62,6 +63,7 @@
     "zustand": "^5.0.3"
   },
   "devDependencies": {
+    "@next/eslint-plugin-next": "^15.5.4",
     "@tanstack/eslint-plugin-query": "^5.74.7",
     "@types/node": "^20",
     "@types/react": "^19",
@@ -75,7 +77,7 @@
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx,json,css}": [
-      "eslint --fix --config .eslintrc.cjs",
+      "next lint --fix",
       "prettier --write"
     ]
   }

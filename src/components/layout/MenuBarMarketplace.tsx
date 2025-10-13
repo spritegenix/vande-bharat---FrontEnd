@@ -53,10 +53,10 @@ export default function MenuBarMarketplace({ className }: MenuBarProps) {
     <>
       <div className={`pb-10 ${className}`}>
         <div className="space-y-2">
-          <MenuTab icon={<BadgePlus />} label="Add Product" href="/marketplace/add-product" />
-          <MenuTab icon={<LayoutGrid />} label="Categories" href="/marketplace/category" />
-          <MenuTab icon={<ShoppingBag />} label="Products" href="/marketplace/product" />
-          <MenuTab icon={<Tag />} label="Offers" href="/marketplace/offers" />
+          <MenuTab icon={<BadgePlus />} label="Add Product" href="/marketplace/add-listings" />
+          <MenuTab icon={<LayoutGrid />} label="Categories" href="/marketplace/categories" />
+          <MenuTab icon={<ShoppingBag />} label="Products" href="/marketplace/products" />
+          {/* <MenuTab icon={<Tag />} label="Offers" href="/marketplace/offers" /> */}
         </div>
         <hr className="my-4 w-full max-w-52 border-t" />
         <p>My Activity</p>
