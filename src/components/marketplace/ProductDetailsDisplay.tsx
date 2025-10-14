@@ -3,6 +3,7 @@ import React from "react";
 import { UseFormReturn } from "react-hook-form"; // Import UseFormReturn
 import * as z from "zod";
 import { Button } from "@/components/ui/button"; // Import Button component
+import { NumberComma } from "@/utils/NumberComma";
 
 // Define the form schema again or import it if it's in a shared file
 const formSchema = z.object({
@@ -14,7 +15,7 @@ const formSchema = z.object({
   }),
   condition: z.string(),
   location: z.string(),
-  category: z.string(),
+  marketplaceCategoryId: z.string(),
   description: z.string(),
   images: z.array(z.string()),
 });
@@ -34,7 +35,7 @@ export default function ProductDetailsDisplay({ isEditing, form }: ProductDetail
       <h1 className="mb-4 text-3xl dark:text-white">{form.getValues("title")}</h1>
 
       <div className="mb-4 flex items-center">
-        <span className="text-3xl dark:text-white">₹{form.getValues("price")}</span>
+        <span className="text-3xl dark:text-white">₹{NumberComma(form.getValues("price"))}</span>
         <span className="ml-4 text-sm text-neutral-500">Listed 2 days ago</span>
       </div>
 
@@ -56,7 +57,9 @@ export default function ProductDetailsDisplay({ isEditing, form }: ProductDetail
         </div>
         <div className="flex items-center">
           <span className="w-24 text-sm text-neutral-400">Category:</span>
-          <span className="text-sm text-neutral-500">{form.getValues("category")}</span>
+          <span className="text-sm text-neutral-500">
+            {form.getValues("marketplaceCategoryId")}
+          </span>
         </div>
       </div>
 

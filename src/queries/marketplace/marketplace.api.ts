@@ -1,7 +1,12 @@
 import { AxiosInstance } from "axios";
 
-export const getMarketplaceItems = async (axios: AxiosInstance) => {
-  const response = await axios.get("/marketplace/products");
+export const getMarketplaceItems = async (axios: AxiosInstance, pageParam: string | null) => {
+  const response = await axios.get("/marketplace/products", {
+    params: {
+      cursor: pageParam,
+      limit: 10,
+    },
+  });
 
   return response.data;
 };
@@ -27,5 +32,20 @@ export const updateMarketplaceItem = async (
 
 export const deleteMarketplaceItem = async (axios: AxiosInstance, itemSlug: string) => {
   const response = await axios.patch(`/marketplace/product/${itemSlug}/delete`);
+  return response.data;
+};
+
+export const getMyMarketplaceItems = async (axios: AxiosInstance, pageParam: string | null) => {
+  const response = await axios.get("/marketplace/mylistings", {
+    params: {
+      cursor: pageParam,
+      limit: 10,
+    },
+  });
+  return response.data;
+};
+
+export const getMarketplaceCategories = async (axios: AxiosInstance) => {
+  const response = await axios.get("/marketplace-categories/all-categories");
   return response.data;
 };

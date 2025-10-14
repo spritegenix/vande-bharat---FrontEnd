@@ -13,7 +13,16 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useGetMarketplaceCategories } from "@/queries/marketplace/queries";
 // Define the form schema again or import it if it's in a shared file
 const formSchema = z.object({
   title: z.string().min(2, {
@@ -24,7 +33,7 @@ const formSchema = z.object({
   }),
   condition: z.string(),
   location: z.string(),
-  category: z.string(),
+  marketplaceCategoryId: z.string(),
   description: z.string(),
   images: z.array(z.string()),
 });
@@ -35,7 +44,6 @@ interface ProductEditFormProps {
   setIsEditing: (editing: boolean) => void;
   onSubmit: (values: z.infer<typeof formSchema>) => void;
 }
-
 export default function ProductEditForm({
   form,
   isEditing,
@@ -45,6 +53,7 @@ export default function ProductEditForm({
   if (!isEditing) {
     return null; // This component only displays when editing
   }
+  const { data: categories } = useGetMarketplaceCategories();
 
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
@@ -106,16 +115,34 @@ export default function ProductEditForm({
 
       <FormField
         control={form.control}
-        name="category"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Category</FormLabel>
-            <FormControl>
-              <Input placeholder="Category" {...field} />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
+        name="marketplaceCategoryId"
+        render={({ field }) => {
+          const selectedCategory = categories?.find(
+            (category: { _id: string; name: string }) => category._id === field.value,
+          );
+          const displayValue = selectedCategory ? selectedCategory.name : field.value;
+
+          return (
+            <FormItem>
+              <FormLabel>Category</FormLabel>
+              <Select onValueChange={field.onChange} value={field.value}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue>{displayValue || "Select a category"}</SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    {categories?.map((category: { _id: string; name: string }) => (
+                      <SelectItem key={category._id} value={category._id}>
+                        {category.name}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          );
+        }}
       />
 
       <div className="mb-6">

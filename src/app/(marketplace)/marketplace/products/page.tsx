@@ -6,9 +6,9 @@ import Link from "next/link";
 import React from "react";
 
 export default function Page() {
-  const { data: marketplaceItems, isLoading } = useGetMarketplaceItems();
+  const { data, isLoading } = useGetMarketplaceItems();
   const { mutate: addItemToWishlist } = useAddItemToWishlist();
-
+  const marketplaceItems = data?.pages.flatMap((page) => page.items) || [];
   if (isLoading) {
     return <div>Loading...</div>;
   }

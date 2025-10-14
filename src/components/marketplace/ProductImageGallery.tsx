@@ -38,7 +38,7 @@ export default function ProductImageGallery({
         onClick={() => setShowLightbox(true)}
       >
         <img
-          src={selectedImage}
+          src={selectedImage || "/images/profile/profileplaceholder.jpg"}
           alt="Selected product image"
           className="h-full w-full rounded-lg object-cover"
         />
@@ -54,7 +54,7 @@ export default function ProductImageGallery({
                 onClick={() => setSelectedImage(image)}
               >
                 <img
-                  src={image}
+                  src={image || "/images/profile/profileplaceholder.jpg"}
                   alt={`Product image ${index + 1}`}
                   className="relative h-full w-full cursor-pointer rounded object-cover"
                 />
@@ -95,7 +95,7 @@ export default function ProductImageGallery({
       {showLightbox && (
         <Modal onClose={() => setShowLightbox(false)}>
           <img
-            src={selectedImage}
+            src={selectedImage || "/images/profile/profileplaceholder.jpg"}
             alt="Product in lightbox"
             className="max-h-[90vh] max-w-[90vw] object-contain"
           />
