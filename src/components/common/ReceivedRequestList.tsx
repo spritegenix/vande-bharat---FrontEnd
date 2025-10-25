@@ -61,7 +61,8 @@ export default function ReceivedRequestList<T>({
           ))}
         </div>
       )}
-      {isFetchingNextPage && <SkeletonCard />}
+      {isFetchingNextPage &&
+        Array.from({ length: 4 }).map((_, index) => <SkeletonCard key={index} />)}
     </div>
   );
 }

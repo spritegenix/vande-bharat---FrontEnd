@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import  { useAuthAxios } from "@/lib/axios";
+import { useAuthAxios } from "@/lib/axios";
 import { CreatePostPayload } from "@/types/post";
 import { AxiosInstance, isAxiosError } from "axios";
 import { extractHashtags } from "@/utils/HashTagExtractor";
@@ -7,7 +7,7 @@ import { queryClient } from "@/lib/react-query";
 import { getPresignedUrl, uploadToS3 } from "@/queries/user/user.api";
 
 // Utility: Get image dimensions
-const getImageMetadata = (file: File): Promise<{ width: number; height: number }> => {
+export const getImageMetadata = (file: File): Promise<{ width: number; height: number }> => {
   return new Promise((resolve) => {
     const img = new Image();
     img.onload = () => resolve({ width: img.width, height: img.height });
@@ -16,7 +16,7 @@ const getImageMetadata = (file: File): Promise<{ width: number; height: number }
 };
 
 // Utility: Get video duration
-const getVideoDuration = (file: File): Promise<number> => {
+export const getVideoDuration = (file: File): Promise<number> => {
   return new Promise((resolve) => {
     const video = document.createElement("video");
     video.preload = "metadata";
@@ -27,24 +27,23 @@ const getVideoDuration = (file: File): Promise<number> => {
 
 interface EditorStore {
   draftText: string;
-  tags:string[]
+  tags: string[];
   draftFiles: File[];
   uploading: boolean;
-// setTags:(text:string[])=>void
+  // setTags:(text:string[])=>void
   setDraftText: (text: string) => void;
   setDraftFiles: (files: File[]) => void;
   removeDraftFile: (index: number) => void;
   setUploading: (uploading: boolean) => void;
   clearEditorState: () => void;
 
-  submitPost: (axios:AxiosInstance) => Promise<CreatePostPayload | undefined>;
-
+  submitPost: (axios: AxiosInstance) => Promise<CreatePostPayload | undefined>;
 }
 
 export const useEditorStore = create<EditorStore>((set, get) => ({
   draftText: "",
   draftFiles: [],
-  tags:[],
+  tags: [],
   uploading: false,
 
   setDraftText: (text) => set({ draftText: text }),
@@ -60,70 +59,54 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
       draftFiles: [],
       uploading: false,
     }),
- 
 
-  submitPost: async (axios:AxiosInstance) => {
-   
-  const { draftText, draftFiles } = get();
-  if (!draftText.trim() && draftFiles.length === 0) return;
+  submitPost: async (axios: AxiosInstance) => {
+    const { draftText, draftFiles } = get();
+    if (!draftText.trim() && draftFiles.length === 0) return;
 
-  try {
+    try {
+      set({ uploading: true });
+      const extractedTags = extractHashtags(draftText);
+      set({ tags: extractedTags });
 
-    set({ uploading: true });
-    const extractedTags = extractHashtags(draftText);
-    set({ tags: extractedTags });
+      const attachments = await uploadMediaFiles(axios, draftFiles);
 
-  
- const attachments = await uploadMediaFiles(axios, draftFiles)
+      const payload: CreatePostPayload = {
+        content: draftText.trim(),
+        tags: get().tags,
+        isHidden: false,
+        attachments,
+      };
 
-    const payload: CreatePostPayload = {
-      content: draftText.trim(),
-      tags: get().tags,
-      isHidden: false,
-      attachments,
-    };
-
-    return payload;
-
-  } catch (error: any) {
-    if (isAxiosError(error)) {
-      console.error("❌ Validation Error:", {
-        status: error.response?.status,
-        message: error.response?.data?.message,
-        errors: error.response?.data?.errors,
-      });
-    } else {
-      console.error("❌ Unexpected Error:", error);
+      return payload;
+    } catch (error: any) {
+      if (isAxiosError(error)) {
+        console.error("❌ Validation Error:", {
+          status: error.response?.status,
+          message: error.response?.data?.message,
+          errors: error.response?.data?.errors,
+        });
+      } else {
+        console.error("❌ Unexpected Error:", error);
+      }
+    } finally {
+      set({ uploading: false });
     }
-  } finally {
-    set({ uploading: false });
-  }
-},
-
+  },
 }));
 
-
-
-
-
-
-
-
-
-export const uploadMediaFiles = async (axios: AxiosInstance ,files: File[]): Promise<any[]> => {
+export const uploadMediaFiles = async (axios: AxiosInstance, files: File[]): Promise<any[]> => {
   const uploaded: any[] = [];
 
   for (const file of files) {
     try {
-     const { uploadUrl, fileUrl }= await  getPresignedUrl(axios, file, "posts");
-   
+      const { uploadUrl, fileUrl } = await getPresignedUrl(axios, file, "posts");
 
       // const uploadUrl = response?.data?.uploadUrl;
       // const fileUrl = response?.data?.fileUrl;
 
       if (!uploadUrl || !fileUrl) throw new Error("Missing uploadUrl or fileUrl");
-await uploadToS3(axios, uploadUrl, file);
-     
+      await uploadToS3(axios, uploadUrl, file);
 
       const media: any = {
         url: fileUrl,

@@ -80,6 +80,7 @@ export default function ProductImageGallery({
                   className="hidden"
                   type="file"
                   accept="image/*"
+                  multiple // Added multiple attribute
                   onChange={(e) => handleAddNewImage(e)}
                   ref={ImageOpenRef}
                 />

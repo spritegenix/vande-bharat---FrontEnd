@@ -73,42 +73,84 @@ export default function PeopleYouMayKnowPage() {
               ref={i === allProfiles.length - 1 ? ref : null}
               className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition hover:shadow-md dark:border-gray-700 dark:bg-slate-900"
             >
-              <div className="relative h-48 w-full overflow-hidden">
-                <img
-                  src={ImageChecker(profile?.avatar)}
-                  alt={profile?.name}
-                  className="h-full w-full object-cover transition-transform duration-300 hover:scale-105"
-                />
+              {/* Mobile-specific layout */}
+              <div className="flex items-center p-3 sm:hidden">
+                <Link href={`/profile/${profile.slug}`} className="mr-3">
+                  <img
+                    src={ImageChecker(profile?.avatar)}
+                    alt={profile?.name}
+                    className="h-16 w-16 rounded-full object-cover"
+                  />
+                </Link>
+                <div className="flex-1">
+                  <Link href={`/profile/${profile.slug}`}>
+                    <h3 className="truncate text-base font-semibold text-gray-800 hover:underline dark:text-white">
+                      {profile.name}
+                    </h3>
+                  </Link>
+                  <div className="mt-2 flex flex-row gap-2">
+                    <Button
+                      variant={sentIds === profile._id ? "default" : "outline"}
+                      className={`flex-1 ${
+                        sentIds === profile._id
+                          ? "bg-green-600 text-white hover:bg-green-700"
+                          : "dark:bg-slate-700"
+                      }`}
+                      onClick={() => handleAddFriend(profile._id)}
+                      disabled={sentIds === profile._id || isPending}
+                    >
+                      {sentIds === profile._id ? "Request Sent" : "Add Friend"}
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      onClick={() => handleRemove(profile._id)}
+                      className="flex-1"
+                    >
+                      Remove
+                    </Button>
+                  </div>
+                </div>
               </div>
 
-              <div className="space-y-4 p-4">
-                <Link href={`/profile/${profile.slug}`}>
-                  <h3 className="truncate text-lg font-semibold text-gray-800 hover:underline dark:text-white">
-                    {profile.name}
-                  </h3>
-                </Link>
+              {/* Desktop/Tablet layout (original design) */}
+              <div className="hidden sm:block">
+                <div className="aspect-w-16 aspect-h-9 relative w-full overflow-hidden sm:h-48">
+                  <img
+                    src={ImageChecker(profile?.avatar)}
+                    alt={profile?.name}
+                    className="h-full w-full object-cover transition-transform duration-300 hover:scale-105"
+                  />
+                </div>
 
-                <div className="flex flex-col gap-2">
-                  <Button
-                    variant={sentIds === profile._id ? "default" : "outline"}
-                    className={`w-full ${
-                      sentIds === profile._id
-                        ? "bg-green-600 text-white hover:bg-green-700"
-                        : "dark:bg-slate-700"
-                    }`}
-                    onClick={() => handleAddFriend(profile._id)}
-                    disabled={sentIds === profile._id || isPending}
-                  >
-                    {sentIds === profile._id ? "Request Sent" : "Add Friend"}
-                  </Button>
+                <div className="space-y-4 p-4">
+                  <Link href={`/profile/${profile.slug}`}>
+                    <h3 className="truncate text-lg font-semibold text-gray-800 hover:underline dark:text-white">
+                      {profile.name}
+                    </h3>
+                  </Link>
 
-                  <Button
-                    variant="destructive"
-                    onClick={() => handleRemove(profile._id)}
-                    className="w-full"
-                  >
-                    Remove
-                  </Button>
+                  <div className="flex flex-col gap-2">
+                    <Button
+                      variant={sentIds === profile._id ? "default" : "outline"}
+                      className={`w-full ${
+                        sentIds === profile._id
+                          ? "bg-green-600 text-white hover:bg-green-700"
+                          : "dark:bg-slate-700"
+                      }`}
+                      onClick={() => handleAddFriend(profile._id)}
+                      disabled={sentIds === profile._id || isPending}
+                    >
+                      {sentIds === profile._id ? "Request Sent" : "Add Friend"}
+                    </Button>
+
+                    <Button
+                      variant="destructive"
+                      onClick={() => handleRemove(profile._id)}
+                      className="w-full"
+                    >
+                      Remove
+                    </Button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -120,7 +162,8 @@ export default function PeopleYouMayKnowPage() {
         )}
       </div>
 
-      {isFetchingNextPage && <SkeletonCard />}
+      {isFetchingNextPage &&
+        Array.from({ length: 4 }).map((_, index) => <SkeletonCard key={index} />)}
     </section>
   );
 }

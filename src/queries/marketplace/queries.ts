@@ -7,11 +7,11 @@ import {
 } from "./marketplace.api";
 import { useAuthAxios } from "@/lib/axios";
 
-export const useGetMarketplaceItems = () => {
+export const useGetMarketplaceItems = ({ category }: { category: string | null }) => {
   const axios = useAuthAxios();
   return useInfiniteQuery({
-    queryKey: ["marketplace-items"],
-    queryFn: ({ pageParam = null }) => getMarketplaceItems(axios, pageParam),
+    queryKey: ["marketplace-items", category],
+    queryFn: ({ pageParam = null }) => getMarketplaceItems(axios, pageParam, category),
     getNextPageParam: (lastPage) => lastPage.nextCursor || undefined,
     refetchOnWindowFocus: false,
     staleTime: 1000 * 60 * 5,
@@ -22,10 +22,15 @@ export const useGetMarketplaceItems = () => {
 
 export const useGetMarketplaceItem = (itemSlug: string) => {
   const axios = useAuthAxios();
+  const isEnabled = !!itemSlug;
+  const queryKey = ["marketplace-item", itemSlug];
   return useQuery({
-    queryKey: ["marketplace-item", itemSlug],
+    queryKey: queryKey,
     queryFn: () => getMarketplaceItem(axios, itemSlug),
-    enabled: !!itemSlug,
+    enabled: isEnabled,
+    staleTime: 1000 * 60 * 5,
+    refetchOnWindowFocus: false,
+    retry: 1,
   });
 };
 
@@ -44,9 +49,14 @@ export const useGetMyMarketplaceItems = () => {
 
 export const useGetMarketplaceCategories = () => {
   const axios = useAuthAxios();
-  return useQuery({
+  return useInfiniteQuery({
     queryKey: ["marketplace-categories"],
-    queryFn: () => getMarketplaceCategories(axios),
+    queryFn: async ({ pageParam = null }) => {
+      const response = await getMarketplaceCategories(axios, pageParam, 10); // Pass pageParam and limit
+      return response.data; // Assuming the controller now returns { items, nextCursor } directly
+    },
+    getNextPageParam: (lastPage) => lastPage.nextCursor || undefined,
+    initialPageParam: null,
     staleTime: 1000 * 60 * 60,
     refetchOnWindowFocus: false,
     retry: 1,

@@ -62,7 +62,7 @@ export default function UserProfile({ className }: UserButtonProps) {
             className,
           )}
         >
-          <UserAvatar avatarUrl={""} size={40} />
+          <UserAvatar avatarUrl={user?.avatar} size={40} />
           <span className="absolute bottom-0 end-0 flex size-4 items-center justify-center rounded-full bg-primary p-0.5 text-white dark:bg-primary">
             <FaAngleDown />
           </span>
@@ -123,24 +123,24 @@ export default function UserProfile({ className }: UserButtonProps) {
                 </Button>
               </DropdownMenuLabel> */}
               <DropdownMenuSeparator />
-              <Link href={"/settings"}>
+              {/* <Link href={"/settings"}>
                 <DropdownMenuItem>
                   <Settings className="mr-2 size-4" />
                   Settings
                 </DropdownMenuItem>
-              </Link>
-              <Link href={"/help"}>
+              </Link> */}
+              {/* <Link href={"/help"}>
                 <DropdownMenuItem>
                   <BadgeHelp className="mr-2 size-4" />
                   Help & Support
                 </DropdownMenuItem>
-              </Link>
-              <Link href={"/feedback"}>
+              </Link> */}
+              {/* <Link href={"/feedback"}>
                 <DropdownMenuItem>
                   <UserIcon className="mr-2 size-4" />
                   Feedback
                 </DropdownMenuItem>
-              </Link>
+              </Link> */}
               <DropdownMenuSub>
                 <DropdownMenuSubTrigger>
                   <Monitor className="mr-2 size-4" />

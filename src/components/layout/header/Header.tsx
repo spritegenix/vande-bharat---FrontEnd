@@ -19,7 +19,7 @@ export default function Header({ setIsLeftMenuOpen, isSearchOpen = false, setSea
           <TooltipProvider delayDuration={0}>
             <div className="flex items-center gap-2 sm:gap-5">
               {/* Donation  */}
-              <Tooltip>
+              {/* <Tooltip>
                 <TooltipTrigger asChild>
                   <Link href="/donation" className="cursor-pointer">
                     <SvgIcon svgPath={donationIcon} />
@@ -28,9 +28,9 @@ export default function Header({ setIsLeftMenuOpen, isSearchOpen = false, setSea
                 <TooltipContent side="bottom" className="px-2 py-1 text-xs">
                   Donation
                 </TooltipContent>
-              </Tooltip>
+              </Tooltip> */}
               {/* Notification  */}
-              <Notification />
+              {/* <Notification /> */}
               {/* Auth Button  */}
               <AuthButton />
             </div>
@@ -51,11 +51,11 @@ export default function Header({ setIsLeftMenuOpen, isSearchOpen = false, setSea
                 <Search />
               </button>
               {/* Donation  */}
-              <Link href="/donation" className="cursor-pointer">
+              {/* <Link href="/donation" className="cursor-pointer">
                 <SvgIcon svgPath={donationIcon} />
-              </Link>
+              </Link> */}
               {/* Notification  */}
-              <Notification />
+              {/* <Notification /> */}
               {/* Auth Button  */}
               <AuthButton />
             </div>

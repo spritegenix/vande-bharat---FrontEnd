@@ -62,7 +62,7 @@ export default function MenuBarMarketplace({ className }: MenuBarProps) {
         <p>My Activity</p>
         <MenuTab icon={<ClipboardList />} label="My Listings" href="/marketplace/my-listings" />
         <MenuTab icon={<Heart />} label="Wishlist" href="/marketplace/wishlist" />
-        <MenuTab icon={<Inbox />} label="Inbox" href="/marketplace/inbox" />
+        {/* <MenuTab icon={<Inbox />} label="Inbox" href="/marketplace/inbox" /> */}
       </div>
       {/* Create Page Modal  */}
       {isCreatePageOpen && (

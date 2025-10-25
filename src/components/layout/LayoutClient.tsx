@@ -55,7 +55,7 @@ export default function LayoutClient({ children }: any) {
             </motion.nav>
           )}
         </AnimatePresence>
-        <section className="col-span-12 lg:col-span-8">{children}</section>
+        <section className="col-span-12 min-h-screen lg:col-span-8">{children}</section>
         <aside className="col-span-2 hidden border-l sm:block"></aside>
       </Wrapper>
       <ScrollToTopButton />

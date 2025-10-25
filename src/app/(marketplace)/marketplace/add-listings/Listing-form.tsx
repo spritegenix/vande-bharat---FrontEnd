@@ -8,6 +8,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -17,34 +18,57 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { zodResolver } from "@hookform/resolvers/zod";
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { useUploadMedia } from "@/hooks/useUploadMedia";
+import { dataURLtoFile } from "@/lib/utils";
+import { useCreateMarketplaceItem } from "@/queries/marketplace/mutations"; // Assuming this mutation exists
+import { useGetMarketplaceCategories } from "@/queries/marketplace/queries"; // Import useGetMarketplaceCategories
+import { useAuthAxios } from "@/lib/axios";
+import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
+import { marketplaceMediaObjectSchema } from "@/types/post";
+
 const productSchema = z.object({
   productName: z.string().min(1, "Product name is required"),
   category: z.string().min(1, "Category is required"),
-  description: z.string().min(30, "Description is required"),
-  price: z.string().min(1, "Price is required"),
+  description: z.string().min(30, "Description must be at least 30 characters long"),
+  price: z.coerce.number().positive({
+    message: "Price must be a positive number.",
+  }),
   condition: z.string().min(1, "Condition is required"),
   location: z.string().min(1, "Location is required"),
-  images: z.array(z.any()).min(1, "At least one image is required"),
+  phoneNumber: z.string().min(1, "Phone number is required"),
+  currency: z.string().min(1, "Currency is required"),
+  images: z
+    .array(z.union([z.instanceof(File), marketplaceMediaObjectSchema]))
+    .min(1, "At least one image is required")
+    .max(10, "You can upload a maximum of 10 images.")
+    .refine((files) => files.every((file) => !(file instanceof File) || file.size <= 1024 * 1024), {
+      message: "Each image must be less than 1MB.",
+    }),
 });
 export type ProductType = z.infer<typeof productSchema>;
 export default function ListingForm() {
+  const [isLocating, setIsLocating] = useState(false); // State for location loading
   const form = useForm<ProductType>({
     resolver: zodResolver(productSchema),
     defaultValues: {
       productName: "",
       category: "",
       description: "",
-      price: "",
+      price: 0,
       condition: "New",
       location: "",
+      phoneNumber: "",
+      currency: "INR",
       images: [],
     },
   });
   const imageInputRef = useRef<HTMLInputElement>(null);
   const [imagePreview, setImagePreview] = useState<string[]>([]);
+  const [isDragging, setIsDragging] = useState(false); // New state for drag-and-drop
   const {
     control,
     formState: { errors },
@@ -53,14 +77,155 @@ export default function ListingForm() {
     watch,
     setValue,
   } = form;
-  const handleRemoveImage = (index: number) => {
-    const updatedImages = [...imagePreview];
-    updatedImages.splice(index, 1);
-    setImagePreview(updatedImages);
+
+  const currentImages = watch("images");
+  const axios = useAuthAxios();
+  const { data: categories } = useGetMarketplaceCategories(); // Fetch categories
+  const handleFiles = useCallback(
+    (files: FileList | File[]) => {
+      const validFiles: File[] = [];
+      const oversizedFiles: string[] = [];
+
+      Array.from(files).forEach((file) => {
+        if (file instanceof File && file.type.startsWith("image/")) {
+          if (file.size <= 1024 * 1024) {
+            // 1MB limit
+            if (currentImages.length + validFiles.length < 10) {
+              validFiles.push(file);
+            } else {
+              alert("You can upload a maximum of 10 images.");
+            }
+          } else {
+            oversizedFiles.push(file.name);
+          }
+        }
+      });
+
+      if (oversizedFiles.length > 0) {
+        alert(
+          `The following images exceed the 1MB limit and were not added: ${oversizedFiles.join(", ")}`,
+        );
+      }
+
+      if (validFiles.length > 0) {
+        const updatedImages = [...currentImages, ...validFiles];
+        setValue("images", updatedImages);
+        setImagePreview(
+          updatedImages.map((item) => {
+            if (item instanceof File) {
+              return URL.createObjectURL(item);
+            } else if (typeof item === "object" && item !== null && "url" in item) {
+              return item.url;
+            }
+            return ""; // Fallback for unexpected types
+          }),
+        );
+      }
+    },
+    [currentImages, setValue],
+  );
+
+  const handleGetLocation = async () => {
+    setIsLocating(true); // Start loading
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const { latitude, longitude } = position.coords;
+
+          // Reverse geocoding using OpenStreetMap Nominatim
+          try {
+            const response = await fetch(
+              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`,
+            );
+            const data = await response.json();
+            if (data.address) {
+              const city = data.address.city || data.address.town || data.address.village || "";
+              const state = data.address.state || "";
+              if (city && state) {
+                setValue("location", `${city}, ${state}`);
+              } else if (city) {
+                setValue("location", city);
+              } else if (state) {
+                setValue("location", state);
+              } else {
+                setValue("location", "Location not found");
+              }
+            } else {
+              setValue("location", "Location not found");
+            }
+          } catch (error) {
+            console.error("Error during reverse geocoding:", error);
+            alert("Error getting location details. Please try again.");
+            setValue("location", ""); // Clear location on error
+          } finally {
+            setIsLocating(false); // End loading
+          }
+        },
+        (error) => {
+          console.error("Error getting location:", error);
+          alert(
+            "Unable to retrieve your location. Please ensure location services are enabled and granted permission.",
+          );
+          setValue("location", ""); // Clear location on error
+          setIsLocating(false); // End loading
+        },
+      );
+    } else {
+      alert("Geolocation is not supported by your browser.");
+      setValue("location", ""); // Clear location if not supported
+      setIsLocating(false); // End loading
+    }
   };
+
+  const { mutateAsync: uploadMedia } = useUploadMedia(axios, "products");
+  const { mutateAsync: createMarketplaceItem } = useCreateMarketplaceItem();
+
+  const handleRemoveImage = (index: number) => {
+    const updatedImagePreviews = [...imagePreview];
+    updatedImagePreviews.splice(index, 1);
+    setImagePreview(updatedImagePreviews);
+
+    const updatedFormImages = [...currentImages];
+    updatedFormImages.splice(index, 1);
+    setValue("images", updatedFormImages);
+  };
+
+  const onSubmit = async (values: ProductType) => {
+    try {
+      const uploadedAttachments = await Promise.all(
+        values.images.map(async (image) => {
+          if (image instanceof File) {
+            const uploadedMediaObject = await uploadMedia(image);
+            return uploadedMediaObject;
+          }
+          return image; // Should not happen for new listings, but for type safety
+        }),
+      );
+
+      const createPayload = {
+        title: values.productName,
+        description: values.description,
+        price: values.price,
+        condition: values.condition,
+        location: values.location,
+        phoneNumber: values.phoneNumber,
+        currency: values.currency,
+        marketplaceCategoryId: values.category, // Assuming category is the ID
+        attachments: uploadedAttachments,
+      };
+      await createMarketplaceItem(createPayload);
+      reset(); // Clear form
+      setImagePreview([]); // Clear image previews
+      toast.success("Listing created successfully");
+    } catch (error) {
+      console.error("Error creating listing:", error);
+      toast.error("Failed to create listing. Please try again.");
+    }
+  };
+
   return (
     <Form {...form}>
-      <form className="space-y-6">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <div className="grid grid-cols-2 gap-6">
           <FormField
             control={control}
@@ -88,14 +253,14 @@ export default function ListingForm() {
                       <SelectTrigger>
                         <SelectValue placeholder="Select category" />
                       </SelectTrigger>
-                      <SelectContent>
-                        {["Books & Research", "Spiritual Items", "Cultural Artifacts"].map(
-                          (item) => (
-                            <SelectItem key={item} value={item}>
-                              {item}
+                      <SelectContent className="max-h-[180px] overflow-y-auto">
+                        {categories?.pages
+                          ?.flatMap((page) => page.items)
+                          ?.map((category: { _id: string; name: string }) => (
+                            <SelectItem key={category._id} value={category._id}>
+                              {category.name}
                             </SelectItem>
-                          ),
-                        )}
+                          ))}
                       </SelectContent>
                     </Select>
                   </FormControl>
@@ -168,12 +333,62 @@ export default function ListingForm() {
           <div>
             <FormField
               control={control}
+              name="currency"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel> Currency *</FormLabel>
+                  <FormControl>
+                    <Select value={field.value} onValueChange={field.onChange}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select currency" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {["INR", "USD", "EUR", "GBP", "JPY"].map((currency) => (
+                          <SelectItem key={currency} value={currency}>
+                            {currency}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+          <div>
+            <FormField
+              control={control}
               name="location"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel> Location *</FormLabel>
                   <FormControl>
                     <Input placeholder="City, State" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <Button
+              type="button"
+              onClick={handleGetLocation}
+              className="mt-2"
+              disabled={isLocating}
+            >
+              {isLocating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+              Get Current Location
+            </Button>
+          </div>
+          <div>
+            <FormField
+              control={control}
+              name="phoneNumber"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel> Phone Number *</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Enter phone number" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -196,9 +411,9 @@ export default function ListingForm() {
                       accept="image/*"
                       multiple
                       onChange={(e) => {
-                        const file = Array.from(e.target.files ?? []);
-                        onChange(file);
-                        setImagePreview(file.map((file) => URL.createObjectURL(file)));
+                        const files = Array.from(e.target.files ?? []);
+                        handleFiles(files);
+                        onChange(files);
                       }}
                       onBlur={onBlur}
                       name={name}
@@ -209,8 +424,23 @@ export default function ListingForm() {
                       className="z-10 hidden"
                     />
                     <div
-                      className="inset-0 z-0 rounded-lg border-2 border-dashed border-neutral-300 p-6 text-center"
+                      className={`inset-0 z-0 rounded-lg border-2 border-dashed p-6 text-center ${
+                        isDragging ? "border-blue-500 bg-blue-50" : "border-neutral-300"
+                      }`}
                       onClick={() => imageInputRef.current?.click()}
+                      onDragOver={(e) => {
+                        e.preventDefault();
+                        setIsDragging(true);
+                      }}
+                      onDragEnter={() => setIsDragging(true)}
+                      onDragLeave={() => setIsDragging(false)}
+                      onDrop={(e) => {
+                        e.preventDefault();
+                        setIsDragging(false);
+                        const files = Array.from(e.dataTransfer.files);
+                        handleFiles(files);
+                        onChange(files); // Update react-hook-form field
+                      }}
                     >
                       <i className="mx-auto mb-2 flex h-16 items-center justify-center text-neutral-400">
                         <svg

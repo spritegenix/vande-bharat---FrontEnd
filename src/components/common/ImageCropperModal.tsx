@@ -16,8 +16,8 @@ const ImageCropperModal: React.FC<ImageCropperModalProps> = ({
   imageSrc,
   onClose,
   onCropped,
-  aspect = 820 / 312,
-  outputSize = { width: 820, height: 312 },
+  aspect = 16 / 9, // Changed from 820 / 312 to a more common 16:9 aspect ratio
+  outputSize = { width: 1280, height: 720 }, // Adjusted output size to match 16:9 ratio
 }) => {
   return (
     <Dialog open={open} onOpenChange={onClose}>

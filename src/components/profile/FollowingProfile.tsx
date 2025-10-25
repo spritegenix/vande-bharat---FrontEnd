@@ -52,39 +52,77 @@ export default function FollowingProfileList({ slug }: { slug?: string }) {
               key={profile._id}
               className="group relative overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-transform hover:-translate-y-1 dark:border-gray-700 dark:bg-slate-900 dark:shadow-md"
             >
-              <div className="relative h-48 w-full overflow-hidden">
-                <img
-                  src={ImageChecker(profile.avatar)}
-                  alt={profile.name}
-                  className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                />
+              {/* Mobile-specific layout */}
+              <div className="flex items-center p-3 sm:hidden">
+                <Link href={`/profile/${profile.slug}`} className="mr-3">
+                  <img
+                    src={ImageChecker(profile.avatar)}
+                    alt={profile.name}
+                    className="h-16 w-16 rounded-full object-cover"
+                  />
+                </Link>
+                <div className="flex-1">
+                  <Link href={`/profile/${profile.slug}`}>
+                    <h3 className="truncate text-base font-semibold text-gray-800 hover:underline dark:text-white">
+                      {profile.name}
+                    </h3>
+                  </Link>
+                  <div className="mt-2 flex flex-row gap-2">
+                    <Button
+                      disabled
+                      variant="outline"
+                      className="flex-1 bg-gray-200 dark:bg-slate-800"
+                    >
+                      Following
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      onClick={() => handleUnfriend(profile._id)}
+                      disabled={isPending}
+                      className="flex-1"
+                    >
+                      Unfriend
+                    </Button>
+                  </div>
+                </div>
               </div>
 
-              <div className="p-4">
-                <h3 className="truncate text-lg font-semibold text-gray-800 dark:text-white">
-                  <Link href={`/profile/${profile.slug}`}>{profile.name}</Link>
-                </h3>
+              {/* Desktop/Tablet layout (original design) */}
+              <div className="hidden sm:block">
+                <div className="relative h-48 w-full overflow-hidden">
+                  <img
+                    src={ImageChecker(profile.avatar)}
+                    alt={profile.name}
+                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                  />
+                </div>
 
-                <div className="mt-3 flex items-center justify-between">
-                  <span className="rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-700 dark:bg-green-900 dark:text-green-200">
-                    Following
-                  </span>
+                <div className="p-4">
+                  <h3 className="truncate text-lg font-semibold text-gray-800 dark:text-white">
+                    <Link href={`/profile/${profile.slug}`}>{profile.name}</Link>
+                  </h3>
 
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon">
-                        <MoreVertical className="h-5 w-5 text-gray-500 dark:text-gray-300" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem
-                        onClick={() => handleUnfriend(profile._id)}
-                        className="text-red-600 dark:text-red-400"
-                      >
-                        <UserX2 className="mr-2 h-4 w-4" /> Unfriend
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                  <div className="mt-3 flex items-center justify-between">
+                    <span className="rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-700 dark:bg-green-900 dark:text-green-200">
+                      Following
+                    </span>
+
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon">
+                          <MoreVertical className="h-5 w-5 text-gray-500 dark:text-gray-300" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem
+                          onClick={() => handleUnfriend(profile._id)}
+                          className="text-red-600 dark:text-red-400"
+                        >
+                          <UserX2 className="mr-2 h-4 w-4" /> Unfriend
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
                 </div>
               </div>
             </div>
@@ -97,8 +135,10 @@ export default function FollowingProfileList({ slug }: { slug?: string }) {
       </div>
 
       {isFetchingNextPage && (
-        <div className="mt-4">
-          <SkeletonCard />
+        <div className="mt-4 grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+          {Array.from({ length: 4 }).map((_, idx) => (
+            <SkeletonCard key={idx} />
+          ))}
         </div>
       )}
     </section>

@@ -69,7 +69,11 @@ export default function SentRequest() {
       <h2 className="text-xl font-bold text-gray-900 dark:text-white">Sent Requests</h2>
 
       {isLoading ? (
-        <SkeletonCard />
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+          {Array.from({ length: 8 }).map((_, index) => (
+            <SkeletonCard key={index} />
+          ))}
+        </div>
       ) : isError ? (
         <p className="text-sm text-red-500">Something went wrong. Please try again.</p>
       ) : allSentRequests.length === 0 ? (
@@ -82,33 +86,73 @@ export default function SentRequest() {
               ref={i === allSentRequests.length - 1 ? ref : undefined}
               className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-md dark:border-gray-700 dark:bg-slate-900"
             >
-              <div className="relative h-48 w-full">
-                <Image
-                  src={ImageChecker(req.toUser.avatar)}
-                  alt={req.toUser.name}
-                  fill
-                  className="object-cover"
-                />
+              {/* Mobile-specific layout */}
+              <div className="flex items-center p-2 sm:hidden">
+                <Link href={`/profile/${req.toUser.slug}`} className="mr-3">
+                  <Image
+                    src={ImageChecker(req.toUser.avatar)}
+                    alt={req.toUser.name}
+                    width={64}
+                    height={64}
+                    className="h-16 w-16 rounded-full object-cover"
+                  />
+                </Link>
+                <div className="flex-1">
+                  <Link href={`/profile/${req.toUser.slug}`}>
+                    <h3 className="truncate text-base font-semibold text-gray-800 hover:underline dark:text-white">
+                      {req.toUser.name}
+                    </h3>
+                  </Link>
+                  <div className="mt-2 flex flex-row gap-2">
+                    <Button
+                      disabled
+                      variant="outline"
+                      className="flex-1 bg-gray-200 dark:bg-slate-800"
+                    >
+                      Request Sent
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      onClick={() => handleCancel(req.toUserId)}
+                      disabled={isPending}
+                      className="flex-1"
+                    >
+                      Cancel Request
+                    </Button>
+                  </div>
+                </div>
               </div>
 
-              <div className="space-y-3 p-4">
-                <Link href={`/profile/${req.toUser.slug}`}>
-                  <h3 className="truncate text-lg font-semibold text-gray-800 hover:underline dark:text-white">
-                    {req.toUser.name}
-                  </h3>
-                </Link>
+              {/* Desktop/Tablet layout (original design) */}
+              <div className="hidden sm:block">
+                <div className="relative h-48 w-full">
+                  <Image
+                    src={ImageChecker(req.toUser.avatar)}
+                    alt={req.toUser.name}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
 
-                <div className="flex flex-col gap-2">
-                  <Button disabled variant="outline" className="bg-gray-200 dark:bg-slate-800">
-                    Request Sent
-                  </Button>
-                  <Button
-                    variant="destructive"
-                    onClick={() => handleCancel(req.toUserId)}
-                    disabled={isPending}
-                  >
-                    Cancel Request
-                  </Button>
+                <div className="space-y-3 p-4">
+                  <Link href={`/profile/${req.toUser.slug}`}>
+                    <h3 className="truncate text-lg font-semibold text-gray-800 hover:underline dark:text-white">
+                      {req.toUser.name}
+                    </h3>
+                  </Link>
+
+                  <div className="flex flex-col gap-2">
+                    <Button disabled variant="outline" className="bg-gray-200 dark:bg-slate-800">
+                      Request Sent
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      onClick={() => handleCancel(req.toUserId)}
+                      disabled={isPending}
+                    >
+                      Cancel Request
+                    </Button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -116,7 +160,8 @@ export default function SentRequest() {
         </div>
       )}
 
-      {isFetchingNextPage && <SkeletonCard />}
+      {isFetchingNextPage &&
+        Array.from({ length: 4 }).map((_, index) => <SkeletonCard key={index} />)}
     </div>
   );
 }

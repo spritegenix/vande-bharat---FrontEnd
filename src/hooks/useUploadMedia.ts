@@ -1,26 +1,58 @@
 // hooks/useUploadMedia.ts
+import { useAuthAxios } from "@/lib/axios";
+import Env from "@/lib/env";
+import { getPresignedUrl, uploadToS3 } from "@/queries/user/user.api";
+import { getImageMetadata, getVideoDuration } from "@/stores/editorStore";
 import { useMutation } from "@tanstack/react-query";
-import axios from "axios";
+import { AxiosInstance } from "axios";
 
-interface UploadUrlResponse {
-  url: string;
-  key: string;
-}
+type MediaFolder = "posts" | "avatars" | "covers" | "products";
 
-export const useUploadMedia = (folder: "posts" | "avatars" | "covers") => {
+// Helper function to upload a single file and return the full media object
+const uploadSingleMediaFile = async (
+  axios: AxiosInstance,
+  file: File,
+  folder: MediaFolder,
+): Promise<any> => {
+  const { uploadUrl, fileUrl } = await getPresignedUrl(axios, file, folder);
+  if (!uploadUrl || !fileUrl) throw new Error("Missing uploadUrl or fileUrl");
+  await uploadToS3(axios, uploadUrl, file);
+
+  const media: any = {
+    url: fileUrl,
+    type: file.type.startsWith("image/") ? "IMAGE" : "VIDEO",
+    fileName: file.name,
+    mimeType: file.type,
+    size: file.size,
+    uploadedAt: new Date().toISOString(),
+  };
+
+  if (file.type.startsWith("image/")) {
+    const { width, height } = await getImageMetadata(file);
+    media.width = width;
+    media.height = height;
+  }
+
+  if (file.type.startsWith("video/")) {
+    const duration = await getVideoDuration(file);
+    media.duration = duration;
+  }
+
+  return media;
+};
+
+export const useUploadMedia = (axios: AxiosInstance, folder: MediaFolder) => {
   return useMutation({
-    mutationFn: async (file: File): Promise<string> => {
-      const { data } = await axios.post<UploadUrlResponse>("http://localhost:4000/api/v1/media/upload-url", {
-        fileName: file.name,
-        fileType: file.type,
-        folder,
-      }, {withCredentials: true});
-
-      await axios.put(data.url, file, {
-        headers: { "Content-Type": file.type },
-      });
-
-      return data.key; // Final public S3 URL
+    mutationFn: async (filesToUpload: File | File[]): Promise<any | any[]> => {
+      if (Array.isArray(filesToUpload)) {
+        const uploadedMediaObjects = await Promise.all(
+          filesToUpload.map((file) => uploadSingleMediaFile(axios, file, folder)),
+        );
+        return uploadedMediaObjects;
+      } else {
+        const uploadedMediaObject = await uploadSingleMediaFile(axios, filesToUpload, folder);
+        return uploadedMediaObject;
+      }
     },
   });
 };

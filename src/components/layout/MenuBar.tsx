@@ -58,7 +58,7 @@ export default function MenuBar({ className }: MenuBarProps) {
         <div className="space-y-2">
           <MenuTab icon={<Home />} label="Home" href="/" />
           <MenuTab icon={<MessageSquareShare />} label="Popular" href="/popular" />
-          <MenuTab icon={<BellRing />} label="Notifications" href="/notifications" />
+          {/* <MenuTab icon={<BellRing />} label="Notifications" href="/notifications" /> */}
           <hr className="my-4 w-full max-w-52 border-t" />
           {userProfileSlug && (
             <MenuTab
