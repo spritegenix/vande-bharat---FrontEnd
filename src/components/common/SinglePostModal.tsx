@@ -48,7 +48,7 @@ export default function SinglePostModal({ isOpen, onClose, postId }: Props) {
           {/* Left: Media Preview */}
           <div className="relative my-auto flex h-full w-full items-center justify-center rounded-lg border-r bg-black dark:border-gray-700 md:w-1/2">
             {attachments.length > 0 && (
-              <Carousel className="my-auto flex h-full w-full">
+              <Carousel className="my-auto flex h-dvh w-full">
                 <CarouselContent className="h-full">
                   {attachments.map((att, idx) => (
                     <CarouselItem key={idx} className="flex h-full items-center justify-center">
@@ -62,7 +62,7 @@ export default function SinglePostModal({ isOpen, onClose, postId }: Props) {
                         <video
                           src={att.url}
                           controls
-                          className="max-h-full max-w-full rounded-lg object-contain"
+                          className="max-h-full max-w-full rounded-lg object-center"
                         />
                       )}
                     </CarouselItem>
@@ -88,12 +88,12 @@ export default function SinglePostModal({ isOpen, onClose, postId }: Props) {
 
             <ScrollArea className="mt-4 flex-1 pr-2">
               <div className="mb-4 px-2">
-                <p className="whitespace-pre-line text-sm text-gray-700 dark:text-gray-300">
+                <p className="text-md whitespace-pre-line text-gray-700 dark:text-gray-300">
                   {post.content}
                 </p>
               </div>
 
-              <div className="mx-2 mt-4 border-t border-gray-200 pt-4 text-sm text-gray-600 dark:border-gray-700 dark:text-gray-400">
+              <div className="text-md mx-2 mt-4 border-t border-gray-200 pt-4 text-gray-600 dark:border-gray-700 dark:text-gray-400">
                 <div className="flex items-center justify-between">
                   <div className="flex w-full items-center justify-between gap-x-4">
                     <LikeButton post={post} />

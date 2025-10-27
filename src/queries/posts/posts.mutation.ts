@@ -9,6 +9,7 @@ import {
   deletePost as deletePostAPI,
   updatePost as updatePostAPI,
 } from "@/queries/posts/posts.api";
+import { toast } from "sonner";
 
 export type AllPosts = {
   success: boolean;
@@ -37,7 +38,7 @@ export const useUpdatePost = () => {
       newFiles: File[];
       existingAttachments: any[];
     }) => {
-      const uploaded = await uploadMediaFiles(axios,newFiles);
+      const uploaded = await uploadMediaFiles(axios, newFiles);
       const finalAttachments = [...existingAttachments, ...uploaded];
       const payload = { content: newText, attachments: finalAttachments };
 
@@ -47,8 +48,9 @@ export const useUpdatePost = () => {
     onMutate: async ({ postId, newText }) => {
       await queryClient.cancelQueries({ queryKey: ["user-posts"] });
       const previous = queryClient.getQueryData<Post[]>(["user-posts"]);
-      queryClient.setQueryData<Post[]>(["user-posts"], (old) =>
-        old?.map((p) => (p._id === postId ? { ...p, content: newText } : p)) ?? []
+      queryClient.setQueryData<Post[]>(
+        ["user-posts"],
+        (old) => old?.map((p) => (p._id === postId ? { ...p, content: newText } : p)) ?? [],
       );
       return { previous };
     },
@@ -73,7 +75,9 @@ export const useCreatePost = () => {
 
     onMutate: async (newPost) => {
       const previousFetchPosts = queryClient.getQueryData<InfiniteData<AllPosts>>(["fetch-posts"]);
-      const previousCommunityPosts = queryClient.getQueryData<InfiniteData<AllPosts>>(["community-posts"]);
+      const previousCommunityPosts = queryClient.getQueryData<InfiniteData<AllPosts>>([
+        "community-posts",
+      ]);
 
       const optimisticPost: Post = {
         ...newPost,
@@ -83,9 +87,7 @@ export const useCreatePost = () => {
         isLiked: false,
         isBookmarked: false,
         userId: { _id: "", slug: "", name: "", avatar: "" },
-        communitySlug: newPost?.communitySlug
-          ? { slug: "", name: "", avatar: "" }
-          : null,
+        communitySlug: newPost?.communitySlug ? { slug: "", name: "", avatar: "" } : null,
         requestStatus: "",
       };
 
@@ -129,16 +131,18 @@ export const useCreatePost = () => {
       if (context?.previousCommunityPosts) {
         queryClient.setQueryData(["community-posts"], context.previousCommunityPosts);
       }
+      toast.error("Failed to create post.");
     },
 
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["user-posts"] });
       queryClient.invalidateQueries({ queryKey: ["community-posts"] }); // ✅ Invalidate community posts
+      queryClient.invalidateQueries({ queryKey: ["fetch-posts"] });
       clearEditorState();
+      toast.success("Post created successfully.");
     },
   });
 };
-
 
 export const useDeletePost = () => {
   const queryClient = useQueryClient();
@@ -149,7 +153,10 @@ export const useDeletePost = () => {
     onMutate: async (postId) => {
       await queryClient.cancelQueries({ queryKey: ["user-posts"] });
       const previousPosts = queryClient.getQueryData<Post[]>(["user-posts"]);
-      queryClient.setQueryData<Post[]>(["user-posts"], (old) => old?.filter((p) => p._id !== postId) ?? []);
+      queryClient.setQueryData<Post[]>(
+        ["user-posts"],
+        (old) => old?.filter((p) => p._id !== postId) ?? [],
+      );
       return { previousPosts };
     },
     onError: (_err, _vars, context) => {
@@ -176,9 +183,7 @@ export const useUpdateComment = () => {
         if (!oldData) return oldData;
         return {
           ...oldData,
-          comments: oldData.comments.map((c: any) =>
-            c._id === commentId ? { ...c, content } : c
-          ),
+          comments: oldData.comments.map((c: any) => (c._id === commentId ? { ...c, content } : c)),
         };
       });
       return { previousComments };

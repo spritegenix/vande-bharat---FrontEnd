@@ -22,14 +22,14 @@ export default function CoverImage({
   canEdit: boolean;
 }) {
   const [modelOpen, setModelOpen] = useState(false);
-  const [imageSrc, setImageSrc] = useState<string>(
+  const [imageSrc, setImageSrc] = useState<string | null>(null);
+  const [selectedImage, setSelectedImage] = useState<string>(
     coverImage || "/images/profile/coverplaceholder.jpg",
   );
-  const [croppedImage, setCroppedImage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   useEffect(() => {
     if (coverImage) {
-      setImageSrc(coverImage);
+      setSelectedImage(coverImage);
     }
   }, [coverImage]);
   const axios = useAuthAxios();
@@ -86,7 +86,7 @@ export default function CoverImage({
 
     const reader = new FileReader();
     reader.onloadend = () => {
-      setImageSrc(reader.result as string);
+      setSelectedImage(reader.result as string);
       setModelOpen(true); // open crop modal after selecting
     };
     reader.readAsDataURL(file);
@@ -95,7 +95,7 @@ export default function CoverImage({
   return (
     <div className="relative h-[150px] w-full md:h-[350px] lg:h-[400px]">
       <Image
-        src={croppedImage || imageSrc}
+        src={imageSrc || selectedImage}
         alt="Cover"
         fill
         className="object-cover object-center"
@@ -128,7 +128,7 @@ export default function CoverImage({
 
       {modelOpen && (
         <ImageCropperModal
-          imageSrc={imageSrc}
+          imageSrc={selectedImage}
           open={modelOpen}
           onClose={() => {
             setModelOpen(false);
@@ -136,7 +136,7 @@ export default function CoverImage({
           onCropped={(blob) => {
             setModelOpen(false);
             const url = URL.createObjectURL(blob);
-            setCroppedImage(url); // set preview
+            setImageSrc(url); // set preview
             updateCoverMutation.mutate(blob);
           }}
         />

@@ -21,6 +21,7 @@ interface Comment {
   userId: UserInfo;
   content: string;
   createdAt: string;
+  replies: Comment[]; // Add replies array for nested comments
 }
 
 export const PostCommentSection = ({ postId }: PostCommentSectionProps) => {
@@ -30,7 +31,7 @@ export const PostCommentSection = ({ postId }: PostCommentSectionProps) => {
   const { data, isLoading, isError } = useQuery({
     queryKey: ["comments", commentId],
     queryFn: () => fetchComments(axios, commentId),
-    enabled: !!open, // only fetch when open
+    enabled: isOpen, // only fetch when open
   });
   const comments = data?.comments || [];
   return (
@@ -45,14 +46,14 @@ export const PostCommentSection = ({ postId }: PostCommentSectionProps) => {
             className="overflow-hidden"
           >
             <div className="mt-2 border-l pl-4 text-sm text-muted-foreground">
-              <CreateComment />
+              <CreateComment postId={postId} />
               {isLoading && <p>Loading comments...</p>}
               {isError && <p>Failed to load comments.</p>}
 
               {!isLoading &&
                 !isError &&
                 comments?.map((c: Comment) => (
-                  <CommentItem c={c} key={c._id} />
+                  <CommentItem c={c} key={c._id} postId={postId} depth={0} />
                   // <div key={c._id} className="mb-4 flex items-start gap-3">
                   //   {/* Avatar */}
                   //   <Link href={`/${c.userId.slug}`}>

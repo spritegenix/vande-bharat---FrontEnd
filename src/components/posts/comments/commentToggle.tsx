@@ -12,6 +12,7 @@ import { useUserStore } from "@/stores/userStore";
 import { CustomTextarea } from "@/components/CustomTextArea";
 import { ConfirmDeleteDialog } from "@/components/common/ConfirmDeleteModal";
 import { useAuthAxios } from "@/lib/axios";
+import CreateComment from "./CreateComment"; // Import CreateComment
 
 interface UserInfo {
   _id: string;
@@ -24,10 +25,20 @@ interface Comment {
   userId: UserInfo;
   content: string;
   createdAt: string;
+  replies: Comment[]; // Add replies array for nested comments
 }
-export default function CommentItem({ c }: { c: Comment }) {
+export default function CommentItem({
+  c,
+  postId,
+  depth,
+}: {
+  c: Comment;
+  postId: string;
+  depth: number;
+}) {
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(c.content);
+  const [showReplyInput, setShowReplyInput] = useState(false); // State to control reply input visibility
   const { mutate: updateCommentMutate, isPending } = useUpdateComment();
   const { mutate: deleteCommentMutate, isPending: isDeleting } = useDeleteComment();
   const { user } = useUserStore();
@@ -44,7 +55,7 @@ export default function CommentItem({ c }: { c: Comment }) {
 
   return (
     <div className="flex items-start gap-3 border-b pb-4">
-      <Link href={`/profile/${c.userId.slug}`}>
+      <Link href={`/profile/${c?.userId?.slug}`}>
         <Avatar className="h-10 w-10">
           <AvatarImage src={c?.userId?.avatar} />
           <AvatarFallback>
@@ -61,10 +72,10 @@ export default function CommentItem({ c }: { c: Comment }) {
 
       <div className="rounded-lg bg-gray-300 p-2 text-black dark:bg-gray-900 dark:text-white">
         <div className="flex items-center justify-between gap-x-5">
-          <Link href={`/profile/${c.userId.slug}`} className="font-medium text-primary">
-            {c.userId.name}
+          <Link href={`/profile/${c?.userId?.slug}`} className="font-medium text-primary">
+            {c?.userId?.name}
           </Link>
-          {c.userId._id === user?._id && (
+          {c?.userId?._id === user?._id && (
             <div className="flex gap-2">
               <Button
                 size="icon"
@@ -111,6 +122,34 @@ export default function CommentItem({ c }: { c: Comment }) {
         )}
 
         <p className="mt-1 text-xs text-muted-foreground">{formatPublishedDate(c.createdAt)}</p>
+        {depth < 2 && ( // Only show reply button for comments up to 2 levels deep (0 and 1)
+          <Button
+            variant="ghost"
+            size="sm"
+            className="mt-2 text-xs text-muted-foreground hover:text-blue-600"
+            onClick={() => setShowReplyInput((prev) => !prev)}
+          >
+            Reply
+          </Button>
+        )}
+
+        {showReplyInput && (
+          <div className="mt-2">
+            <CreateComment
+              postId={postId}
+              parentCommentId={c._id}
+              onCommentCreated={() => setShowReplyInput(false)}
+            />
+          </div>
+        )}
+
+        {c.replies && c.replies.length > 0 && (
+          <div className="ml-8 mt-4 border-l pl-4">
+            {c.replies.map((reply) => (
+              <CommentItem c={reply} key={reply._id} postId={postId} depth={depth + 1} />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

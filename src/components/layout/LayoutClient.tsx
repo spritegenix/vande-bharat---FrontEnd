@@ -10,17 +10,26 @@ import { Button } from "../ui/button";
 import { toast } from "sonner";
 import { useCurrentUser } from "@/queries/user/user.queries";
 import { useUserStore } from "@/stores/userStore";
+import { useUser } from "@clerk/nextjs";
 
 export default function LayoutClient({ children }: any) {
   const [isLeftMenuOpen, setIsLeftMenuOpen] = useState(false);
   const [isSearchOpen, setSearchOpen] = useState(false);
-  const { data: user, isLoading, isError } = useCurrentUser({ fields: "banner,name,avatar,slug" });
+  const { isSignedIn } = useUser();
+  const {
+    data: user,
+    isLoading,
+    isError,
+  } = useCurrentUser({
+    fields: "banner,name,avatar,slug",
+    enabled: !!isSignedIn,
+  });
   const { setUser } = useUserStore();
   useEffect(() => {
     if (user) {
       setUser(user);
     }
-  }, [user]);
+  }, [user, setUser]);
   return (
     <>
       <Header

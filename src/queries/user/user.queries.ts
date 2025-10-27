@@ -13,13 +13,15 @@ import {
 import { useAuthAxios } from "@/lib/axios";
 
 export const useCurrentUser = (queryParams?: Record<string, any>) => {
+  const { enabled = true, ...restQueryParams } = queryParams || {};
   const axios = useAuthAxios();
   return useQuery({
-    queryKey: ["current-user", queryParams],
-    queryFn: () => fetchCurrentUser(axios, queryParams),
+    queryKey: ["current-user", restQueryParams],
+    queryFn: () => fetchCurrentUser(axios, restQueryParams),
     staleTime: 1000 * 60 * 5,
     retry: 1,
     refetchOnWindowFocus: false,
+    enabled,
   });
 };
 

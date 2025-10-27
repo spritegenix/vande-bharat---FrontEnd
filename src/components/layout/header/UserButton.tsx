@@ -49,7 +49,7 @@ export default function UserProfile({ className }: UserButtonProps) {
   const [isProfileSwitchTab, setIsProfileSwitchTab] = useState(false);
   const handleLogout = async () => {
     await signOut();
-    setUser("");
+    setUser(null);
   };
   // const queryClient = useQueryClient();
 

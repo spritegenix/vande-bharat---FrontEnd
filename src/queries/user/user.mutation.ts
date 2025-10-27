@@ -3,6 +3,7 @@ import {
   acceptFollowRequest,
   cancelRequest,
   getPresignedUrl,
+  rejectFollowRequest,
   removeSuggestion,
   sendFollowRequest,
   unfriendUser,
@@ -83,6 +84,7 @@ export const useAcceptRequest = () => {
     onSuccess: () => {
       toast.success("Request accepted successfully");
       queryClient.invalidateQueries({ queryKey: ["recieved-requests"] });
+      queryClient.invalidateQueries({ queryKey: ["user-by-id"] });
     },
     onError: () => {
       toast.error("Failed to accept request");
@@ -95,10 +97,11 @@ export const useRejectRecievedRequest = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ fromUserId }: { fromUserId: string }) => removeSuggestion(axios, fromUserId),
+    mutationFn: ({ fromUserId }: { fromUserId: string }) => rejectFollowRequest(axios, fromUserId),
     onSuccess: () => {
       toast.error(`Removed from requests.`);
       queryClient.invalidateQueries({ queryKey: ["recieved-requests"] });
+      queryClient.invalidateQueries({ queryKey: ["user-by-id"] });
     },
     onError: (err: any) => {
       toast.error(err?.response?.data?.message || "Failed to remove request");

@@ -14,8 +14,8 @@ interface ImageCropperProps {
 
 const ImageCropper: React.FC<ImageCropperProps> = ({
   imageSrc,
-  aspect = 820 / 312,
-  outputSize = { width: 820, height: 312 },
+  aspect = 16 / 9,
+  outputSize = { width: 1920, height: 1080 },
   onComplete,
   onCancel,
 }) => {
@@ -38,19 +38,19 @@ const ImageCropper: React.FC<ImageCropperProps> = ({
   };
 
   return (
-    <div className="space-y-4">
-      <div className="relative h-[300px] w-full bg-black">
-        <Cropper
-          image={imageSrc}
-          crop={crop}
-          zoom={zoom}
-          aspect={aspect}
-          onCropChange={setCrop}
-          onZoomChange={setZoom}
-          onCropComplete={handleCropComplete}
-        />
-      </div>
-      <div className="flex justify-between gap-4">
+    <div className="relative flex min-h-[300px] w-full items-center justify-center bg-black">
+      <Cropper
+        image={imageSrc}
+        crop={crop}
+        zoom={zoom}
+        aspect={aspect}
+        onCropChange={setCrop}
+        onZoomChange={setZoom}
+        onCropComplete={handleCropComplete}
+        // The Cropper component itself should fill its parent
+        // No direct style needed here if parent is correctly sized and Cropper handles its own absolute positioning
+      />
+      <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 justify-between gap-4">
         <Button type="button" onClick={handleDone}>
           Crop
         </Button>
