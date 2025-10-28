@@ -6,11 +6,16 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import Link from "next/link";
 import AuthButton from "./AuthButton";
 import Notification from "./Notification";
-import { AlignJustify, Search } from "lucide-react";
+import { AlignJustify, Search, Moon, Sun } from "lucide-react";
+import { useTheme } from "next-themes";
 
 export default function Header({ setIsLeftMenuOpen, isSearchOpen = false, setSearchOpen }: any) {
+  const { theme, setTheme } = useTheme();
+  const toggleTheme = () => {
+    setTheme(theme === "dark" ? "light" : "dark");
+  };
   return (
-    <header className="fixed top-0 z-50 w-full border-b bg-background dark:bg-background sm:h-14">
+    <header className="fixed top-0 z-50 mb-1 w-full border-b bg-background dark:bg-background sm:h-14">
       <Wrapper className="my-auto p-1">
         {/* Desktop Mode  */}
         <nav className="hidden w-full justify-between gap-2 lg:flex">
@@ -31,6 +36,17 @@ export default function Header({ setIsLeftMenuOpen, isSearchOpen = false, setSea
               </Tooltip> */}
               {/* Notification  */}
               {/* <Notification /> */}
+              {/* Theme Toggle */}
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button onClick={toggleTheme} className="cursor-pointer">
+                    {theme === "dark" ? <Sun /> : <Moon />}
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent side="bottom" className="px-2 py-1 text-xs">
+                  Toggle Theme
+                </TooltipContent>
+              </Tooltip>
               {/* Auth Button  */}
               <AuthButton />
             </div>
@@ -56,6 +72,10 @@ export default function Header({ setIsLeftMenuOpen, isSearchOpen = false, setSea
               </Link> */}
               {/* Notification  */}
               {/* <Notification /> */}
+              {/* Theme Toggle */}
+              <button onClick={toggleTheme} className="cursor-pointer">
+                {theme === "dark" ? <Sun /> : <Moon />}
+              </button>
               {/* Auth Button  */}
               <AuthButton />
             </div>
