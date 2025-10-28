@@ -7,7 +7,8 @@ import { Inbox, Send } from "lucide-react";
 
 export default function RequestsPage() {
   return (
-    <div className="p-4">
+    //<div className="max-w-md mx-auto p-3">
+    <div className="grid-cols3 xl:grid-cols-3">
       <h1 className="mb-4 text-2xl font-semibold text-gray-800 dark:text-white">Follow Requests</h1>
 
       <Tabs defaultValue="received" className="w-full">

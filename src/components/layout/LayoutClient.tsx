@@ -10,6 +10,7 @@ import { Button } from "../ui/button";
 import { toast } from "sonner";
 import { useCurrentUser } from "@/queries/user/user.queries";
 import { useUserStore } from "@/stores/userStore";
+import SuggestionCard from "../elements/Findpeople.tsx/Suggestions";
 
 export default function LayoutClient({ children }: any) {
   const [isLeftMenuOpen, setIsLeftMenuOpen] = useState(false);
@@ -56,7 +57,9 @@ export default function LayoutClient({ children }: any) {
           )}
         </AnimatePresence>
         <section className="col-span-12 min-h-screen lg:col-span-8">{children}</section>
-        <aside className="col-span-2 hidden border-l sm:block"></aside>
+        <aside className="col-span-2 hidden border-l sm:block">
+          <SuggestionCard />
+        </aside>
       </Wrapper>
       <ScrollToTopButton />
     </>
