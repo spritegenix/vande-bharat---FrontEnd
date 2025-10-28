@@ -8,7 +8,7 @@ export default function Logo({ className = "" }: { className?: string }) {
   return (
     <Link href="/" className={`cursor-pointer ${className}`}>
       <Image
-        src={theme === "dark" ? "/logoWhite.png" : "/logoBlack.png"}
+        src={"/logoWhite.png"}
         alt="logo"
         height={300}
         width={500}
