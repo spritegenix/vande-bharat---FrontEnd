@@ -13,6 +13,7 @@ export default function IndividualProfilePage() {
 
   // const { data, isLoading, isError } = useCurrentUser({ fields: "banner,name,avatar,slug" });
   const { data: user, isLoading, isError } = useUserById(usersSlug);
+
   if (isLoading) return <LoadingSpinner />;
   if (isError) return <p>Failed to load user.</p>;
   return (
@@ -22,6 +23,7 @@ export default function IndividualProfilePage() {
         profileImage={user?.avatar}
         name={user?.name}
         followStatus={user?.followStatus}
+        profileId={user?._id}
       />
       <ProfileCategory slug={usersSlug} />
     </div>

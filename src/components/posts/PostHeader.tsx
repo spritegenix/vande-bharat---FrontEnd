@@ -19,11 +19,11 @@ export default function PostHeader({ post }: { post: Post }) {
           />
         </AvatarFallback>
       </Avatar>
-      <div className="flex flex-col text-sm font-semibold">
+      <div className="text-md flex flex-col gap-1 font-semibold">
         <Link href={`/profile/${post?.userId?.slug}`}>
           <p>{post?.userId?.name}</p>
         </Link>
-        <p className="text-xs font-normal text-gray-500">{formatPublishedDate(post?.createdAt)}</p>
+        <p className="text-sm font-normal text-gray-500">{formatPublishedDate(post?.createdAt)}</p>
       </div>
     </div>
   );

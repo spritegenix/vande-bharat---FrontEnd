@@ -22,13 +22,16 @@ export default function ProfileNameSection({
   name,
   followStatus,
   canEdit,
+  profileId,
 }: {
   profileImage: string;
   name: string;
   followStatus: "PENDING" | "ACCEPTED" | "REJECTED" | "CANCELLED" | null;
   canEdit: boolean;
+  profileId: string;
 }) {
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const [currentFollowStatus, setCurrentFollowStatus] = useState(followStatus);
   const [imageSrc, setImageSrc] = useState<string>(
     profileImage || "/images/profile/profile-img.webp",
   );
@@ -80,6 +83,7 @@ export default function ProfileNameSection({
   const { mutate } = useSendRequest();
   const handleFollow = (id: string) => {
     mutate({ toUserId: id });
+    setCurrentFollowStatus("PENDING");
   };
   return (
     <div className="absolute bottom-6 w-full md:-bottom-4 lg:-bottom-0">
@@ -146,14 +150,14 @@ export default function ProfileNameSection({
 
         {!canEdit && (
           <div className="md:m-5 md:mr-9">
-            {followStatus !== "REJECTED" && (
+            {currentFollowStatus !== "REJECTED" && (
               <Button
                 className="px-4 py-2 text-gray-900 dark:bg-offwhite"
-                onClick={() => user && handleFollow(user._id)}
+                onClick={() => handleFollow(profileId)}
               >
-                {followStatus === "PENDING"
+                {currentFollowStatus === "PENDING"
                   ? "Requested"
-                  : followStatus === "ACCEPTED"
+                  : currentFollowStatus === "ACCEPTED"
                     ? "Following"
                     : "Follow"}
               </Button>

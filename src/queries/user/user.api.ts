@@ -101,6 +101,11 @@ export const acceptFollowRequest = async (axios: AxiosInstance, fromUserId: stri
   return res.data;
 };
 
+export const rejectFollowRequest = async (axios: AxiosInstance, toUserId: string) => {
+  const res = await axios.patch(`/users/follow-request/${toUserId}/reject`);
+  return res.data;
+};
+
 export const allFollowRequests = async (axios: AxiosInstance, pageParam = "") => {
   const res = await axios.get("/users/recieved-requests", {
     params: { limit: 3, cursor: pageParam },

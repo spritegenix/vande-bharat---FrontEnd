@@ -12,6 +12,7 @@ export interface ProfileHeaderProps {
   profileImage?: string;
   name: string;
   followStatus: "PENDING" | "ACCEPTED" | "REJECTED" | "CANCELLED" | null;
+  profileId: string;
 }
 
 const ProfileHeader: React.FC<ProfileHeaderProps> = ({
@@ -19,6 +20,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   profileImage,
   name,
   followStatus,
+  profileId,
 }) => {
   const { user } = useUserStore();
   const params = useParams();
@@ -34,6 +36,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
         name={name}
         canEdit={user?.slug === slug}
         followStatus={followStatus}
+        profileId={profileId}
       />
     </div>
   );

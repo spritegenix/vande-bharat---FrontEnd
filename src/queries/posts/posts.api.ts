@@ -24,10 +24,7 @@ export type AllPosts = {
 };
 
 // posts.api.ts
-export const fetchPosts = async (
-  pageParam: string | null,
-  axios: AxiosInstance
-) => {
+export const fetchPosts = async (pageParam: string | null, axios: AxiosInstance) => {
   const response = await axios.get("/posts/all-posts", {
     params: {
       isLiked: true,
@@ -45,10 +42,7 @@ export const fetchPosts = async (
 };
 
 // posts.api.ts
-export const fetchPopularPosts = async (
-  axios: AxiosInstance,
-  pageParam: string | null = null
-) => {
+export const fetchPopularPosts = async (axios: AxiosInstance, pageParam: string | null = null) => {
   const response = await axios.get("/posts/all-posts", {
     params: {
       isLiked: true,
@@ -65,7 +59,6 @@ export const fetchPopularPosts = async (
     nextCursor: response.data.nextCursor ?? undefined,
   };
 };
-
 
 export const userPosts = async (
   axios: AxiosInstance,
@@ -85,29 +78,27 @@ export const userPosts = async (
 };
 
 export const fetchBookmarkedPosts = async (
- axios: AxiosInstance,
-  pageParam: string | null = null
+  axios: AxiosInstance,
+  pageParam: string | null = null,
 ) => {
   try {
-  const response = await axios.get("/posts/bookmarks/my-bookmarks", {
-    params: {
-      isLiked: true,
-      isBookmarked: true,
-      cursor: pageParam,
-      limit: 3,
-    },
-  })
-  
-  return {
-    posts: response.data.bookmarks,
-    nextCursor: response.data.nextCursor ?? undefined,
-  }
-  }catch (error) {
+    const response = await axios.get("/posts/bookmarks/my-bookmarks", {
+      params: {
+        isLiked: true,
+        isBookmarked: true,
+        cursor: pageParam,
+        limit: 3,
+      },
+    });
+
+    return {
+      posts: response.data.bookmarks,
+      nextCursor: response.data.nextCursor ?? undefined,
+    };
+  } catch (error) {
     console.error("Error fetching bookmarked posts:", error);
     throw error; // Re-throw the error to handle it in the calling function
   }
-
-
 };
 
 export const updateComment = async (
@@ -120,10 +111,15 @@ export const updateComment = async (
 
 export const createComment = async (
   axios: AxiosInstance,
-  { postId, content }: { postId: string; content: string },
+  {
+    postId,
+    content,
+    parentCommentId,
+  }: { postId: string; content: string; parentCommentId?: string },
 ) => {
   const res = await axios.post(`/posts/${postId}/comments/create-comment`, {
     content,
+    parentCommentId,
   });
   return res.data;
 };
