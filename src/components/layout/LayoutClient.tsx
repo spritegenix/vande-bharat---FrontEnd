@@ -25,12 +25,9 @@ export default function LayoutClient({ children }: any) {
     enabled: !!isSignedIn,
   });
   const { setUser } = useUserStore();
-  const { signOut } = useClerk();
   useEffect(() => {
     if (user) {
       setUser(user);
-    } else {
-      signOut();
     }
   }, [user, setUser]);
   return (
