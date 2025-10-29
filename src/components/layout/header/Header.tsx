@@ -37,7 +37,7 @@ export default function Header({ setIsLeftMenuOpen, isSearchOpen = false, setSea
               {/* Notification  */}
               {/* <Notification /> */}
               {/* Theme Toggle */}
-              <Tooltip>
+              {/* <Tooltip>
                 <TooltipTrigger asChild>
                   <button onClick={toggleTheme} className="cursor-pointer">
                     {theme === "dark" ? <Sun /> : <Moon />}
@@ -46,7 +46,7 @@ export default function Header({ setIsLeftMenuOpen, isSearchOpen = false, setSea
                 <TooltipContent side="bottom" className="px-2 py-1 text-xs">
                   Toggle Theme
                 </TooltipContent>
-              </Tooltip>
+              </Tooltip> */}
               {/* Auth Button  */}
               <AuthButton />
             </div>
@@ -73,9 +73,9 @@ export default function Header({ setIsLeftMenuOpen, isSearchOpen = false, setSea
               {/* Notification  */}
               {/* <Notification /> */}
               {/* Theme Toggle */}
-              <button onClick={toggleTheme} className="cursor-pointer">
+              {/* <button onClick={toggleTheme} className="cursor-pointer">
                 {theme === "dark" ? <Sun /> : <Moon />}
-              </button>
+              </button> */}
               {/* Auth Button  */}
               <AuthButton />
             </div>

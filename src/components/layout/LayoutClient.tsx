@@ -10,7 +10,7 @@ import { Button } from "../ui/button";
 import { toast } from "sonner";
 import { useCurrentUser } from "@/queries/user/user.queries";
 import { useUserStore } from "@/stores/userStore";
-import { useUser } from "@clerk/nextjs";
+import { useClerk, useUser } from "@clerk/nextjs";
 
 export default function LayoutClient({ children }: any) {
   const [isLeftMenuOpen, setIsLeftMenuOpen] = useState(false);
@@ -25,9 +25,12 @@ export default function LayoutClient({ children }: any) {
     enabled: !!isSignedIn,
   });
   const { setUser } = useUserStore();
+  const { signOut } = useClerk();
   useEffect(() => {
     if (user) {
       setUser(user);
+    } else {
+      signOut();
     }
   }, [user, setUser]);
   return (
