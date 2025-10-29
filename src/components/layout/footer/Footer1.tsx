@@ -23,7 +23,7 @@ export default function Footer1({ footerData }: any) {
       <div className="grid grid-cols-1 pb-5 md:grid-cols-10">
         {/* Footer Company About  */}
         <div className="col-span-3 flex flex-col gap-y-5 border-white/30 md:border-r-2 md:pr-16">
-          <Logo mode="light" />
+          <Logo />
           <p className="mb-4 text-wrap max-sm:mt-3">
             <TextWithLineBreak text={footerData?.text} />
           </p>
