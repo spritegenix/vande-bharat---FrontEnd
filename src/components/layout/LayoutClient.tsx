@@ -10,7 +10,6 @@ import { Button } from "../ui/button";
 import { toast } from "sonner";
 import { useCurrentUser } from "@/queries/user/user.queries";
 import { useUserStore } from "@/stores/userStore";
-import SuggestionCard from "../elements/Findpeople.tsx/Suggestions";
 import { useUser } from "@clerk/nextjs";
 
 export default function LayoutClient({ children }: any) {
@@ -66,9 +65,7 @@ export default function LayoutClient({ children }: any) {
           )}
         </AnimatePresence>
         <section className="col-span-12 min-h-screen lg:col-span-8">{children}</section>
-        <aside className="col-span-2 hidden border-l sm:block">
-          <SuggestionCard />
-        </aside>
+        <aside className="col-span-2 hidden border-l sm:block"></aside>
       </Wrapper>
       <ScrollToTopButton />
     </>
