@@ -99,7 +99,11 @@ export default function Page() {
             </span>
           </div> */}
         </div>
-
+        {marketplaceItems.length === 0 && !isLoading && (
+          <div className="col-span-full flex h-64 items-center justify-center">
+            <p className="text-lg text-gray-500 dark:text-gray-400">No Products found.</p>
+          </div>
+        )}
         <div id="products-grid" className="p-6">
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {marketplaceItems?.map((item: any, index: number) => (

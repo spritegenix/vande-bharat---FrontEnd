@@ -112,12 +112,13 @@ export default function MenuBar({ className }: MenuBarProps) {
         )} */}
         {/* --------------------------Communities----------------------------  */}
         <p className="mb-2 pl-5 text-sm font-semibold text-zinc-500">Communities</p>
-        <Button variant={"outline"} asChild className="my-3 ml-4 border-gray-500">
-          <Link href={`/community/create`} className="flex items-center gap-3">
-            <Plus size={28} />
-            <p className="">Create Community</p>
-          </Link>
-        </Button>
+        <Link
+          href={`/community/create`}
+          className="ml-4 flex cursor-pointer items-center gap-2 text-sm font-semibold text-zinc-500 transition-colors hover:text-zinc-700 dark:hover:text-zinc-300"
+        >
+          <Plus size={16} />
+          <span>Create Community</span>
+        </Link>
 
         {/* <MotionAccordion
           className="space-y-1"

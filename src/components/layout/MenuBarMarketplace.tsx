@@ -15,6 +15,7 @@ import {
   ClipboardList,
   Heart,
   Inbox,
+  Home,
 } from "lucide-react";
 import Modal from "../elements/Modal";
 import CreatePageForm from "./CreatePageForm";
@@ -53,6 +54,7 @@ export default function MenuBarMarketplace({ className }: MenuBarProps) {
     <>
       <div className={`pb-10 ${className}`}>
         <div className="space-y-2">
+          <MenuTab icon={<Home />} label="Home" href="/" />
           <MenuTab icon={<BadgePlus />} label="Add Product" href="/marketplace/add-listings" />
           <MenuTab icon={<LayoutGrid />} label="Categories" href="/marketplace/categories" />
           <MenuTab icon={<ShoppingBag />} label="Products" href="/marketplace/products" />

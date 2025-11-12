@@ -16,6 +16,7 @@ import { useEditorStore } from "@/stores/editorStore";
 import { useCreatePost } from "@/queries/posts/posts.mutation";
 import { CreatePostPayload } from "@/types/post";
 import { useAuthAxios } from "@/lib/axios";
+import { Button } from "./ui/button";
 
 const editorConfig = {
   namespace: "FacebookStyleEditor",
@@ -110,7 +111,7 @@ export default function EditorWithImage({
         />
       </LexicalComposer>
 
-      <label className="block w-full cursor-pointer text-blue-600">
+      <label className="block w-full cursor-pointer text-white">
         <input
           type="file"
           multiple
@@ -151,13 +152,13 @@ export default function EditorWithImage({
       )}
 
       <div className="flex justify-end">
-        <button
+        <Button
           disabled={uploading}
           onClick={handlePost}
-          className="w-fit rounded bg-blue-600 px-5 py-2 text-white hover:bg-blue-700"
+          className="text- w-fit rounded px-5 py-2 text-muted-foreground text-white hover:text-white"
         >
           {uploading ? "Posting..." : "Post"}
-        </button>
+        </Button>
       </div>
     </div>
   );

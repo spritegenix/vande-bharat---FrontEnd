@@ -10,7 +10,11 @@ export default function CommunityListPage() {
   return (
     <div className="mx-auto max-w-4xl space-y-4 p-4">
       <h1 className="mb-4 text-2xl font-bold">Communities You Might Like</h1>
-
+      {suggestions.length === 0 && !isLoading && (
+        <div className="col-span-full flex h-64 items-center justify-center">
+          <p className="text-lg text-gray-500 dark:text-gray-400">No Communites found.</p>
+        </div>
+      )}
       {isLoading ? (
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           {Array.from({ length: 3 }).map((_, index) => (
