@@ -15,7 +15,7 @@ export default function Header({ setIsLeftMenuOpen, isSearchOpen = false, setSea
     setTheme(theme === "dark" ? "light" : "dark");
   };
   return (
-    <header className="fixed top-0 z-50 mb-1 w-full border-b bg-background dark:bg-background sm:h-14">
+    <header className="fixed top-0 z-50 mb-1 w-full border-b bg-background dark:bg-background sm:h-16">
       <Wrapper className="my-auto p-1">
         {/* Desktop Mode  */}
         <nav className="hidden w-full justify-between gap-2 lg:flex">
