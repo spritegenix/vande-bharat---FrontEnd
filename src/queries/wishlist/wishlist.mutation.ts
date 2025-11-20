@@ -33,7 +33,7 @@ export const useRemoveItemFromWishlist = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["wishlist"] });
       queryClient.invalidateQueries({ queryKey: ["marketplace-items"] }); // Invalidate marketplace items to reflect wishlist status change
-      toast.success("Item removed from wishlist!");
+      toast.error("Item removed from wishlist!");
     },
     onError: (error: any) => {
       toast.error(error?.response?.data?.message || "Failed to remove item from wishlist");

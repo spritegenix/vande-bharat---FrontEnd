@@ -17,6 +17,7 @@ import {
 } from "@/queries/community/community.mutation";
 import { useUserStore } from "@/stores/userStore";
 import { aboutContentType } from "@/types/community";
+import { Calendar, Eye, User } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React from "react";
 function dates(date: string) {
@@ -91,9 +92,17 @@ export default function CommunityBanner({ aboutContent }: { aboutContent: aboutC
                 {aboutContent?.description}
               </p>
               <div className="flex flex-wrap items-center gap-x-4 text-sm text-neutral-500 dark:text-neutral-400">
-                <span>👥 {aboutContent?.totalMemberCount} members</span>
-                <span>👁️ {aboutContent?.isPrivate ? "Private" : "Public"}</span>
-                <span>📅 Created {aboutContent?.createdAt && dates(aboutContent?.createdAt)}</span>
+                <span>
+                  <User className="inline" size={18} /> {aboutContent?.totalMemberCount} members
+                </span>
+                <span>
+                  <Eye className="inline" size={18} />{" "}
+                  {aboutContent?.isPrivate ? "Private" : "Public"}
+                </span>
+                <span>
+                  <Calendar className="inline" size={18} /> Created{" "}
+                  {aboutContent?.createdAt && dates(aboutContent?.createdAt)}
+                </span>
               </div>
             </div>
           </div>

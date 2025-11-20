@@ -22,7 +22,6 @@ import React, { useRef, useState, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useUploadMedia } from "@/hooks/useUploadMedia";
-import { dataURLtoFile } from "@/lib/utils";
 import { useCreateMarketplaceItem } from "@/queries/marketplace/mutations"; // Assuming this mutation exists
 import { useGetMarketplaceCategories } from "@/queries/marketplace/queries"; // Import useGetMarketplaceCategories
 import { useAuthAxios } from "@/lib/axios";
@@ -69,14 +68,7 @@ export default function ListingForm() {
   const imageInputRef = useRef<HTMLInputElement>(null);
   const [imagePreview, setImagePreview] = useState<string[]>([]);
   const [isDragging, setIsDragging] = useState(false); // New state for drag-and-drop
-  const {
-    control,
-    formState: { errors },
-    reset,
-    handleSubmit,
-    watch,
-    setValue,
-  } = form;
+  const { control, reset, handleSubmit, watch, setValue } = form;
 
   const currentImages = watch("images");
   const axios = useAuthAxios();
@@ -226,7 +218,7 @@ export default function ListingForm() {
   return (
     <Form {...form}>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-        <div className="grid grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
           <FormField
             control={control}
             name="productName"
@@ -287,7 +279,7 @@ export default function ListingForm() {
           />
         </div>
 
-        <div className="grid grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
           <div>
             <FormField
               control={control}
@@ -373,7 +365,7 @@ export default function ListingForm() {
             <Button
               type="button"
               onClick={handleGetLocation}
-              className="mt-2"
+              className="mt-2 rounded-lg px-4 py-2 text-sm font-semibold transition-colors duration-300 md:text-base"
               disabled={isLocating}
             >
               {isLocating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
@@ -468,7 +460,7 @@ export default function ListingForm() {
             )}
           />
         </div>
-        <div className="image-previews mt-4 flex gap-2">
+        <div className="image-previews mt-4 flex flex-wrap gap-2">
           {imagePreview.map((src, index) => (
             <div key={src} className="relative">
               <img
@@ -485,12 +477,12 @@ export default function ListingForm() {
             </div>
           ))}
         </div>
-        <button
+        <Button
           type="submit"
-          className="rounded-md bg-neutral-900 px-6 py-2 text-white hover:bg-neutral-800"
+          className="rounded-lg px-4 py-2 text-sm font-semibold transition-colors duration-300 md:text-base"
         >
           Create Listing
-        </button>
+        </Button>
       </form>
     </Form>
   );

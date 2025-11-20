@@ -40,9 +40,9 @@ export default function LayoutClient({ children }: any) {
 
       <Wrapper as="main" isTop className="mx-auto mt-5 grid grid-cols-12">
         {/* Desktop View */}
-        <nav className="col-span-2 hidden h-full border-r lg:block">
-          <div className="fixed bottom-0 top-0 overflow-y-auto pt-10 lg:w-60">
-            <MenuBar className="pt-7" />
+        <nav className="relative col-span-2 hidden h-full border-r lg:block">
+          <div className="absolute inset-0 w-full overflow-y-auto">
+            <MenuBar className="" />
           </div>
         </nav>
 

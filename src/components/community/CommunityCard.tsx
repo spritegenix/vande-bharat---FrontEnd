@@ -63,7 +63,7 @@ export default function CommunityCard({
               onClick={handlePrivateRequest}
               variant="default"
               disabled={joinPrivateStatus === "pending"}
-              className={`w-full rounded-full px-4 py-2 text-sm font-semibold transition-colors duration-300 md:text-base ${
+              className={`w-full rounded-lg px-4 py-2 text-sm font-semibold transition-colors duration-300 md:text-base ${
                 requestSent === "PENDING"
                   ? "bg-green-500 text-white hover:bg-green-600"
                   : "hover:bg-primary/90 bg-primary text-white"
@@ -80,7 +80,7 @@ export default function CommunityCard({
               variant={"default"}
               onClick={handleToggle}
               disabled={joinStatus === "pending"}
-              className="hover:bg-primary/90 w-full rounded-full bg-primary px-4 py-2 text-sm font-semibold text-white transition-colors duration-300 md:text-base"
+              className="hover:bg-primary/90 w-full rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white transition-colors duration-300 md:text-base"
             >
               {joinStatus === "pending" ? "Joining..." : "Join"}
             </Button>
