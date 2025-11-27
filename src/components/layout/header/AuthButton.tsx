@@ -10,7 +10,7 @@ export default function AuthButton() {
   return (
     <>
       {!user ? (
-        <Button as={Link} href="/login" prefetch={true}>
+        <Button as={Link} href="/login?redirect_url=/feed" prefetch={true}>
           Log In
         </Button>
       ) : (

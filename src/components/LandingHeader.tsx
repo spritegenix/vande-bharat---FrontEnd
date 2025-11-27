@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import React, { useState, useEffect, useRef } from "react";
+import AuthButton from "./layout/header/AuthButton";
 
 export default function LandingHeader() {
   const [isTransparent, setIsTransparent] = useState(true);
@@ -75,6 +76,7 @@ export default function LandingHeader() {
                 Forums
               </span>
             </Link>
+            <AuthButton />
           </nav>
           {/* <div className="flex items-center space-x-4">
             <button
