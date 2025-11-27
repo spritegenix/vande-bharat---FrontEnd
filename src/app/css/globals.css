@@ -355,30 +355,37 @@
 .react-day-picker-caption > div:first-child {
   display: none !important;
 }
-.rdp-caption_dropdowns{
+.rdp-caption_dropdowns {
   display: flex;
   justify-content: space-between;
-  gap: 10px 
+  gap: 10px;
 }
 
-#react-day-picker-2{
-  display:  none !important;
+#react-day-picker-2 {
+  display: none !important;
 }
-.rdp-vhidden{
+.rdp-vhidden {
   display: none;
 }
-.rdp-dropdown_month > div{
-display: none;
+.rdp-dropdown_month > div {
+  display: none;
 }
-.rdp-dropdown_year > div{
-  display:  none;
+.rdp-dropdown_year > div {
+  display: none;
 }
 
+#hero-section {
+  height: 100vh;
+  width: 100%;
+}
 
-
-
-
-
-
-
-
+.hero-background-overlay {
+  background-image: url("../../../public/images/hero-bg.jpeg");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  filter: blur(1px);
+  background-attachment: fixed; /* Add this line for parallax effect */
+  height: 100%;
+  width: 100%;
+}

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect } from "react";
+import { Image as LucideImage, LucideVideo, X } from "lucide-react";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
@@ -94,43 +95,41 @@ export default function EditorWithImage({
   };
 
   return (
-    <div className="mx-auto w-full max-w-xl space-y-2 rounded-lg">
+    <div className="mx-auto w-full max-w-xl rounded-xl bg-white p-4 shadow-sm dark:bg-neutral-800">
       <LexicalComposer initialConfig={editorConfig}>
-        <RichTextPlugin
-          contentEditable={
-            <ContentEditable className="min-h-[80px] w-full rounded-xl border border-gray-300 bg-gray-300 px-4 py-2 outline-none dark:bg-gray-900" />
-          }
-          placeholder={<div className="p-2 text-gray-400">What's on your mind?</div>}
-          ErrorBoundary={LexicalErrorBoundary}
-        />
-        <HistoryPlugin />
-        <OnChangePlugin onChange={handleTextChange} />
-        <ClearEditorPlugin
-          shouldClear={shouldClearEditor}
-          onCleared={() => setShouldClearEditor(false)}
-        />
+        <div className="relative mb-4">
+          <RichTextPlugin
+            contentEditable={
+              <ContentEditable className="min-h-[120px] w-full resize-none rounded-sm border border-gray-200 bg-transparent px-2 py-2 text-lg outline-none dark:border-gray-700 dark:bg-neutral-800 dark:text-white" />
+            }
+            placeholder={
+              <div className="pointer-events-none absolute left-2 top-2 select-none text-lg text-gray-400">
+                What's on your mind?
+              </div>
+            }
+            ErrorBoundary={LexicalErrorBoundary}
+          />
+          <HistoryPlugin />
+          <OnChangePlugin onChange={handleTextChange} />
+          <ClearEditorPlugin
+            shouldClear={shouldClearEditor}
+            onCleared={() => setShouldClearEditor(false)}
+          />
+        </div>
       </LexicalComposer>
 
-      <label className="block w-full cursor-pointer text-white">
-        <input
-          type="file"
-          multiple
-          accept=".jpg,.jpeg,.webp,.mp4"
-          onChange={handleMediaUpload}
-          className="hidden"
-        />
-        + Add Images/Videos
-      </label>
-
       {draftFiles.length > 0 && (
-        <div className="grid grid-cols-2 gap-4">
+        <div className="mb-4 grid grid-cols-2 gap-2">
           {draftFiles.map((file, index) => (
-            <div key={index} className="relative h-40 w-full overflow-hidden rounded border">
+            <div
+              key={index}
+              className="relative aspect-video w-full overflow-hidden rounded-lg border dark:border-gray-700"
+            >
               <button
                 onClick={() => removeDraftFile(index)}
-                className="absolute right-1 top-1 z-10 flex h-6 w-6 items-center justify-center rounded-full bg-black bg-opacity-60 text-xs text-white hover:bg-red-600"
+                className="absolute right-2 top-2 z-10 flex h-6 w-6 items-center justify-center rounded-full bg-black/60 text-white hover:bg-red-600"
               >
-                ×
+                <X size={14} />
               </button>
               {file.type.startsWith("video/") ? (
                 <video
@@ -151,11 +150,31 @@ export default function EditorWithImage({
         </div>
       )}
 
-      <div className="flex justify-end">
+      <div className="flex items-center justify-between rounded-lg border border-gray-200 p-3 dark:border-gray-700">
+        <span className="font-medium text-gray-900 dark:text-gray-100">Add to your post</span>
+        <div className="flex items-center gap-2">
+          <label className="cursor-pointer rounded-full p-2 text-green-500 hover:bg-gray-100 dark:hover:bg-gray-700">
+            <input
+              type="file"
+              multiple
+              accept=".jpg,.jpeg,.webp,.mp4"
+              onChange={handleMediaUpload}
+              className="hidden"
+            />
+            <span className="flex items-center gap-2">
+              {" "}
+              <LucideImage size={24} className="text-green-300" />
+              <LucideVideo size={24} className="text-blue-500" />
+            </span>
+          </label>
+        </div>
+      </div>
+
+      <div className="mt-4 flex justify-end">
         <Button
           disabled={uploading}
           onClick={handlePost}
-          className="text- w-fit rounded px-5 py-2 text-muted-foreground text-white hover:text-white"
+          className="w-fit rounded-lg py-2 font-semibold text-white disabled:opacity-50"
         >
           {uploading ? "Posting..." : "Post"}
         </Button>

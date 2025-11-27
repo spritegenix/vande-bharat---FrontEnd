@@ -37,6 +37,7 @@
     "clsx": "^2.1.1",
     "date-fns": "^3.6.0",
     "embla-carousel-react": "^8.6.0",
+    "firebase": "^12.6.0",
     "framer-motion": "^12.2.0",
     "jsdom": "^26.0.0",
     "lexical": "^0.31.0",

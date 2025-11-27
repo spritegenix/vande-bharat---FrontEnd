@@ -8,6 +8,7 @@ import Env from "@/lib/env";
 import Providers from "@/providers/Providers";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Toaster } from "sonner";
+import { FcmClientWrapper } from "@/components/fcm-client-wrapper";
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
@@ -71,9 +72,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         // proxyUrl={process.env.NEXT_PUBLIC_API_BASE_URL}
         >
           <Providers>
-            {/*  modal portal */}
-            <div id="modal-portal" className="relative z-[999999] h-0" />
-            {children}
+            <FcmClientWrapper>
+              {" "}
+              {/* Use the new client component here */}
+              {/*  modal portal */}
+              <div id="modal-portal" className="relative z-[999999] h-0" />
+              {children}
+            </FcmClientWrapper>
           </Providers>
           <Toaster richColors closeButton position="top-right" />
         </ClerkProvider>
