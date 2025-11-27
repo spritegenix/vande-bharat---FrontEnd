@@ -9,7 +9,7 @@ import {
   useMarkNotificationAsRead,
   useMarkAllNotificationsAsRead,
 } from "@/queries/notifications/notifications.mutation";
-import type { NotificationFilter, NotificationType } from "@/types/notification";
+import type { NotificationFilter, INotification } from "@/types/notification";
 
 export default function NotificationPage() {
   const [page, setPage] = useState(1);
@@ -34,7 +34,7 @@ export default function NotificationPage() {
   };
 
   // Filter notifications locally (since we already have the data)
-  const filteredNotifications = notifications.filter((n: NotificationType) => {
+  const filteredNotifications = notifications.filter((n: INotification) => {
     if (filter === "read") return n.isRead;
     if (filter === "unread") return !n.isRead;
     return true;
@@ -101,7 +101,7 @@ export default function NotificationPage() {
             </Button>
           </div>
         ) : filteredNotifications.length > 0 ? (
-          filteredNotifications.map((n: NotificationType) => (
+          filteredNotifications.map((n: INotification) => (
             <div
               key={n._id}
               className={`rounded-md border p-4 text-sm transition-colors hover:bg-gray-50 ${
