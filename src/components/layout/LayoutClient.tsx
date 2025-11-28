@@ -16,6 +16,8 @@ export default function LayoutClient({ children }: any) {
   const [isLeftMenuOpen, setIsLeftMenuOpen] = useState(false);
   const [isSearchOpen, setSearchOpen] = useState(false);
   const { isSignedIn } = useUser();
+  const { signOut } = useClerk();
+
   const {
     data: user,
     isLoading,

@@ -63,7 +63,34 @@ const FeedsSection: React.FC<FeedsSectionProps> = ({
     if (!user) redirect("/login");
     unfriend({ toUserId });
   };
-  if (isLoading) return <LoadingSpinner />;
+  if (isLoading)
+    return (
+      <div className="mb-2">
+        {[...Array(3)].map((_, index) => (
+          <Box key={index} className="m-2 my-6 animate-pulse pb-2 md:mx-auto">
+            <div className="flex items-center p-3 pb-0">
+              <div className="mr-3 h-10 w-10 rounded-full bg-gray-300"></div>
+              <div className="flex-1">
+                <div className="mb-2 h-4 w-3/4 rounded bg-gray-300"></div>
+                <div className="h-3 w-1/2 rounded bg-gray-300"></div>
+              </div>
+              <div className="h-8 w-20 rounded bg-gray-300"></div>
+            </div>
+            <div className="p-3 pt-0">
+              <div className="mb-2 h-4 w-full rounded bg-gray-300"></div>
+              <div className="h-4 w-5/6 rounded bg-gray-300"></div>
+            </div>
+            <div className="mx-3 mb-3 h-48 rounded bg-gray-300"></div>
+            <div className="flex justify-around border-t border-gray-200 p-3">
+              <div className="h-6 w-16 rounded bg-gray-300"></div>
+              <div className="h-6 w-16 rounded bg-gray-300"></div>
+              <div className="h-6 w-16 rounded bg-gray-300"></div>
+              <div className="h-6 w-16 rounded bg-gray-300"></div>
+            </div>
+          </Box>
+        ))}
+      </div>
+    );
   if (isError) return <p className="text-center text-red-500">Error loading posts.</p>;
 
   return (

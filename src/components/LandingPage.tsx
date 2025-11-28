@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import LandingFooter from "./layout/footer/LandingFooter";
 
 export default function LandingPage() {
   return (
@@ -33,10 +34,10 @@ export default function LandingPage() {
               Join a vibrant community of researchers, temple authorities, historians, and cultural
               enthusiasts united in preserving and evolving India's spiritual and cultural legacy.
             </p>
-            <div className="flex flex-col justify-center gap-4 sm:flex-row">
+            <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Link
                 href="/community"
-                className="rounded-lg bg-neutral-900 px-8 py-3 text-white shadow-md transition-all hover:-translate-y-0.5 hover:bg-neutral-800 hover:shadow-lg"
+                className="w-fit rounded-lg bg-neutral-900 px-8 py-3 text-white shadow-md transition-all hover:-translate-y-0.5 hover:bg-neutral-800 hover:shadow-lg"
               >
                 Join Community
               </Link>
@@ -291,79 +292,7 @@ export default function LandingPage() {
           </div>
         </section>
       </div>
-
-      <footer id="footer" className="border-t border-neutral-200 bg-white">
-        <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-          <div className="grid gap-8 md:grid-cols-4">
-            <div>
-              <div className="mb-4 flex items-center space-x-2">
-                <Image src="/logoBlack.png" alt="Logo" width={250} height={100} />
-              </div>
-              <p className="text-sm text-neutral-600">
-                Connecting communities to celebrate and preserve Bharat's cultural heritage.
-              </p>
-            </div>
-            <div>
-              <h4 className="mb-4 text-neutral-900">Platform</h4>
-              <ul className="space-y-2 text-sm text-neutral-600">
-                <li>
-                  <Link href="/community">
-                    <span className="cursor-pointer hover:text-neutral-900">Communities</span>
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/events">
-                    <span className="cursor-pointer hover:text-neutral-900">Events</span>
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/resources">
-                    <span className="cursor-pointer hover:text-neutral-900">Resources</span>
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/forums">
-                    <span className="cursor-pointer hover:text-neutral-900">Forums</span>
-                  </Link>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="mb-4 text-neutral-900">Support</h4>
-              <ul className="space-y-2 text-sm text-neutral-600">
-                <li>
-                  <span className="cursor-pointer hover:text-neutral-900">Help Center</span>
-                </li>
-                <li>
-                  <span className="cursor-pointer hover:text-neutral-900">Guidelines</span>
-                </li>
-                <li>
-                  <span className="cursor-pointer hover:text-neutral-900">Contact Us</span>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="mb-4 text-neutral-900">Legal</h4>
-              <ul className="space-y-2 text-sm text-neutral-600">
-                <li>
-                  <span className="cursor-pointer hover:text-neutral-900">Privacy Policy</span>
-                </li>
-                <li>
-                  <span className="cursor-pointer hover:text-neutral-900">Terms of Service</span>
-                </li>
-              </ul>
-            </div>
-          </div>
-          <div className="mt-8 border-t border-neutral-200 pt-8 text-center text-sm text-neutral-600">
-            <p>
-              © 2025 Vande Bharat Venture. All rights reserved. Designed and Developed by{" "}
-              <a href="https://spritegenix.com" target="_blank" rel="noopener noreferrer">
-                SpriteGenix
-              </a>
-            </p>
-          </div>
-        </div>
-      </footer>
+      <LandingFooter />
     </main>
   );
 }

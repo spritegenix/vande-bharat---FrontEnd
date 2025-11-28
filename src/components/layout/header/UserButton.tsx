@@ -45,7 +45,7 @@ interface UserButtonProps {
 export default function UserProfile({ className }: UserButtonProps) {
   const { user, setUser } = useUserStore();
   const { signOut } = useClerk();
-  const { theme, setTheme } = useTheme();
+  // const { theme, setTheme } = useTheme();
   const [isProfileSwitchTab, setIsProfileSwitchTab] = useState(false);
   const handleLogout = async () => {
     await signOut();
@@ -141,7 +141,7 @@ export default function UserProfile({ className }: UserButtonProps) {
                   Feedback
                 </DropdownMenuItem>
               </Link> */}
-              <DropdownMenuSub>
+              {/* <DropdownMenuSub>
                 <DropdownMenuSubTrigger>
                   <Monitor className="mr-2 size-4" />
                   Theme
@@ -165,7 +165,7 @@ export default function UserProfile({ className }: UserButtonProps) {
                     </DropdownMenuItem>
                   </DropdownMenuSubContent>
                 </DropdownMenuPortal>
-              </DropdownMenuSub>
+              </DropdownMenuSub> */}
               <DropdownMenuSeparator />
               <DropdownMenuItem>
                 <Button variant="ghost" className="w-full justify-start" onClick={handleLogout}>
